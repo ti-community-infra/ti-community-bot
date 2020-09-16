@@ -16,7 +16,9 @@
   "scripts": {
     "build": "tsc",
     "start": "probot run ./lib/index.js",
-    "test": "jest"
+    "test": "jest",
+    "lint": "prettier --check 'src/**/*.ts' 'test/**/*.ts' *.md package.json tsconfig.json",
+    "lint:fix": "prettier --write 'src/**/*.ts' 'test/**/*.ts' *.md package.json tsconfig.json"
   },
   "dependencies": {
     "probot": "^10.1.0"
@@ -27,8 +29,10 @@
     "@types/node": "^14.0.27",
     "@typescript-eslint/parser": "^3.9.0",
     "eslint-plugin-typescript": "^0.14.0",
+    "husky": "^4.3.0",
     "jest": "^26.4.0",
     "nock": "^13.0.4",
+    "prettier": "2.1.2",
     "smee-client": "^1.1.0",
     "ts-jest": "^26.2.0",
     "typescript": "^3.9.7"
@@ -38,5 +42,10 @@
   },
   "jest": {
     "testEnvironment": "node"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint && npm test"
+    }
   }
 }
