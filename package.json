@@ -17,8 +17,8 @@
     "build": "tsc",
     "start": "probot run ./lib/index.js",
     "test": "jest",
-    "lint": "prettier --check 'src/*.ts' 'test/*.ts' *.md package.json tsconfig.json",
-    "lint:fix": "prettier --write 'src/*.ts' 'test/*.ts' *.md package.json tsconfig.json"
+    "lint": "prettier --check 'src/**/*.ts' 'test/**/*.ts' *.md package.json tsconfig.json",
+    "lint:fix": "prettier --write 'src/**/*.ts' 'test/**/*.ts' *.md package.json tsconfig.json"
   },
   "dependencies": {
     "probot": "^10.1.0"
