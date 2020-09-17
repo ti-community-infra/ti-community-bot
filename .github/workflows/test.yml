@@ -24,7 +24,6 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      # ISSUE: https://github.com/prettier/prettier/issues/7825.
       - name: Set git to use LF
           run: |
             git config --global core.autocrlf false
