@@ -21,7 +21,7 @@
     "lint:fix": "prettier --write 'src/**/*.ts' 'test/**/*.ts' *.md package.json tsconfig.json"
   },
   "dependencies": {
-    "probot": "^10.1.0"
+    "probot": "^10.7.1"
   },
   "devDependencies": {
     "@types/jest": "^26.0.9",
