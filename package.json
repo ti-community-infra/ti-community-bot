@@ -18,10 +18,13 @@
     "start": "probot run ./lib/index.js",
     "test": "jest",
     "lint": "prettier --check 'src/**/*.ts' 'test/**/*.ts' *.md package.json tsconfig.json",
-    "lint:fix": "prettier --write 'src/**/*.ts' 'test/**/*.ts' *.md package.json tsconfig.json"
+    "lint:fix": "prettier --write 'src/**/*.ts' 'test/**/*.ts' *.md package.json tsconfig.json",
+    "typeorm": "ts-node ./node_modules/.bin/typeorm"
   },
   "dependencies": {
-    "probot": "^10.7.1"
+    "probot": "^10.7.1",
+    "reflect-metadata": "^0.1.13",
+    "typeorm": "^0.2.26"
   },
   "devDependencies": {
     "@types/jest": "^26.0.9",
