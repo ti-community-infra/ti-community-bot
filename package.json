@@ -16,15 +16,22 @@
   "scripts": {
     "build": "tsc",
     "start": "probot run ./lib/index.js",
+    "build:watch": "tsc && (tsc -w --preserveWatchOutput & nodemon)",
+    "dev": "npm run build:watch",
     "test": "jest",
     "lint": "prettier --check 'src/**/*.ts' 'test/**/*.ts' *.md package.json tsconfig.json",
     "lint:fix": "prettier --write 'src/**/*.ts' 'test/**/*.ts' *.md package.json tsconfig.json",
     "typeorm": "ts-node ./node_modules/.bin/typeorm"
   },
   "dependencies": {
+    "ajv": "^6.12.5",
+    "axios": "^0.20.0",
     "probot": "^10.7.1",
+    "probot-commands-pro": "^1.0.1",
     "reflect-metadata": "^0.1.13",
-    "typeorm": "^0.2.26"
+    "typeorm": "^0.2.26",
+    "typedi": "^0.8.0",
+    "typeorm-typedi-extensions": "^0.2.3"
   },
   "devDependencies": {
     "@types/jest": "^26.0.9",
@@ -35,6 +42,7 @@
     "husky": "^4.3.0",
     "jest": "^26.4.0",
     "nock": "^13.0.4",
+    "nodemon": "^2.0.4",
     "prettier": "^2.0.5",
     "smee-client": "^1.1.0",
     "ts-jest": "^26.2.0",

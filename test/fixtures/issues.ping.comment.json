@@ -1,0 +1,21 @@
+{
+  "action": "created",
+  "issue": {
+    "number": 1,
+    "user": {
+      "login": "Rustin-Liu"
+    }
+  },
+  "repository": {
+    "name": "ti-community-bot",
+    "owner": {
+      "login": "Rustin-Liu"
+    }
+  },
+  "comment": {
+    "body": "/ping"
+  },
+  "installation": {
+    "id": 2
+  }
+}

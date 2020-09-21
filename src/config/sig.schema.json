@@ -1,0 +1,82 @@
+{
+  "type": "object",
+  "required": ["TechLeaders", "Committers", "Reviewers", "ActiveContributors"],
+  "properties": {
+    "TechLeaders": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required":["GithubId"],
+        "properties": {
+          "GithubId": {
+            "type": "string"
+          },
+          "Email": {
+            "type": "string",
+            "format": "email"
+          },
+          "Company": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "Committers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required":["GithubId"],
+        "properties": {
+          "GithubId": {
+            "type": "string"
+          },
+          "Email": {
+            "type": "string",
+            "format": "email"
+          },
+          "Company": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "Reviewers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required":["GithubId"],
+        "properties": {
+          "GithubId": {
+            "type": "string"
+          },
+          "Email": {
+            "type": "string",
+            "format": "email"
+          },
+          "Company": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "ActiveContributors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required":["GithubId"],
+        "properties": {
+          "GithubId": {
+            "type": "string"
+          },
+          "Email": {
+            "type": "string",
+            "format": "email"
+          },
+          "Company": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
