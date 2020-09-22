@@ -1,4 +1,0 @@
-status = ["build (10.x, ubuntu-latest)", "build (10.x, macos-latest)",
-  "build (12.x, ubuntu-latest)", "build (12.x, macos-latest)"]
-use_squash_merge = true
-delete_merged_branches = true
