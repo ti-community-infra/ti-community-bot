@@ -5,11 +5,11 @@ import { PullRequestFileQuery } from "../../queries/PullRequestFileQuery";
 import {
   Config,
   DEFAULT_CONFIG_FILE_PATH,
-  DEFAULT_SIG_FILE_NAME,
+  DEFAULT_SIG_MEMBERS_FILE_NAME,
 } from "../../config/Config";
 import Ajv from "ajv";
 
-import sigSchema from "../../config/sig.schema.json";
+import sigSchema from "../../config/sig.members.schema.json";
 import { Status } from "../../services/reply";
 import { combineReplay } from "../../services/utils/ReplyUtil";
 
@@ -45,7 +45,7 @@ const handleFormat = async (
   const config = await context.config<Config>(DEFAULT_CONFIG_FILE_PATH);
 
   const pullRequestFormatQuery: PullRequestFormatQuery = {
-    sigFileName: config?.sigFileName || DEFAULT_SIG_FILE_NAME,
+    sigFileName: config?.sigMembersFileName || DEFAULT_SIG_MEMBERS_FILE_NAME,
     files,
   };
 

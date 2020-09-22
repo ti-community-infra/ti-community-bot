@@ -1,6 +1,6 @@
 import { PullRequestFormatQuery } from "../../queries/PullRequestFormatQuery";
 import { Reply, Status } from "../reply";
-import { DEFAULT_SIG_FILE_EXT } from "../../config/Config";
+import { DEFAULT_SIG_MEMBERS_FILE_EXT } from "../../config/Config";
 import { ValidateFunction } from "ajv";
 import {
   contributorHasMultipleRole,
@@ -10,7 +10,7 @@ import {
   PullRequestFormatTip,
 } from "../messages/PullRequestFormatMessage";
 import { Service } from "typedi";
-import { SigSchema } from "../../config/SigSchema";
+import { SigMembersSchema } from "../../config/SigMembersSchema";
 
 const axios = require("axios").default;
 
@@ -21,7 +21,9 @@ enum FileStatus {
 
 @Service()
 export default class PullRequestFormatService {
-  public checkContributorHasOnlyOneRole(sig: SigSchema): string | undefined {
+  public checkContributorHasOnlyOneRole(
+    sig: SigMembersSchema
+  ): string | undefined {
     const contributorsMap = new Set();
     console.log(Object.values(sig));
     const contributors = Object.values(sig).reduce((a, b) => {
@@ -53,7 +55,7 @@ export default class PullRequestFormatService {
 
     // Filter sig file extension。
     const illegalFilesExt = files.filter((f) => {
-      return !f.filename.includes(DEFAULT_SIG_FILE_EXT);
+      return !f.filename.includes(DEFAULT_SIG_MEMBERS_FILE_EXT);
     });
 
     if (illegalFilesExt.length > 0) {
@@ -77,7 +79,9 @@ export default class PullRequestFormatService {
           warning: JSON.stringify(validate.errors),
         };
       }
-      const githubId = this.checkContributorHasOnlyOneRole(<SigSchema>sig);
+      const githubId = this.checkContributorHasOnlyOneRole(
+        <SigMembersSchema>sig
+      );
       console.log(githubId);
       if (githubId !== undefined) {
         return {

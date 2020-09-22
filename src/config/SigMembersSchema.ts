@@ -1,10 +1,10 @@
 interface ContributorSchema {
   githubId: string;
-  email: string;
+  email?: string;
   company?: string;
 }
 
-export interface SigSchema {
+export interface SigMembersSchema {
   techLeaders: ContributorSchema[];
   committers: ContributorSchema[];
   reviewers: ContributorSchema[];
