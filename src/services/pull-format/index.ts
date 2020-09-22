@@ -16,7 +16,9 @@ const axios = require("axios").default;
 
 enum FileStatus {
   Added = "added",
+  Renamed = "renamed",
   Modified = "modified",
+  Deleted = "deleted",
 }
 
 @Service()
@@ -54,7 +56,7 @@ export default class PullFormatService {
         f.filename
           .toLowerCase()
           .includes(pullRequestFormatQuery.sigMembersFileName) &&
-        (f.status === FileStatus.Added || f.status === FileStatus.Modified)
+        f.status !== FileStatus.Deleted // Ignore when the file deleted.
       );
     });
 
