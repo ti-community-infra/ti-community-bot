@@ -21,17 +21,15 @@ enum FileStatus {
 
 @Service()
 export default class PullFormatService {
-  public checkContributorHasOnlyOneRole(
+  private static checkContributorHasOnlyOneRole(
     sig: SigMembersSchema
   ): string | undefined {
     const contributorsMap = new Set();
-    console.log(Object.values(sig));
     const contributors = Object.values(sig).reduce((a, b) => {
       return a.concat(b);
     });
 
     for (let contributor of contributors) {
-      console.log(contributor);
       if (!contributorsMap.has(contributor.githubId)) {
         contributorsMap.add(contributor.githubId);
       } else {
@@ -41,6 +39,11 @@ export default class PullFormatService {
     return;
   }
 
+  /**
+   * Format the sig members file.
+   * @param validate
+   * @param pullRequestFormatQuery
+   */
   public async formatting(
     validate: ValidateFunction,
     pullRequestFormatQuery: PullFormatQuery
@@ -85,10 +88,9 @@ export default class PullFormatService {
           warning: JSON.stringify(validate.errors),
         };
       }
-      const githubId = this.checkContributorHasOnlyOneRole(
+      const githubId = PullFormatService.checkContributorHasOnlyOneRole(
         <SigMembersSchema>sig
       );
-      console.log(githubId);
       if (githubId !== undefined) {
         return {
           data: null,
