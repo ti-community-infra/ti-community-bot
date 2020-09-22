@@ -20,7 +20,7 @@ enum FileStatus {
 }
 
 @Service()
-export default class PullRequestFormatService {
+export default class PullFormatService {
   public checkContributorHasOnlyOneRole(
     sig: SigMembersSchema
   ): string | undefined {
