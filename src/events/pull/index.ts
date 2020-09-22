@@ -9,12 +9,13 @@ import {
 } from "../../config/Config";
 import Ajv from "ajv";
 
-import sigSchema from "../../config/sig.members.schema.json";
+import sigMembersSchema from "../../config/sig.members.schema.json";
 import { Status } from "../../services/reply";
 import { combineReplay } from "../../services/utils/ReplyUtil";
 
+// NOTICE: compile schema.
 const ajv = Ajv();
-const validate = ajv.compile(sigSchema);
+const validate = ajv.compile(sigMembersSchema);
 
 enum PullRequestActions {
   Opened = "opened",
@@ -25,7 +26,7 @@ enum PullRequestActions {
   Reopened = "reopened",
 }
 
-const handleFormat = async (
+const checkFormat = async (
   context: Context,
   pullRequestFormatService: PullRequestFormatService
 ) => {
@@ -42,6 +43,7 @@ const handleFormat = async (
     };
   });
 
+  // NOTICE: get config from repo.
   const config = await context.config<Config>(DEFAULT_CONFIG_FILE_PATH);
 
   const pullRequestFormatQuery: PullRequestFormatQuery = {
@@ -59,12 +61,12 @@ const handleFormat = async (
     state: reply.status === Status.Success ? "success" : "failure",
     target_url: "https://github.com/tidb-community-bots/ti-community-bot",
     description: reply.message,
-    context: "Sig File Format",
+    context: "Sig Members File Format",
   };
 
   switch (reply.status) {
     case Status.Failed: {
-      // TODO: add log.
+      context.log.error("Format failed.", files);
       await context.github.issues.createComment(
         context.issue({ body: reply.message })
       );
@@ -84,6 +86,7 @@ const handleFormat = async (
       break;
     }
     case Status.Problematic: {
+      context.log.warn("Format has some problems.", files);
       await context.github.issues.createComment(
         context.issue({ body: combineReplay(reply) })
       );
@@ -112,7 +115,7 @@ const handlePullRequestEvents = async (
       break;
     }
     default: {
-      await handleFormat(context, pullRequestFormatService);
+      await checkFormat(context, pullRequestFormatService);
       break;
     }
   }
