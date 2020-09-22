@@ -22,10 +22,10 @@ enum FileStatus {
 @Service()
 export default class PullFormatService {
   private static checkContributorHasOnlyOneRole(
-    sig: SigMembersSchema
+    sigMembers: SigMembersSchema
   ): string | undefined {
     const contributorsMap = new Set();
-    const contributors = Object.values(sig).reduce((a, b) => {
+    const contributors = Object.values(sigMembers).reduce((a, b) => {
       return a.concat(b);
     });
 
@@ -76,8 +76,8 @@ export default class PullFormatService {
 
     // Check each file format.
     for (let i = 0; i < files.length; i++) {
-      const { data: sig } = await axios.get(files[i].raw_url);
-      if (!validate(sig)) {
+      const { data: sigMembers } = await axios.get(files[i].raw_url);
+      if (!validate(sigMembers)) {
         return {
           data: null,
           status: Status.Problematic,
@@ -89,7 +89,7 @@ export default class PullFormatService {
         };
       }
       const githubId = PullFormatService.checkContributorHasOnlyOneRole(
-        <SigMembersSchema>sig
+        <SigMembersSchema>sigMembers
       );
       if (githubId !== undefined) {
         return {
