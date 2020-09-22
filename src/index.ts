@@ -1,6 +1,7 @@
-import { Application, Context } from "probot"; // eslint-disable-line no-unused-vars
+import { Application, Context } from "probot";
 import { Container } from "typedi";
 import "reflect-metadata";
+
 import handlePullRequestEvents from "./events/pull";
 import PullRequestFormatService from "./services/pr-format";
 
