@@ -1,78 +1,78 @@
 {
   "type": "object",
-  "required": ["TechLeaders", "Committers", "Reviewers", "ActiveContributors"],
+  "required": ["techLeaders", "committers", "reviewers", "activeContributors"],
   "properties": {
-    "TechLeaders": {
+    "techLeaders": {
       "type": "array",
       "items": {
         "type": "object",
-        "required":["GithubId"],
+        "required":["githubId"],
         "properties": {
-          "GithubId": {
+          "githubId": {
             "type": "string"
           },
-          "Email": {
+          "email": {
             "type": "string",
             "format": "email"
           },
-          "Company": {
+          "company": {
             "type": "string"
           }
         }
       }
     },
-    "Committers": {
+    "committers": {
       "type": "array",
       "items": {
         "type": "object",
-        "required":["GithubId"],
+        "required":["githubId"],
         "properties": {
-          "GithubId": {
+          "githubId": {
             "type": "string"
           },
-          "Email": {
+          "email": {
             "type": "string",
             "format": "email"
           },
-          "Company": {
+          "company": {
             "type": "string"
           }
         }
       }
     },
-    "Reviewers": {
+    "reviewers": {
       "type": "array",
       "items": {
         "type": "object",
-        "required":["GithubId"],
+        "required":["githubId"],
         "properties": {
-          "GithubId": {
+          "githubId": {
             "type": "string"
           },
-          "Email": {
+          "email": {
             "type": "string",
             "format": "email"
           },
-          "Company": {
+          "company": {
             "type": "string"
           }
         }
       }
     },
-    "ActiveContributors": {
+    "activeContributors": {
       "type": "array",
       "items": {
         "type": "object",
-        "required":["GithubId"],
+        "required":["githubId"],
         "properties": {
-          "GithubId": {
+          "githubId": {
             "type": "string"
           },
-          "Email": {
+          "email": {
             "type": "string",
             "format": "email"
           },
-          "Company": {
+          "company": {
             "type": "string"
           }
         }

@@ -2,20 +2,56 @@ import { PullRequestFormatQuery } from "../../queries/PullRequestFormatQuery";
 import { Reply, Status } from "../reply";
 import { DEFAULT_SIG_FILE_EXT } from "../../config/Config";
 import { ValidateFunction } from "ajv";
+import {
+  contributorHasMultipleRole,
+  mustBeJSONFileMessage,
+  mustMatchSchema,
+  PullRequestFormatMessage,
+  PullRequestFormatTip,
+} from "../messages/PullRequestFormatMessage";
+import { Service } from "typedi";
+import { SigSchema } from "../../config/SigSchema";
 
 const axios = require("axios").default;
 
+enum FileStatus {
+  Added = "added",
+  Modified = "modified",
+}
+
+@Service()
 export default class PullRequestFormatService {
-  public async format(
+  public checkContributorHasOnlyOneRole(sig: SigSchema): string | undefined {
+    const contributorsMap = new Set();
+    console.log(Object.values(sig));
+    const contributors = Object.values(sig).reduce((a, b) => {
+      return a.concat(b);
+    });
+
+    for (let contributor of contributors) {
+      console.log(contributor);
+      if (!contributorsMap.has(contributor.githubId)) {
+        contributorsMap.add(contributor.githubId);
+      } else {
+        return contributor.githubId;
+      }
+    }
+    return;
+  }
+
+  public async formatting(
     validate: ValidateFunction,
     pullRequestFormatQuery: PullRequestFormatQuery
   ): Promise<Reply<null>> {
+    // Filter sig file name.
     const files = pullRequestFormatQuery.files.filter((f) => {
-      return f.filename
-        .toLowerCase()
-        .includes(pullRequestFormatQuery.sigFileName);
+      return (
+        f.filename.toLowerCase().includes(pullRequestFormatQuery.sigFileName) &&
+        (f.status === FileStatus.Added || f.status === FileStatus.Modified)
+      );
     });
 
+    // Filter sig file extension。
     const illegalFilesExt = files.filter((f) => {
       return !f.filename.includes(DEFAULT_SIG_FILE_EXT);
     });
@@ -23,18 +59,32 @@ export default class PullRequestFormatService {
     if (illegalFilesExt.length > 0) {
       return {
         data: null,
-        status: Status.Failed,
-        message: "The file must be json.",
+        status: Status.Problematic,
+        message: mustBeJSONFileMessage(pullRequestFormatQuery.sigFileName),
+        tip: PullRequestFormatTip.MigrateToJSON,
       };
     }
 
+    // Check each file format.
     for (let i = 0; i < files.length; i++) {
-      const file = await axios.get(files[i].raw_url);
-      if (!validate(file)) {
+      const { data: sig } = await axios.get(files[i].raw_url);
+      if (!validate(sig)) {
         return {
           data: null,
-          status: Status.Failed,
-          message: "The file must match the schema.",
+          status: Status.Problematic,
+          message: mustMatchSchema(pullRequestFormatQuery.sigFileName),
+          tip: PullRequestFormatTip.MigrateToJSON,
+          warning: JSON.stringify(validate.errors),
+        };
+      }
+      const githubId = this.checkContributorHasOnlyOneRole(<SigSchema>sig);
+      console.log(githubId);
+      if (githubId !== undefined) {
+        return {
+          data: null,
+          status: Status.Problematic,
+          message: PullRequestFormatMessage.OnlyOneRole,
+          warning: contributorHasMultipleRole(githubId),
         };
       }
     }
@@ -42,7 +92,7 @@ export default class PullRequestFormatService {
     return {
       data: null,
       status: Status.Success,
-      message: "Format Success",
+      message: PullRequestFormatMessage.FormatSuccess,
     };
   }
 }

@@ -17,17 +17,11 @@ const ajv = Ajv();
 const validate = ajv.compile(sigSchema);
 
 enum PullRequestActions {
-  // eslint-disable-next-line no-unused-vars
   Opened = "opened",
-  // eslint-disable-next-line no-unused-vars
   Edited = "edited",
-  // eslint-disable-next-line no-unused-vars
   Labeled = "labeled",
-  // eslint-disable-next-line no-unused-vars
   Unlabeled = "unlabeled",
-  // eslint-disable-next-line no-unused-vars
   Closed = "closed",
-  // eslint-disable-next-line no-unused-vars
   Reopened = "reopened",
 }
 
@@ -55,7 +49,7 @@ const handleFormat = async (
     files,
   };
 
-  const reply = await pullRequestFormatService.format(
+  const reply = await pullRequestFormatService.formatting(
     validate,
     pullRequestFormatQuery
   );
@@ -82,9 +76,6 @@ const handleFormat = async (
       break;
     }
     case Status.Success: {
-      await context.github.issues.createComment(
-        context.issue({ body: reply.message })
-      );
       // @ts-ignore
       await context.github.repos.createStatus({
         ...context.repo(),
@@ -96,6 +87,11 @@ const handleFormat = async (
       await context.github.issues.createComment(
         context.issue({ body: combineReplay(reply) })
       );
+      // @ts-ignore
+      await context.github.repos.createStatus({
+        ...context.repo(),
+        ...status,
+      });
       break;
     }
   }
