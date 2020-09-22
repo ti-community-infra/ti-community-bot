@@ -1,4 +1,4 @@
-import { PullRequestFormatQuery } from "../../queries/PullRequestFormatQuery";
+import { PullFormatQuery } from "../../queries/PullFormatQuery";
 import { Reply, Status } from "../reply";
 import { DEFAULT_SIG_MEMBERS_FILE_EXT } from "../../config/Config";
 import { ValidateFunction } from "ajv";
@@ -43,12 +43,14 @@ export default class PullRequestFormatService {
 
   public async formatting(
     validate: ValidateFunction,
-    pullRequestFormatQuery: PullRequestFormatQuery
+    pullRequestFormatQuery: PullFormatQuery
   ): Promise<Reply<null>> {
     // Filter sig file name.
     const files = pullRequestFormatQuery.files.filter((f) => {
       return (
-        f.filename.toLowerCase().includes(pullRequestFormatQuery.sigFileName) &&
+        f.filename
+          .toLowerCase()
+          .includes(pullRequestFormatQuery.sigMembersFileName) &&
         (f.status === FileStatus.Added || f.status === FileStatus.Modified)
       );
     });
@@ -62,7 +64,9 @@ export default class PullRequestFormatService {
       return {
         data: null,
         status: Status.Problematic,
-        message: mustBeJSONFileMessage(pullRequestFormatQuery.sigFileName),
+        message: mustBeJSONFileMessage(
+          pullRequestFormatQuery.sigMembersFileName
+        ),
         tip: PullRequestFormatTip.MigrateToJSON,
       };
     }
@@ -74,7 +78,7 @@ export default class PullRequestFormatService {
         return {
           data: null,
           status: Status.Problematic,
-          message: mustMatchSchema(pullRequestFormatQuery.sigFileName),
+          message: mustMatchSchema(pullRequestFormatQuery.sigMembersFileName),
           tip: PullRequestFormatTip.MigrateToJSON,
           warning: JSON.stringify(validate.errors),
         };

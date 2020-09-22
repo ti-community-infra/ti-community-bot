@@ -1,7 +1,7 @@
 import { Context } from "probot";
 import PullRequestFormatService from "../../services/pr-format";
-import { PullRequestFormatQuery } from "../../queries/PullRequestFormatQuery";
-import { PullRequestFileQuery } from "../../queries/PullRequestFileQuery";
+import { PullFormatQuery } from "../../queries/PullFormatQuery";
+import { PullFileQuery } from "../../queries/PullFileQuery";
 import {
   Config,
   DEFAULT_CONFIG_FILE_PATH,
@@ -37,7 +37,7 @@ const checkFormat = async (
     pull_number: number,
   });
 
-  const files: PullRequestFileQuery[] = filesData.map((f) => {
+  const files: PullFileQuery[] = filesData.map((f) => {
     return {
       ...f,
     };
@@ -46,8 +46,9 @@ const checkFormat = async (
   // NOTICE: get config from repo.
   const config = await context.config<Config>(DEFAULT_CONFIG_FILE_PATH);
 
-  const pullRequestFormatQuery: PullRequestFormatQuery = {
-    sigFileName: config?.sigMembersFileName || DEFAULT_SIG_MEMBERS_FILE_NAME,
+  const pullRequestFormatQuery: PullFormatQuery = {
+    sigMembersFileName:
+      config?.sigMembersFileName || DEFAULT_SIG_MEMBERS_FILE_NAME,
     files,
   };
 

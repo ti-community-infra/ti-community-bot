@@ -1,4 +1,4 @@
-export interface PullRequestFileQuery {
+export interface PullFileQuery {
   sha: string;
   filename: string;
   status: string;
