@@ -6,9 +6,9 @@ import nock from "nock";
 import myProbotApp from "../src";
 import { Probot, ProbotOctokit } from "probot";
 // Requiring our fixtures
-import payload from "./fixtures/issues.opened.json";
+import payload from "./fixtures/issues.ping.comment.json";
 
-const issueCreatedBody = { body: "Thanks for opening this issue!" };
+const pongBody = { body: "pong! I am community bot." };
 const fs = require("fs");
 const path = require("path");
 
@@ -35,7 +35,7 @@ describe("My Probot app", () => {
     probot.load(myProbotApp);
   });
 
-  test("creates a comment when an issue is opened", async (done) => {
+  test("creates a comment when got a ping command", async (done) => {
     const mock = nock("https://api.github.com")
       // Test that we correctly return a test token
       .post("/app/installations/2/access_tokens")
@@ -47,14 +47,17 @@ describe("My Probot app", () => {
       })
 
       // Test that a comment is posted
-      .post("/repos/hiimbex/testing-things/issues/1/comments", (body: any) => {
-        done(expect(body).toMatchObject(issueCreatedBody));
-        return true;
-      })
+      .post(
+        "/repos/Rustin-Liu/ti-community-bot/issues/1/comments",
+        (body: any) => {
+          done(expect(body).toMatchObject(pongBody));
+          return true;
+        }
+      )
       .reply(200);
 
     // Receive a webhook event
-    await probot.receive({ name: "issues", payload });
+    await probot.receive({ name: "issue_comment", payload });
 
     expect(mock.pendingMocks()).toStrictEqual([]);
   });
