@@ -3,12 +3,12 @@ import { Reply, Status } from "../reply";
 import { DEFAULT_SIG_MEMBERS_FILE_EXT } from "../../config/Config";
 import { ValidateFunction } from "ajv";
 import {
-  contributorHasMultipleRole,
+  contributorHasMultipleRoleWarning,
   mustBeJSONFileMessage,
-  mustMatchSchema,
-  PullRequestFormatMessage,
-  PullRequestFormatTip,
-} from "../messages/PullRequestFormatMessage";
+  mustMatchSchemaMessage,
+  PullFormatMessage,
+  migrateToJSONTip,
+} from "../messages/PullFormatMessage";
 import { Service } from "typedi";
 import { SigMembersSchema } from "../../config/SigMembersSchema";
 
@@ -67,7 +67,7 @@ export default class PullFormatService {
         message: mustBeJSONFileMessage(
           pullRequestFormatQuery.sigMembersFileName
         ),
-        tip: PullRequestFormatTip.MigrateToJSON,
+        tip: migrateToJSONTip(),
       };
     }
 
@@ -78,8 +78,10 @@ export default class PullFormatService {
         return {
           data: null,
           status: Status.Problematic,
-          message: mustMatchSchema(pullRequestFormatQuery.sigMembersFileName),
-          tip: PullRequestFormatTip.MigrateToJSON,
+          message: mustMatchSchemaMessage(
+            pullRequestFormatQuery.sigMembersFileName
+          ),
+          tip: migrateToJSONTip(),
           warning: JSON.stringify(validate.errors),
         };
       }
@@ -91,8 +93,8 @@ export default class PullFormatService {
         return {
           data: null,
           status: Status.Problematic,
-          message: PullRequestFormatMessage.OnlyOneRole,
-          warning: contributorHasMultipleRole(githubId),
+          message: PullFormatMessage.OnlyOneRole,
+          warning: contributorHasMultipleRoleWarning(githubId),
         };
       }
     }
@@ -100,7 +102,7 @@ export default class PullFormatService {
     return {
       data: null,
       status: Status.Success,
-      message: PullRequestFormatMessage.FormatSuccess,
+      message: PullFormatMessage.FormatSuccess,
     };
   }
 }
