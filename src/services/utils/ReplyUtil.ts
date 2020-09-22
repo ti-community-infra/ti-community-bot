@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-unused-vars
 import { Reply } from "../reply";
 
 export function combineReplay(replay: Reply<any>) {
