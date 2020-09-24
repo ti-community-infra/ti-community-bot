@@ -5,6 +5,7 @@ interface ContributorSchema {
 }
 
 export interface SigMembersSchema {
+  name: string;
   techLeaders: ContributorSchema[];
   committers: ContributorSchema[];
   reviewers: ContributorSchema[];
