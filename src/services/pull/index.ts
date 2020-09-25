@@ -22,7 +22,7 @@ enum FileStatus {
 }
 
 @Service()
-export default class PullFormatService {
+export default class PullService {
   private static checkContributorHasOnlyOneRole(
     sigMembers: SigMembersSchema
   ): string | undefined {
@@ -90,7 +90,7 @@ export default class PullFormatService {
           warning: JSON.stringify(validate.errors),
         };
       }
-      const githubId = PullFormatService.checkContributorHasOnlyOneRole(
+      const githubId = PullService.checkContributorHasOnlyOneRole(
         <SigMembersSchema>sigMembers
       );
       if (githubId !== undefined) {

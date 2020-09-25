@@ -3,7 +3,7 @@ import { Container } from "typedi";
 import "reflect-metadata";
 
 import handlePullRequestEvents from "./events/pull";
-import PullFormatService from "./services/pull-format";
+import PullService from "./services/pull";
 
 const commands = require("probot-commands-pro");
 
@@ -15,6 +15,6 @@ export = (app: Application) => {
   });
 
   app.on("pull_request", async (context: Context) => {
-    await handlePullRequestEvents(context, Container.get(PullFormatService));
+    await handlePullRequestEvents(context, Container.get(PullService));
   });
 };
