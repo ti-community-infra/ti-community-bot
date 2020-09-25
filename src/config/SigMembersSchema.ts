@@ -1,4 +1,4 @@
-interface ContributorSchema {
+export interface ContributorSchema {
   githubId: string;
   email?: string;
   company?: string;
@@ -10,4 +10,11 @@ export interface SigMembersSchema {
   committers: ContributorSchema[];
   reviewers: ContributorSchema[];
   activeContributors: ContributorSchema[];
+}
+
+export enum SigMemberLevelKey {
+  Leader = "techLeaders",
+  Committer = "committers",
+  Reviewer = "reviewers",
+  ActiveContributor = "activeContributors",
 }

@@ -7,6 +7,7 @@ import myProbotApp from "../src";
 import { Probot, ProbotOctokit } from "probot";
 // Requiring our fixtures
 import payload from "./fixtures/issues.ping.comment.json";
+import typeorm = require("typeorm");
 
 const pongBody = { body: "pong! I am community bot." };
 const fs = require("fs");
@@ -21,6 +22,7 @@ describe("My Probot app", () => {
   let probot: any;
 
   beforeEach(() => {
+    typeorm.createConnection = jest.fn().mockResolvedValue(null);
     nock.disableNetConnect();
     probot = new Probot({
       id: 123,

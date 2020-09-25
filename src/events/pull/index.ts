@@ -12,6 +12,7 @@ import Ajv from "ajv";
 import sigMembersSchema from "../../config/sig.members.schema.json";
 import { Status } from "../../services/reply";
 import { combineReplay } from "../../services/utils/ReplyUtil";
+import { SigService } from "../../services/sig";
 
 // NOTICE: compile schema.
 const ajv = Ajv();
@@ -101,12 +102,63 @@ const checkFormat = async (
   }
 };
 
+const updateSigInfo = async (context: Context, sigService: SigService) => {
+  const { number } = context.payload.pull_request;
+
+  const { data: filesData } = await context.github.pulls.listFiles({
+    ...context.issue(),
+    pull_number: number,
+  });
+
+  const files: PullFileQuery[] = filesData.map((f) => {
+    return {
+      ...f,
+    };
+  });
+
+  // NOTICE: get config from repo.
+  const config = await context.config<Config>(DEFAULT_CONFIG_FILE_PATH);
+
+  const pullRequestFormatQuery: PullFormatQuery = {
+    sigMembersFileName:
+      config?.sigMembersFileName || DEFAULT_SIG_MEMBERS_FILE_NAME,
+    files,
+  };
+
+  const reply = await sigService.updateSigInfo(pullRequestFormatQuery);
+
+  switch (reply.status) {
+    case Status.Failed: {
+      context.log.error("Update sig info.", files);
+      await context.github.issues.createComment(
+        context.issue({ body: reply.message })
+      );
+      break;
+    }
+    case Status.Success: {
+      context.log.info("Update sig info.", files);
+      await context.github.issues.createComment(
+        context.issue({ body: reply.message })
+      );
+      break;
+    }
+    case Status.Problematic: {
+      context.log.warn("Update sig info has some problems.", files);
+      await context.github.issues.createComment(
+        context.issue({ body: combineReplay(reply) })
+      );
+    }
+  }
+};
+
 const handlePullRequestEvents = async (
   context: Context,
-  pullRequestFormatService: PullService
+  pullRequestFormatService: PullService,
+  sigService: SigService
 ) => {
   switch (context.payload.action) {
     case PullRequestActions.Closed: {
+      await updateSigInfo(context, sigService);
       break;
     }
     case PullRequestActions.Labeled: {

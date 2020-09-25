@@ -14,7 +14,7 @@ import { SigMembersSchema } from "../../config/SigMembersSchema";
 
 const axios = require("axios").default;
 
-enum FileStatus {
+export enum FileStatus {
   Added = "added",
   Renamed = "renamed",
   Modified = "modified",
