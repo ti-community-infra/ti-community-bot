@@ -150,6 +150,7 @@ const handlePullRequestEvents = async (
   switch (context.payload.action) {
     case PullRequestActions.Closed: {
       const { merged_at: mergedAt } = context.payload.pull_request;
+      // NOTICE: we update sig info when PR merged.
       if (mergedAt) {
         await updateSigInfo(context, sigService);
       }
