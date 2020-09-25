@@ -131,6 +131,11 @@ export class SigService {
     return contributorInfos;
   }
 
+  /**
+   * Update sig info when PR merged.
+   * It will delete all members and add members from the sig info file.
+   * @param pullRequestFormatQuery
+   */
   public async updateSigInfo(
     pullRequestFormatQuery: PullFormatQuery
   ): Promise<Reply<null>> {
