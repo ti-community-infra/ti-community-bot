@@ -4,7 +4,7 @@ export interface ContributorSchema {
   company?: string;
 }
 
-export interface SigMembersSchema {
+export interface SigInfoSchema {
   name: string;
   techLeaders: ContributorSchema[];
   committers: ContributorSchema[];

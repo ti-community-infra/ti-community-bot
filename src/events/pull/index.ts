@@ -5,18 +5,18 @@ import { PullFileQuery } from "../../queries/PullFileQuery";
 import {
   Config,
   DEFAULT_CONFIG_FILE_PATH,
-  DEFAULT_SIG_MEMBERS_FILE_NAME,
+  DEFAULT_SIG_INFO_FILE_NAME,
 } from "../../config/Config";
 import Ajv from "ajv";
 
-import sigMembersSchema from "../../config/sig.members.schema.json";
+import sigInfoSchema from "../../config/sig.info.schema.json";
 import { Status } from "../../services/reply";
 import { combineReplay } from "../../services/utils/ReplyUtil";
 import { SigService } from "../../services/sig";
 
 // NOTICE: compile schema.
 const ajv = Ajv();
-const validate = ajv.compile(sigMembersSchema);
+const validate = ajv.compile(sigInfoSchema);
 
 enum PullRequestActions {
   Opened = "opened",
@@ -48,8 +48,7 @@ const checkFormat = async (
   const config = await context.config<Config>(DEFAULT_CONFIG_FILE_PATH);
 
   const pullRequestFormatQuery: PullFormatQuery = {
-    sigMembersFileName:
-      config?.sigMembersFileName || DEFAULT_SIG_MEMBERS_FILE_NAME,
+    sigInfoFileName: config?.sigInfoFileName || DEFAULT_SIG_INFO_FILE_NAME,
     files,
   };
 
@@ -120,8 +119,7 @@ const updateSigInfo = async (context: Context, sigService: SigService) => {
   const config = await context.config<Config>(DEFAULT_CONFIG_FILE_PATH);
 
   const pullRequestFormatQuery: PullFormatQuery = {
-    sigMembersFileName:
-      config?.sigMembersFileName || DEFAULT_SIG_MEMBERS_FILE_NAME,
+    sigInfoFileName: config?.sigInfoFileName || DEFAULT_SIG_INFO_FILE_NAME,
     files,
   };
 

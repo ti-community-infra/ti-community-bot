@@ -10,8 +10,8 @@ import { FileStatus } from "../pull";
 import {
   ContributorSchema,
   SigMemberLevelKey,
-  SigMembersSchema,
-} from "../../config/SigMembersSchema";
+  SigInfoSchema,
+} from "../../config/SigInfoSchema";
 import assert from "assert";
 
 const axios = require("axios").default;
@@ -29,7 +29,7 @@ export class SigService {
     private contributorInfoRepository: Repository<ContributorInfo>
   ) {}
 
-  private async findOrAddSig(sigInfo: SigMembersSchema): Promise<Sig> {
+  private async findOrAddSig(sigInfo: SigInfoSchema): Promise<Sig> {
     let sig = await this.sigRepository.findOne({
       where: {
         name: sigInfo.name,
@@ -72,7 +72,7 @@ export class SigService {
   }
 
   private collectContributorsByLevel(
-    sigInfo: SigMembersSchema
+    sigInfo: SigInfoSchema
   ): ContributorSchemaWithLevel[] {
     const contributorInfos: ContributorSchemaWithLevel[] = [];
 
@@ -134,7 +134,7 @@ export class SigService {
       return (
         f.filename
           .toLowerCase()
-          .includes(pullRequestFormatQuery.sigMembersFileName) &&
+          .includes(pullRequestFormatQuery.sigInfoFileName) &&
         f.status !== FileStatus.Deleted // Ignore when the file deleted.
       );
     });

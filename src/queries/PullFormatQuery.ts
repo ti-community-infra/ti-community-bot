@@ -1,6 +1,6 @@
 import { PullFileQuery } from "./PullFileQuery";
 
 export interface PullFormatQuery {
-  sigMembersFileName: string;
+  sigInfoFileName: string;
   files: PullFileQuery[];
 }

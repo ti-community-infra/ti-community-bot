@@ -1,6 +1,6 @@
 import { PullFormatQuery } from "../../queries/PullFormatQuery";
 import { Reply, Status } from "../reply";
-import { DEFAULT_SIG_MEMBERS_FILE_EXT } from "../../config/Config";
+import { DEFAULT_SIG_INFO_FILE_EXT } from "../../config/Config";
 import { ValidateFunction } from "ajv";
 import {
   contributorHasMultipleRoleWarning,
@@ -10,7 +10,7 @@ import {
   migrateToJSONTip,
 } from "../messages/PullFormatMessage";
 import { Service } from "typedi";
-import { SigMembersSchema } from "../../config/SigMembersSchema";
+import { SigInfoSchema } from "../../config/SigInfoSchema";
 
 const axios = require("axios").default;
 
@@ -24,10 +24,10 @@ export enum FileStatus {
 @Service()
 export default class PullService {
   private static checkContributorHasOnlyOneRole(
-    sigMembers: SigMembersSchema
+    sigInfo: SigInfoSchema
   ): string | undefined {
     const contributorsMap = new Set();
-    const contributors = Object.values(sigMembers).reduce((a, b) => {
+    const contributors = Object.values(sigInfo).reduce((a, b) => {
       return a.concat(b);
     });
 
@@ -55,43 +55,41 @@ export default class PullService {
       return (
         f.filename
           .toLowerCase()
-          .includes(pullRequestFormatQuery.sigMembersFileName) &&
+          .includes(pullRequestFormatQuery.sigInfoFileName) &&
         f.status !== FileStatus.Deleted // Ignore when the file deleted.
       );
     });
 
     // Filter sig file extension。
     const illegalFilesExt = files.filter((f) => {
-      return !f.filename.includes(DEFAULT_SIG_MEMBERS_FILE_EXT);
+      return !f.filename.includes(DEFAULT_SIG_INFO_FILE_EXT);
     });
 
     if (illegalFilesExt.length > 0) {
       return {
         data: null,
         status: Status.Problematic,
-        message: mustBeJSONFileMessage(
-          pullRequestFormatQuery.sigMembersFileName
-        ),
+        message: mustBeJSONFileMessage(pullRequestFormatQuery.sigInfoFileName),
         tip: migrateToJSONTip(),
       };
     }
 
     // Check each file format.
     for (let i = 0; i < files.length; i++) {
-      const { data: sigMembers } = await axios.get(files[i].raw_url);
-      if (!validate(sigMembers)) {
+      const { data: sigInfo } = await axios.get(files[i].raw_url);
+      if (!validate(sigInfo)) {
         return {
           data: null,
           status: Status.Problematic,
           message: mustMatchSchemaMessage(
-            pullRequestFormatQuery.sigMembersFileName
+            pullRequestFormatQuery.sigInfoFileName
           ),
           tip: migrateToJSONTip(),
           warning: JSON.stringify(validate.errors),
         };
       }
       const githubId = PullService.checkContributorHasOnlyOneRole(
-        <SigMembersSchema>sigMembers
+        <SigInfoSchema>sigInfo
       );
       if (githubId !== undefined) {
         return {
