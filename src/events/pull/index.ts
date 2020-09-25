@@ -1,5 +1,5 @@
 import { Context } from "probot";
-import PullFormatService from "../../services/pull-format";
+import PullService from "../../services/pull";
 import { PullFormatQuery } from "../../queries/PullFormatQuery";
 import { PullFileQuery } from "../../queries/PullFileQuery";
 import {
@@ -28,7 +28,7 @@ enum PullRequestActions {
 
 const checkFormat = async (
   context: Context,
-  pullRequestFormatService: PullFormatService
+  pullRequestFormatService: PullService
 ) => {
   const { head, number } = context.payload.pull_request;
 
@@ -103,7 +103,7 @@ const checkFormat = async (
 
 const handlePullRequestEvents = async (
   context: Context,
-  pullRequestFormatService: PullFormatService
+  pullRequestFormatService: PullService
 ) => {
   switch (context.payload.action) {
     case PullRequestActions.Closed: {
