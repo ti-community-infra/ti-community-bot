@@ -13,6 +13,7 @@ import {
   SigInfoSchema,
 } from "../../config/SigInfoSchema";
 import assert from "assert";
+import { SigMessage } from "../messages/SigMessage";
 
 const axios = require("axios").default;
 
@@ -45,7 +46,7 @@ export class SigService {
     return sig;
   }
 
-  private async findOrAddContributors(
+  private async updateOrAddContributors(
     contributorInfos: ContributorSchema[]
   ): Promise<ContributorInfo[]> {
     const contributors = [];
@@ -61,14 +62,20 @@ export class SigService {
       if (contributor === undefined) {
         contributor = new ContributorInfo();
         contributor.github = contributorInfo.githubId;
-        contributor.email = contributorInfo.email;
-        contributor.company = contributorInfo.company;
-        await this.contributorInfoRepository.save(contributor);
       }
+      contributor.email = contributorInfo.email;
+      contributor.company = contributorInfo.company;
+      await this.contributorInfoRepository.save(contributor);
       contributors.push(contributor);
     }
 
     return contributors;
+  }
+
+  private async deleteSigMembers(sigId: number) {
+    await this.sigMemberRepository.query(
+      `delete from sig_member where sig_id = '${sigId}'`
+    );
   }
 
   private collectContributorsByLevel(
@@ -121,8 +128,6 @@ export class SigService {
       }
     });
 
-    console.log(contributorInfos);
-
     return contributorInfos;
   }
 
@@ -147,9 +152,10 @@ export class SigService {
         contributorInfos.map((c) => [c.githubId, c])
       );
 
-      const contributors = await this.findOrAddContributors(contributorInfos);
+      const contributors = await this.updateOrAddContributors(contributorInfos);
       assert(contributorInfos.length === contributors.length);
 
+      await this.deleteSigMembers(sig.id);
       for (let j = 0; j < contributors.length; j++) {
         const contributor = contributors[j];
         let sigMember = await this.sigMemberRepository.findOne({
@@ -173,7 +179,7 @@ export class SigService {
     return {
       data: null,
       status: Status.Success,
-      message: "Update sig info success.",
+      message: SigMessage.UpdateSuccess,
     };
   }
 }

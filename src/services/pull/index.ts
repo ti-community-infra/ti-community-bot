@@ -6,9 +6,9 @@ import {
   contributorHasMultipleRoleWarning,
   mustBeJSONFileMessage,
   mustMatchSchemaMessage,
-  PullFormatMessage,
+  PullMessage,
   migrateToJSONTip,
-} from "../messages/PullFormatMessage";
+} from "../messages/PullMessage";
 import { Service } from "typedi";
 import { SigInfoSchema } from "../../config/SigInfoSchema";
 
@@ -95,7 +95,7 @@ export default class PullService {
         return {
           data: null,
           status: Status.Problematic,
-          message: PullFormatMessage.OnlyOneRole,
+          message: PullMessage.OnlyOneRole,
           warning: contributorHasMultipleRoleWarning(githubId),
         };
       }
@@ -104,7 +104,7 @@ export default class PullService {
     return {
       data: null,
       status: Status.Success,
-      message: PullFormatMessage.FormatSuccess,
+      message: PullMessage.FormatSuccess,
     };
   }
 }

@@ -1,6 +1,6 @@
 import sigInfoSchema from "../../config/sig.info.schema.json";
 
-export enum PullFormatMessage {
+export enum PullMessage {
   FormatSuccess = "Format Success.",
   OnlyOneRole = "Contributors can only have one role.",
 }

@@ -46,11 +46,10 @@ const constructPullFormatQuery = async (
   // NOTICE: get config from repo.
   const config = await context.config<Config>(DEFAULT_CONFIG_FILE_PATH);
 
-  const pullFormatQuery: PullFormatQuery = {
+  return {
     sigInfoFileName: config?.sigInfoFileName || DEFAULT_SIG_INFO_FILE_NAME,
     files,
   };
-  return pullFormatQuery;
 };
 
 const checkFormat = async (
@@ -150,7 +149,10 @@ const handlePullRequestEvents = async (
 ) => {
   switch (context.payload.action) {
     case PullRequestActions.Closed: {
-      await updateSigInfo(context, sigService);
+      const { merged_at: mergedAt } = context.payload.pull_request;
+      if (mergedAt) {
+        await updateSigInfo(context, sigService);
+      }
       break;
     }
     case PullRequestActions.Labeled: {
