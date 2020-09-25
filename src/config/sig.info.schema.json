@@ -24,6 +24,25 @@
         }
       }
     },
+    "coLeaders": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required":["githubId"],
+        "properties": {
+          "githubId": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "company": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "committers": {
       "type": "array",
       "items": {

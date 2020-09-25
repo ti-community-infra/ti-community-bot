@@ -7,6 +7,7 @@ export interface ContributorSchema {
 export interface SigInfoSchema {
   name: string;
   techLeaders: ContributorSchema[];
+  coLeaders: ContributorSchema[];
   committers: ContributorSchema[];
   reviewers: ContributorSchema[];
   activeContributors: ContributorSchema[];
@@ -14,6 +15,7 @@ export interface SigInfoSchema {
 
 export enum SigMemberLevelKey {
   Leader = "techLeaders",
+  CoLeader = "coLeaders",
   Committer = "committers",
   Reviewer = "reviewers",
   ActiveContributor = "activeContributors",

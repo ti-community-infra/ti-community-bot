@@ -2,6 +2,7 @@ import { Column, Entity, PrimaryGeneratedColumn, Unique } from "typeorm";
 
 export enum SigMemberLevel {
   Leader = "leader",
+  CoLeader = "co-leader",
   Committer = "committer",
   Reviewer = "reviewer",
   ActiveContributor = "active-contributor",
