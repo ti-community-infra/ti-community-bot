@@ -82,6 +82,7 @@ export class SigService {
     sigInfo: SigInfoSchema
   ): ContributorSchemaWithLevel[] {
     const contributorInfos: ContributorSchemaWithLevel[] = [];
+    // FIXME: need a better way to reduce duplication of code.
     Object.keys(sigInfo).forEach((key) => {
       switch (key) {
         case SigMemberLevelKey.Leader: {
