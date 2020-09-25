@@ -27,11 +27,10 @@ enum PullRequestActions {
   Reopened = "reopened",
 }
 
-const checkFormat = async (
-  context: Context,
-  pullRequestFormatService: PullService
-) => {
-  const { head, number } = context.payload.pull_request;
+const constructPullFormatQuery = async (
+  context: Context
+): Promise<PullFormatQuery> => {
+  const { number } = context.payload.pull_request;
 
   const { data: filesData } = await context.github.pulls.listFiles({
     ...context.issue(),
@@ -47,14 +46,24 @@ const checkFormat = async (
   // NOTICE: get config from repo.
   const config = await context.config<Config>(DEFAULT_CONFIG_FILE_PATH);
 
-  const pullRequestFormatQuery: PullFormatQuery = {
+  const pullFormatQuery: PullFormatQuery = {
     sigInfoFileName: config?.sigInfoFileName || DEFAULT_SIG_INFO_FILE_NAME,
     files,
   };
+  return pullFormatQuery;
+};
+
+const checkFormat = async (
+  context: Context,
+  pullRequestFormatService: PullService
+) => {
+  const { head } = context.payload.pull_request;
+
+  const pullFormatQuery = await constructPullFormatQuery(context);
 
   const reply = await pullRequestFormatService.formatting(
     validate,
-    pullRequestFormatQuery
+    pullFormatQuery
   );
 
   const status = {
@@ -64,6 +73,8 @@ const checkFormat = async (
     description: reply.message,
     context: "Sig Members File Format",
   };
+
+  const { files } = pullFormatQuery;
 
   switch (reply.status) {
     case Status.Failed: {
@@ -102,28 +113,11 @@ const checkFormat = async (
 };
 
 const updateSigInfo = async (context: Context, sigService: SigService) => {
-  const { number } = context.payload.pull_request;
+  const pullFormatQuery = await constructPullFormatQuery(context);
 
-  const { data: filesData } = await context.github.pulls.listFiles({
-    ...context.issue(),
-    pull_number: number,
-  });
+  const reply = await sigService.updateSigInfo(pullFormatQuery);
 
-  const files: PullFileQuery[] = filesData.map((f) => {
-    return {
-      ...f,
-    };
-  });
-
-  // NOTICE: get config from repo.
-  const config = await context.config<Config>(DEFAULT_CONFIG_FILE_PATH);
-
-  const pullRequestFormatQuery: PullFormatQuery = {
-    sigInfoFileName: config?.sigInfoFileName || DEFAULT_SIG_INFO_FILE_NAME,
-    files,
-  };
-
-  const reply = await sigService.updateSigInfo(pullRequestFormatQuery);
+  const { files } = pullFormatQuery;
 
   switch (reply.status) {
     case Status.Failed: {
