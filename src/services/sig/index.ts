@@ -82,7 +82,6 @@ export class SigService {
     sigInfo: SigInfoSchema
   ): ContributorSchemaWithLevel[] {
     const contributorInfos: ContributorSchemaWithLevel[] = [];
-
     Object.keys(sigInfo).forEach((key) => {
       switch (key) {
         case SigMemberLevelKey.Leader: {
@@ -91,6 +90,16 @@ export class SigService {
             contributorInfos.push({
               ...c,
               level: SigMemberLevel.Leader,
+            });
+          });
+          break;
+        }
+        case SigMemberLevelKey.CoLeader: {
+          const contributors = sigInfo[SigMemberLevelKey.CoLeader];
+          contributors.forEach((c) => {
+            contributorInfos.push({
+              ...c,
+              level: SigMemberLevel.CoLeader,
             });
           });
           break;
@@ -153,6 +162,7 @@ export class SigService {
       const { data: sigInfo } = await axios.get(files[i].raw_url);
       const sig = await this.findOrAddSig(sigInfo);
       const contributorInfos = this.collectContributorsByLevel(sigInfo);
+
       const contributorInfosMap = new Map(
         contributorInfos.map((c) => [c.githubId, c])
       );

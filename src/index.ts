@@ -30,7 +30,6 @@ export = (app: Application) => {
       });
     })
     .catch((err) => {
-      console.log(err);
       app.log.fatal("Connect to db failed", err);
     });
 };

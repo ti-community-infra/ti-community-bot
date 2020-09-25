@@ -28,7 +28,11 @@ export default class PullService {
   ): string | undefined {
     const contributorsMap = new Set();
     const contributors = Object.values(sigInfo).reduce((a, b) => {
-      return a.concat(b);
+      // FIXME: it should be checked in a more reasonable way.
+      if (Array.isArray(a) && Array.isArray(b)) {
+        return a.concat(b);
+      }
+      return [];
     });
 
     for (let contributor of contributors) {
