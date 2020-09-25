@@ -11,8 +11,8 @@ export class ContributorInfo {
   @Column({ default: null })
   name: string;
 
-  @Column({ default: null })
-  email: string;
+  @Column({ type: "varchar", default: null })
+  email?: string | null;
 
   @Column({ default: null })
   location: string;
@@ -23,8 +23,8 @@ export class ContributorInfo {
   @Column({ default: null })
   other: string;
 
-  @Column({ default: null })
-  company: string;
+  @Column({ type: "varchar", default: null })
+  company?: string | null;
 
   @Column({ default: null })
   tp: string;

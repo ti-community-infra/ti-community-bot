@@ -26,11 +26,12 @@
   "dependencies": {
     "ajv": "^6.12.5",
     "axios": "^0.20.0",
+    "mysql": "^2.18.1",
     "probot": "^10.7.1",
     "probot-commands-pro": "^1.0.1",
     "reflect-metadata": "^0.1.13",
-    "typeorm": "^0.2.26",
     "typedi": "^0.8.0",
+    "typeorm": "^0.2.26",
     "typeorm-typedi-extensions": "^0.2.3"
   },
   "devDependencies": {

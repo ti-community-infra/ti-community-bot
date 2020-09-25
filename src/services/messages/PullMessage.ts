@@ -1,6 +1,6 @@
-import sigMembersSchema from "../../config/sig.members.schema.json";
+import sigInfoSchema from "../../config/sig.info.schema.json";
 
-export enum PullFormatMessage {
+export enum PullMessage {
   FormatSuccess = "Format Success.",
   OnlyOneRole = "Contributors can only have one role.",
 }
@@ -19,7 +19,7 @@ export function migrateToJSONTip() {
   You should migrate the current file to a json file, the file format is as follows:
 
   \`\`\`json
-  ${JSON.stringify(sigMembersSchema, null, 4)}
+  ${JSON.stringify(sigInfoSchema, null, 4)}
   \`\`\`
 
   `;

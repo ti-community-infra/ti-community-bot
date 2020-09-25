@@ -1,8 +1,15 @@
 import { Column, Entity, PrimaryGeneratedColumn, Unique } from "typeorm";
 
+export enum SigMemberLevel {
+  Leader = "leader",
+  Committer = "committer",
+  Reviewer = "reviewer",
+  ActiveContributor = "active-contributor",
+}
+
 // FIXME: it should be sig_members.
 @Entity({ name: "sig_member" })
-@Unique("sig_id", ["sig_id", "contributor_id"])
+@Unique("sig_id", ["sigId", "contributorId"])
 export class SigMember {
   @PrimaryGeneratedColumn({ name: "id" })
   id: number;

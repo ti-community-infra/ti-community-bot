@@ -5,17 +5,18 @@ import { PullFileQuery } from "../../queries/PullFileQuery";
 import {
   Config,
   DEFAULT_CONFIG_FILE_PATH,
-  DEFAULT_SIG_MEMBERS_FILE_NAME,
+  DEFAULT_SIG_INFO_FILE_NAME,
 } from "../../config/Config";
 import Ajv from "ajv";
 
-import sigMembersSchema from "../../config/sig.members.schema.json";
+import sigInfoSchema from "../../config/sig.info.schema.json";
 import { Status } from "../../services/reply";
 import { combineReplay } from "../../services/utils/ReplyUtil";
+import { SigService } from "../../services/sig";
 
 // NOTICE: compile schema.
 const ajv = Ajv();
-const validate = ajv.compile(sigMembersSchema);
+const validate = ajv.compile(sigInfoSchema);
 
 enum PullRequestActions {
   Opened = "opened",
@@ -26,11 +27,10 @@ enum PullRequestActions {
   Reopened = "reopened",
 }
 
-const checkFormat = async (
-  context: Context,
-  pullRequestFormatService: PullService
-) => {
-  const { head, number } = context.payload.pull_request;
+const constructPullFormatQuery = async (
+  context: Context
+): Promise<PullFormatQuery> => {
+  const { number } = context.payload.pull_request;
 
   const { data: filesData } = await context.github.pulls.listFiles({
     ...context.issue(),
@@ -46,15 +46,23 @@ const checkFormat = async (
   // NOTICE: get config from repo.
   const config = await context.config<Config>(DEFAULT_CONFIG_FILE_PATH);
 
-  const pullRequestFormatQuery: PullFormatQuery = {
-    sigMembersFileName:
-      config?.sigMembersFileName || DEFAULT_SIG_MEMBERS_FILE_NAME,
+  return {
+    sigInfoFileName: config?.sigInfoFileName || DEFAULT_SIG_INFO_FILE_NAME,
     files,
   };
+};
+
+const checkFormat = async (
+  context: Context,
+  pullRequestFormatService: PullService
+) => {
+  const { head } = context.payload.pull_request;
+
+  const pullFormatQuery = await constructPullFormatQuery(context);
 
   const reply = await pullRequestFormatService.formatting(
     validate,
-    pullRequestFormatQuery
+    pullFormatQuery
   );
 
   const status = {
@@ -64,6 +72,8 @@ const checkFormat = async (
     description: reply.message,
     context: "Sig Members File Format",
   };
+
+  const { files } = pullFormatQuery;
 
   switch (reply.status) {
     case Status.Failed: {
@@ -101,12 +111,49 @@ const checkFormat = async (
   }
 };
 
+const updateSigInfo = async (context: Context, sigService: SigService) => {
+  const pullFormatQuery = await constructPullFormatQuery(context);
+
+  const reply = await sigService.updateSigInfo(pullFormatQuery);
+
+  const { files } = pullFormatQuery;
+
+  switch (reply.status) {
+    case Status.Failed: {
+      context.log.error("Update sig info.", files);
+      await context.github.issues.createComment(
+        context.issue({ body: reply.message })
+      );
+      break;
+    }
+    case Status.Success: {
+      context.log.info("Update sig info.", files);
+      await context.github.issues.createComment(
+        context.issue({ body: reply.message })
+      );
+      break;
+    }
+    case Status.Problematic: {
+      context.log.warn("Update sig info has some problems.", files);
+      await context.github.issues.createComment(
+        context.issue({ body: combineReplay(reply) })
+      );
+    }
+  }
+};
+
 const handlePullRequestEvents = async (
   context: Context,
-  pullRequestFormatService: PullService
+  pullRequestFormatService: PullService,
+  sigService: SigService
 ) => {
   switch (context.payload.action) {
     case PullRequestActions.Closed: {
+      const { merged_at: mergedAt } = context.payload.pull_request;
+      // NOTICE: we update sig info when PR merged.
+      if (mergedAt) {
+        await updateSigInfo(context, sigService);
+      }
       break;
     }
     case PullRequestActions.Labeled: {
