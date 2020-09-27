@@ -1,11 +1,11 @@
 import { Column, Entity, PrimaryGeneratedColumn, Unique } from "typeorm";
 
 export enum SigMemberLevel {
-  Leader = "leader",
-  CoLeader = "co-leader",
-  Committer = "committer",
-  Reviewer = "reviewer",
-  ActiveContributor = "active-contributor",
+  techLeaders = "leader",
+  coLeaders = "co-leader",
+  committers = "committer",
+  reviewers = "reviewer",
+  activeContributors = "active-contributor",
 }
 
 // FIXME: it should be sig_members.

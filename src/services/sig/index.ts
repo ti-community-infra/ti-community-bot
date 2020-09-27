@@ -7,11 +7,7 @@ import { ContributorInfo } from "../../db/entities/ContributorInfo";
 import { PullFormatQuery } from "../../queries/PullFormatQuery";
 import { Reply, Status } from "../reply";
 import { FileStatus } from "../pull";
-import {
-  ContributorSchema,
-  SigMemberLevelKey,
-  SigInfoSchema,
-} from "../../config/SigInfoSchema";
+import { ContributorSchema, SigInfoSchema } from "../../config/SigInfoSchema";
 import assert from "assert";
 import { SigMessage } from "../messages/SigMessage";
 
@@ -82,62 +78,24 @@ export class SigService {
     sigInfo: SigInfoSchema
   ): ContributorSchemaWithLevel[] {
     const contributorInfos: ContributorSchemaWithLevel[] = [];
-    // FIXME: need a better way to reduce duplication of code.
-    Object.keys(sigInfo).forEach((key) => {
-      switch (key) {
-        case SigMemberLevelKey.Leader: {
-          const contributors = sigInfo[SigMemberLevelKey.Leader];
-          contributors.forEach((c) => {
-            contributorInfos.push({
-              ...c,
-              level: SigMemberLevel.Leader,
-            });
-          });
-          break;
-        }
-        case SigMemberLevelKey.CoLeader: {
-          const contributors = sigInfo[SigMemberLevelKey.CoLeader];
-          contributors.forEach((c) => {
-            contributorInfos.push({
-              ...c,
-              level: SigMemberLevel.CoLeader,
-            });
-          });
-          break;
-        }
-        case SigMemberLevelKey.Committer: {
-          const contributors = sigInfo[SigMemberLevelKey.Committer];
-          contributors.forEach((c) => {
-            contributorInfos.push({
-              ...c,
-              level: SigMemberLevel.Committer,
-            });
-          });
-          break;
-        }
-        case SigMemberLevelKey.Reviewer: {
-          const contributors = sigInfo[SigMemberLevelKey.Reviewer];
-          contributors.forEach((c) => {
-            contributorInfos.push({
-              ...c,
-              level: SigMemberLevel.Reviewer,
-            });
-          });
-          break;
-        }
-        case SigMemberLevelKey.ActiveContributor: {
-          const contributors = sigInfo[SigMemberLevelKey.ActiveContributor];
-          contributors.forEach((c) => {
-            contributorInfos.push({
-              ...c,
-              level: SigMemberLevel.ActiveContributor,
-            });
-          });
-          break;
-        }
-      }
-    });
 
+    Object.keys(sigInfo).forEach((key) => {
+      Object.keys(SigMemberLevel).forEach((memberLevelKey) => {
+        if (key === memberLevelKey) {
+          console.log(key, memberLevelKey);
+          const contributors = sigInfo[key];
+          if (Array.isArray(contributors)) {
+            contributors.forEach((c) => {
+              contributorInfos.push({
+                ...c,
+                level:
+                  SigMemberLevel[memberLevelKey as keyof typeof SigMemberLevel],
+              });
+            });
+          }
+        }
+      });
+    });
     return contributorInfos;
   }
 
