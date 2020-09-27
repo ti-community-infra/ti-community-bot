@@ -10,7 +10,7 @@ import {
   migrateToJSONTip,
 } from "../messages/PullMessage";
 import { Service } from "typedi";
-import { SigInfoSchema } from "../../config/SigInfoSchema";
+import { ContributorSchema, SigInfoSchema } from "../../config/SigInfoSchema";
 
 const axios = require("axios").default;
 
@@ -27,12 +27,12 @@ export default class PullService {
     sigInfo: SigInfoSchema
   ): string | undefined {
     const contributorsMap = new Set();
-    const contributors = Object.values(sigInfo).reduce((a, b) => {
-      // FIXME: it should be checked in a more reasonable way.
-      if (Array.isArray(a) && Array.isArray(b)) {
-        return a.concat(b);
+
+    let contributors: ContributorSchema[] = [];
+    Object.values(sigInfo).forEach((value) => {
+      if (Array.isArray(value)) {
+        contributors = contributors.concat(value);
       }
-      return [];
     });
 
     for (let contributor of contributors) {
