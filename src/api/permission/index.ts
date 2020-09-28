@@ -10,6 +10,8 @@ import {
 } from "../../config/Config";
 import { config } from "../../services/utils/ConfigUtil";
 import { ContributorSchema } from "../../config/SigInfoSchema";
+import { StatusCodes } from "http-status-codes";
+import { PullMessage } from "../../services/messages/PullMessage";
 
 const listPermissions = async (
   req: Request,
@@ -17,6 +19,7 @@ const listPermissions = async (
   permissionService: PermissionService,
   github: InstanceType<typeof ProbotOctokit>
 ) => {
+  // Collect params.
   const owner = req.params.owner;
   const repo = req.params.repo;
   const pullNumber = Number(req.params.number);
@@ -33,6 +36,7 @@ const listPermissions = async (
     };
   });
 
+  // Get config form repo.
   const repoConfig = await config<Config>(
     owner,
     repo,
@@ -40,15 +44,25 @@ const listPermissions = async (
     github
   );
 
-  // TODO: need response.
+  // Because we need this config to get maintainer team.
   if (repoConfig === null) {
+    res.status(StatusCodes.BAD_REQUEST);
+    const response = {
+      data: null,
+      status: StatusCodes.BAD_REQUEST,
+      message: PullMessage.ConfigNotFound,
+    };
+    res.json(response);
+
     return;
   }
 
+  // Get maintainers and repo collaborators.
   const { data: maintainerInfos } = await github.teams.listMembersInOrg({
     org: owner,
     team_slug: repoConfig.maintainerTeamSlug,
   });
+
   const maintainers: ContributorSchema[] = maintainerInfos.map((m) => {
     return {
       githubId: m.login,

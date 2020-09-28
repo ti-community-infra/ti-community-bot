@@ -5,6 +5,7 @@ import { ProbotOctokit } from "probot/lib/octokit/probot-octokit";
 import path from "path";
 
 export type MergeOptions = merge.Options;
+
 type ReposGetContentsParams = Endpoints["GET /repos/:owner/:repo/contents/:path"]["parameters"];
 
 const CONFIG_PATH = ".github";
@@ -19,6 +20,11 @@ const BASE_REGEX = new RegExp(
   "i"
 );
 
+/**
+ * Load yaml form github repo.
+ * @param params Repo get content params.
+ * @param github Github api instance.
+ */
 async function loadYaml(
   params: ReposGetContentsParams,
   github: InstanceType<typeof ProbotOctokit>
@@ -30,16 +36,15 @@ async function loadYaml(
       params
     );
 
-    // Ignore in case path is a folder
+    // Ignore in case path is a folder.
     // - https://developer.github.com/v3/repos/contents/#response-if-content-is-a-directory
     if (Array.isArray(response.data)) {
       return null;
     }
 
-    // we don't handle symlinks or submodule
+    // We don't handle symlinks or submodule.
     // - https://developer.github.com/v3/repos/contents/#response-if-content-is-a-symlink
     // - https://developer.github.com/v3/repos/contents/#response-if-content-is-a-submodule
-    // tslint:disable-next-line
     if (typeof response.data.content !== "string") {
       return;
     }
@@ -57,6 +62,11 @@ async function loadYaml(
   }
 }
 
+/**
+ * Get base params.
+ * @param params
+ * @param base
+ */
 function getBaseParams(
   params: ReposGetContentsParams,
   base: string
@@ -73,6 +83,15 @@ function getBaseParams(
   };
 }
 
+/**
+ * Get config form github repo.
+ * @param owner Github repo owner.
+ * @param repo Github repo name.
+ * @param fileName Github config file name.
+ * @param github Github api instance.
+ * @param defaultConfig Default config.
+ * @param deepMergeOptions Deep merge options.
+ */
 export async function config<T>(
   owner: string,
   repo: string,
