@@ -11,7 +11,7 @@ import { Reply, Status } from "../reply";
 import { FileStatus } from "../pull";
 import { ContributorSchema, SigInfoSchema } from "../../config/SigInfoSchema";
 import { SigMessage } from "../messages/SigMessage";
-import { collectContributorsByLevel } from "../utils/SigInfoUtils";
+import { collectContributorsWithLevel } from "../utils/SigInfoUtils";
 
 const axios = require("axios").default;
 
@@ -95,7 +95,7 @@ export class SigService {
     for (let i = 0; i < files.length; i++) {
       const { data: sigInfo } = await axios.get(files[i].raw_url);
       const sig = await this.findOrAddSig(sigInfo);
-      const contributorInfos = collectContributorsByLevel(sigInfo);
+      const contributorInfos = collectContributorsWithLevel(sigInfo);
 
       const contributorInfosMap = new Map(
         contributorInfos.map((c) => [c.githubId, c])

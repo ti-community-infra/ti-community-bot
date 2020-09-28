@@ -18,7 +18,7 @@ import { ContributorSchema, SigInfoSchema } from "../../config/SigInfoSchema";
 import { Sig } from "../../db/entities/Sig";
 import { SigMember, SigMemberLevel } from "../../db/entities/SigMember";
 import {
-  collectContributorsByLevel,
+  collectContributorsWithLevel,
   ContributorInfoWithLevel,
 } from "../utils/SigInfoUtils";
 import { ContributorInfo } from "../../db/entities/ContributorInfo";
@@ -298,7 +298,7 @@ export default class PullService {
 
     // Get the PR's members diff.
     const oldMembersWithLevel = await this.listSigMembers(sig.id);
-    const newMembersWithLevel = collectContributorsByLevel(sigInfo);
+    const newMembersWithLevel = collectContributorsWithLevel(sigInfo);
     const difference = [...newMembersWithLevel].filter((nm) =>
       [...oldMembersWithLevel].every((om) => !equal(om, nm))
     );

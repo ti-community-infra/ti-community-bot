@@ -9,7 +9,11 @@ export interface ContributorInfoWithLevel {
   company?: string;
 }
 
-export function collectContributorsByLevel(
+/**
+ * Collect contributor info with level.
+ * @param sigInfo Sig info.
+ */
+export function collectContributorsWithLevel(
   sigInfo: SigInfoSchema
 ): ContributorInfoWithLevel[] {
   const contributorInfos: ContributorInfoWithLevel[] = [];
