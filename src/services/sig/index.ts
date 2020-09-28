@@ -1,14 +1,15 @@
 import { Service } from "typedi";
 import { InjectRepository } from "typeorm-typedi-extensions";
-import { Sig } from "../../db/entities/Sig";
+import assert from "assert";
 import { Repository } from "typeorm";
+
+import { Sig } from "../../db/entities/Sig";
 import { SigMember } from "../../db/entities/SigMember";
 import { ContributorInfo } from "../../db/entities/ContributorInfo";
 import { PullFormatQuery } from "../../queries/PullFormatQuery";
 import { Reply, Status } from "../reply";
 import { FileStatus } from "../pull";
 import { ContributorSchema, SigInfoSchema } from "../../config/SigInfoSchema";
-import assert from "assert";
 import { SigMessage } from "../messages/SigMessage";
 import { collectContributorsByLevel } from "../utils/SigInfoUtils";
 
