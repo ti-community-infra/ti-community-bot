@@ -6,7 +6,7 @@ import "reflect-metadata";
 import handlePullRequestEvents from "./events/pull";
 import PullService from "./services/pull";
 import { SigService } from "./services/sig";
-import listReviewers from "./api/permission";
+import listReviewers from "./api/pull";
 import { StatusCodes } from "http-status-codes";
 import { PullMessage } from "./services/messages/PullMessage";
 

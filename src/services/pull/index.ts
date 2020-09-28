@@ -21,7 +21,7 @@ import {
 } from "../utils/SigInfoUtils";
 import { ContributorInfo } from "../../db/entities/ContributorInfo";
 import { PullReviewersDTO } from "../dtos/PullReviewersDTO";
-import { PullReviewQuery } from "../../queries/PullReviewQuery";
+import { PullReviewersQuery } from "../../queries/PullReviewersQuery";
 import { Response } from "../response";
 import { StatusCodes } from "http-status-codes";
 
@@ -236,7 +236,7 @@ export default class PullService {
    * @param pullReviewQuery Pull request review query.
    */
   public async listReviewers(
-    pullReviewQuery: PullReviewQuery
+    pullReviewQuery: PullReviewersQuery
   ): Promise<Response<PullReviewersDTO | null>> {
     // Filter sig file name.
     const files = pullReviewQuery.files.filter((f) => {

@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { ProbotOctokit } from "probot/lib/octokit/probot-octokit";
 
 import { PullFileQuery } from "../../queries/PullFileQuery";
-import { PullReviewQuery } from "../../queries/PullReviewQuery";
+import { PullReviewersQuery } from "../../queries/PullReviewersQuery";
 import {
   Config,
   DEFAULT_CONFIG_FILE_PATH,
@@ -17,7 +17,7 @@ import PullService from "../../services/pull";
 const listReviews = async (
   req: Request,
   res: Response,
-  permissionService: PullService,
+  pullService: PullService,
   github: InstanceType<typeof ProbotOctokit>
 ) => {
   // Collect params.
@@ -80,14 +80,14 @@ const listReviews = async (
     };
   });
 
-  const pullPermissionQuery: PullReviewQuery = {
+  const pullReviewersQuery: PullReviewersQuery = {
     sigInfoFileName: repoConfig.sigInfoFileName || DEFAULT_SIG_INFO_FILE_NAME,
     maintainers,
     collaborators,
     files,
   };
 
-  const response = await permissionService.listReviewers(pullPermissionQuery);
+  const response = await pullService.listReviewers(pullReviewersQuery);
 
   res.status(response.status);
   res.json(response);
