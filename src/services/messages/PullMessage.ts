@@ -7,6 +7,7 @@ export enum PullMessage {
   InstallationIdNotFound = "The installation ID could not be found.",
   CanNotHandleMultipleSigFiles = "Cannot handle the permissions of multiple sig info files.",
   ListReviewersSuccess = "List reviewers success.",
+  CanNotModifyMultipleSigFiles = "Cannot modify multiple sig info files in one PR.",
 }
 
 export function mustBeJSONFileMessage(fileName: string) {

@@ -12,6 +12,7 @@ import { FileStatus } from "../pull";
 import { ContributorSchema, SigInfoSchema } from "../../config/SigInfoSchema";
 import { SigMessage } from "../messages/SigMessage";
 import { collectContributorsWithLevel } from "../utils/SigInfoUtils";
+import { MAX_SIG_INFO_FILE_CHANGE_NUMBER } from "../../config/Config";
 
 const axios = require("axios").default;
 
@@ -26,6 +27,11 @@ export class SigService {
     private contributorInfoRepository: Repository<ContributorInfo>
   ) {}
 
+  /**
+   * Find or add a sig.
+   * @param sigInfo
+   * @private
+   */
   private async findOrAddSig(sigInfo: SigInfoSchema): Promise<Sig> {
     let sig = await this.sigRepository.findOne({
       where: {
@@ -42,13 +48,18 @@ export class SigService {
     return sig;
   }
 
+  /**
+   * Update or add contributors.
+   * @param contributorsInfo Contributors info.
+   * @private
+   */
   private async updateOrAddContributors(
-    contributorInfos: ContributorSchema[]
+    contributorsInfo: ContributorSchema[]
   ): Promise<ContributorInfo[]> {
     const contributors = [];
 
-    for (let i = 0; i < contributorInfos.length; i++) {
-      const contributorInfo = contributorInfos[i];
+    for (let i = 0; i < contributorsInfo.length; i++) {
+      const contributorInfo = contributorsInfo[i];
       let contributor = await this.contributorInfoRepository.findOne({
         where: {
           github: contributorInfo.githubId,
@@ -68,6 +79,11 @@ export class SigService {
     return contributors;
   }
 
+  /**
+   * Delete sig members.
+   * @param sigId
+   * @private
+   */
   private async deleteSigMembers(sigId: number) {
     await this.sigMemberRepository.query(
       `delete from sig_member where sig_id = '${sigId}'`
@@ -92,37 +108,37 @@ export class SigService {
       );
     });
 
-    for (let i = 0; i < files.length; i++) {
-      const { data: sigInfo } = await axios.get(files[i].raw_url);
-      const sig = await this.findOrAddSig(sigInfo);
-      const contributorInfos = collectContributorsWithLevel(sigInfo);
+    const sigInfoFile = files[MAX_SIG_INFO_FILE_CHANGE_NUMBER - 1];
 
-      const contributorInfosMap = new Map(
-        contributorInfos.map((c) => [c.githubId, c])
-      );
+    const { data: sigInfo } = await axios.get(sigInfoFile.raw_url);
+    const sig = await this.findOrAddSig(sigInfo);
+    const contributorsInfo = collectContributorsWithLevel(sigInfo);
 
-      const contributors = await this.updateOrAddContributors(contributorInfos);
-      assert(contributorInfos.length === contributors.length);
+    const contributorsInfoMap = new Map(
+      contributorsInfo.map((c) => [c.githubId, c])
+    );
 
-      await this.deleteSigMembers(sig.id);
-      for (let j = 0; j < contributors.length; j++) {
-        const contributor = contributors[j];
-        let sigMember = await this.sigMemberRepository.findOne({
-          where: {
-            sigId: sig.id,
-            contributorId: contributor.id,
-          },
-        });
+    const contributors = await this.updateOrAddContributors(contributorsInfo);
+    assert(contributorsInfo.length === contributors.length);
 
-        if (sigMember === undefined) {
-          sigMember = new SigMember();
-          sigMember.sigId = sig.id;
-          sigMember.contributorId = contributor.id;
-        }
+    await this.deleteSigMembers(sig.id);
+    for (let j = 0; j < contributors.length; j++) {
+      const contributor = contributors[j];
+      let sigMember = await this.sigMemberRepository.findOne({
+        where: {
+          sigId: sig.id,
+          contributorId: contributor.id,
+        },
+      });
 
-        sigMember.level = contributorInfosMap.get(contributor.github)!.level;
-        await this.sigMemberRepository.save(sigMember);
+      if (sigMember === undefined) {
+        sigMember = new SigMember();
+        sigMember.sigId = sig.id;
+        sigMember.contributorId = contributor.id;
       }
+
+      sigMember.level = contributorsInfoMap.get(contributor.github)!.level;
+      await this.sigMemberRepository.save(sigMember);
     }
 
     return {

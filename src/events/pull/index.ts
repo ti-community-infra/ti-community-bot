@@ -52,25 +52,24 @@ const constructPullFormatQuery = async (
   };
 };
 
-const checkFormat = async (
-  context: Context,
-  pullRequestFormatService: PullService
-) => {
+/**
+ * Check pull format.
+ * @param context Probot context.
+ * @param pullService Pull request service.
+ */
+const checkPullFormat = async (context: Context, pullService: PullService) => {
   const { head } = context.payload.pull_request;
 
   const pullFormatQuery = await constructPullFormatQuery(context);
 
-  const reply = await pullRequestFormatService.formatting(
-    validate,
-    pullFormatQuery
-  );
+  const reply = await pullService.formatting(validate, pullFormatQuery);
 
   const status = {
     sha: head.sha,
     state: reply.status === Status.Success ? "success" : "failure",
     target_url: "https://github.com/tidb-community-bots/ti-community-bot",
     description: reply.message,
-    context: "Sig Members File Format",
+    context: "Sig Info File Format",
   };
 
   const { files } = pullFormatQuery;
@@ -163,7 +162,7 @@ const handlePullRequestEvents = async (
       break;
     }
     default: {
-      await checkFormat(context, pullRequestFormatService);
+      await checkPullFormat(context, pullRequestFormatService);
       break;
     }
   }
