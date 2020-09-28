@@ -4,7 +4,7 @@ import { Response } from "../response";
 import { PullPermissionsDTO } from "../dtos/PullPermissionsDTO";
 import { InjectRepository } from "typeorm-typedi-extensions";
 import { Repository } from "typeorm";
-import { SigMember } from "../../db/entities/SigMember";
+import { SigMember, SigMemberLevel } from "../../db/entities/SigMember";
 import { Sig } from "../../db/entities/Sig";
 import { ContributorInfo } from "../../db/entities/ContributorInfo";
 import { FileStatus } from "../pull";
@@ -16,6 +16,7 @@ import {
 } from "../utils/SigInfoUtils";
 
 const axios = require("axios").default;
+const equal = require("deep-equal");
 
 @Service()
 export class PermissionService {
@@ -35,14 +36,66 @@ export class PermissionService {
         .leftJoinAndSelect(Sig, "s", "sm.sig_id = s.id")
         .leftJoinAndSelect(ContributorInfo, "ci", "sm.contributor_id = ci.id")
         .where(`sig_id = ${sigId}`)
-        .select("ci.github as githubId, sm.level as level")
+        .select(
+          "ci.github as githubId, sm.level as level, ci.email as email, ci.company as company"
+        )
         .getRawMany()
     ).map((c) => {
       return {
         githubId: c.githubId,
         level: c.level,
+        email: c.email,
+        company: c.company,
       };
     });
+  }
+
+  private getPermissionsByDiff(
+    diff: ContributorInfoWithLevel[],
+    oldMembers: ContributorInfoWithLevel[],
+    maintainers: string[]
+  ): PullPermissionsDTO | undefined {
+    for (let i = 0; i < diff.length; i++) {
+      // FIXME: be a set.
+      const contributor = diff[i];
+      switch (contributor.level) {
+        case SigMemberLevel.techLeaders:
+        case SigMemberLevel.coLeaders:
+        case SigMemberLevel.committers: {
+          return {
+            collaborators: maintainers,
+            lgtmNumber: 2,
+          };
+        }
+        case SigMemberLevel.reviewers: {
+          return {
+            collaborators: oldMembers
+              .filter(
+                (om) =>
+                  om.level !== SigMemberLevel.reviewers &&
+                  om.level !== SigMemberLevel.activeContributors
+              )
+              .map((c) => {
+                return c.githubId;
+              })
+              .concat(maintainers),
+            lgtmNumber: 2,
+          };
+        }
+        case SigMemberLevel.activeContributors: {
+          return {
+            collaborators: oldMembers
+              .filter((om) => om.level !== SigMemberLevel.activeContributors)
+              .map((c) => {
+                return c.githubId;
+              })
+              .concat(maintainers),
+            lgtmNumber: 1,
+          };
+        }
+      }
+    }
+    return undefined;
   }
 
   public async listPermissions(
@@ -106,17 +159,22 @@ export class PermissionService {
     const newMembersWithLevel = collectContributorsByLevel(sigInfo);
 
     const difference = [...newMembersWithLevel].filter((nm) =>
-      [...oldMembersWithLevel].every((om) => om.githubId !== nm.githubId)
+      [...oldMembersWithLevel].every((om) => !equal(om, nm))
     );
 
-    console.log(difference);
+    const dto = this.getPermissionsByDiff(
+      difference,
+      oldMembersWithLevel,
+      pullPermissionQuery.maintainers.map((m) => {
+        return m.githubId;
+      })
+    );
 
-    const collaborators = difference.map((c) => {
-      return c.githubId;
-    });
     return {
-      data: {
-        collaborators,
+      data: dto || {
+        collaborators: pullPermissionQuery.collaborators.map((c) => {
+          return c.githubId;
+        }),
         lgtmNumber: 2,
       },
       status: StatusCodes.OK,
