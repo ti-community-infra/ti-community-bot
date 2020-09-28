@@ -13,7 +13,10 @@ import {
 } from "../messages/PullMessage";
 import { PullFormatQuery } from "../../queries/PullFormatQuery";
 import { Reply, Status } from "../reply";
-import { DEFAULT_SIG_INFO_FILE_EXT } from "../../config/Config";
+import {
+  DEFAULT_SIG_INFO_FILE_EXT,
+  MAX_SIG_INFO_FILE_CHANGE_NUMBER,
+} from "../../config/Config";
 import { ContributorSchema, SigInfoSchema } from "../../config/SigInfoSchema";
 import { Sig } from "../../db/entities/Sig";
 import { SigMember, SigMemberLevel } from "../../db/entities/SigMember";
@@ -50,9 +53,14 @@ export default class PullService {
     private sigMemberRepository: Repository<SigMember>
   ) {}
 
+  /**
+   * Check contributor has only on role.
+   * @param sigInfo Sig info.
+   * @private
+   */
   private static checkContributorHasOnlyOneRole(
     sigInfo: SigInfoSchema
-  ): string | undefined {
+  ): string | null {
     const contributorsMap = new Set();
 
     let contributors: ContributorSchema[] = [];
@@ -69,7 +77,7 @@ export default class PullService {
         return contributor.githubId;
       }
     }
-    return;
+    return null;
   }
 
   /**
@@ -184,6 +192,14 @@ export default class PullService {
       );
     });
 
+    if (files.length > MAX_SIG_INFO_FILE_CHANGE_NUMBER) {
+      return {
+        data: null,
+        status: Status.Failed,
+        message: PullMessage.CanNotModifyMultipleSigFiles,
+      };
+    }
+
     // Filter sig file extension。
     const illegalFilesExt = files.filter((f) => {
       return !f.filename.includes(DEFAULT_SIG_INFO_FILE_EXT);
@@ -198,31 +214,29 @@ export default class PullService {
       };
     }
 
-    // Check each file format.
-    for (let i = 0; i < files.length; i++) {
-      const { data: sigInfo } = await axios.get(files[i].raw_url);
-      if (!validate(sigInfo)) {
-        return {
-          data: null,
-          status: Status.Problematic,
-          message: mustMatchSchemaMessage(
-            pullRequestFormatQuery.sigInfoFileName
-          ),
-          tip: migrateToJSONTip(),
-          warning: JSON.stringify(validate.errors),
-        };
-      }
-      const githubId = PullService.checkContributorHasOnlyOneRole(
-        <SigInfoSchema>sigInfo
-      );
-      if (githubId !== undefined) {
-        return {
-          data: null,
-          status: Status.Problematic,
-          message: PullMessage.OnlyOneRole,
-          warning: contributorHasMultipleRoleWarning(githubId),
-        };
-      }
+    // Check sig ingo file format.
+    const sigInfoFile = files[MAX_SIG_INFO_FILE_CHANGE_NUMBER - 1];
+
+    const { data: sigInfo } = await axios.get(sigInfoFile.raw_url);
+    if (!validate(sigInfo)) {
+      return {
+        data: null,
+        status: Status.Problematic,
+        message: mustMatchSchemaMessage(pullRequestFormatQuery.sigInfoFileName),
+        tip: migrateToJSONTip(),
+        warning: JSON.stringify(validate.errors),
+      };
+    }
+    const githubId = PullService.checkContributorHasOnlyOneRole(
+      <SigInfoSchema>sigInfo
+    );
+    if (githubId !== null) {
+      return {
+        data: null,
+        status: Status.Problematic,
+        message: PullMessage.OnlyOneRole,
+        warning: contributorHasMultipleRoleWarning(githubId),
+      };
     }
 
     return {
@@ -247,7 +261,7 @@ export default class PullService {
       );
     });
 
-    if (files.length > 1) {
+    if (files.length > MAX_SIG_INFO_FILE_CHANGE_NUMBER) {
       return {
         data: null,
         status: StatusCodes.BAD_REQUEST,
@@ -272,7 +286,9 @@ export default class PullService {
     }
 
     // Get sig info.
-    const { data } = await axios.get(files[0].raw_url);
+    const { data } = await axios.get(
+      files[MAX_SIG_INFO_FILE_CHANGE_NUMBER - 1].raw_url
+    );
     const sigInfo = <SigInfoSchema>data;
     // Find sig.
     const sig = await this.sigRepository.findOne({
