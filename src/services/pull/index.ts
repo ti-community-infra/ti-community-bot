@@ -250,7 +250,7 @@ export default class PullService {
     if (files.length > 1) {
       return {
         data: null,
-        status: StatusCodes.CONFLICT,
+        status: StatusCodes.BAD_REQUEST,
         message: PullMessage.CanNotHandleMultipleSigFiles,
       };
     }
