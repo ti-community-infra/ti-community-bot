@@ -1,8 +1,8 @@
-import { PermissionService } from "../../services/permission";
 import { Request, Response } from "express";
 import { ProbotOctokit } from "probot/lib/octokit/probot-octokit";
+
 import { PullFileQuery } from "../../queries/PullFileQuery";
-import { PullPermissionQuery } from "../../queries/PullPermissionQuery";
+import { PullReviewQuery } from "../../queries/PullReviewQuery";
 import {
   Config,
   DEFAULT_CONFIG_FILE_PATH,
@@ -12,11 +12,12 @@ import { config } from "../../services/utils/ConfigUtil";
 import { ContributorSchema } from "../../config/SigInfoSchema";
 import { StatusCodes } from "http-status-codes";
 import { PullMessage } from "../../services/messages/PullMessage";
+import PullService from "../../services/pull";
 
-const listPermissions = async (
+const listReviews = async (
   req: Request,
   res: Response,
-  permissionService: PermissionService,
+  permissionService: PullService,
   github: InstanceType<typeof ProbotOctokit>
 ) => {
   // Collect params.
@@ -79,17 +80,17 @@ const listPermissions = async (
     };
   });
 
-  const pullPermissionQuery: PullPermissionQuery = {
+  const pullPermissionQuery: PullReviewQuery = {
     sigInfoFileName: repoConfig.sigInfoFileName || DEFAULT_SIG_INFO_FILE_NAME,
     maintainers,
     collaborators,
     files,
   };
 
-  const response = await permissionService.listPermissions(pullPermissionQuery);
+  const response = await permissionService.listReviewers(pullPermissionQuery);
 
   res.status(response.status);
   res.json(response);
 };
 
-export default listPermissions;
+export default listReviews;

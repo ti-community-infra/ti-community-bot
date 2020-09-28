@@ -6,8 +6,7 @@ import "reflect-metadata";
 import handlePullRequestEvents from "./events/pull";
 import PullService from "./services/pull";
 import { SigService } from "./services/sig";
-import { PermissionService } from "./services/permission";
-import listPermissions from "./api/permission";
+import listReviewers from "./api/permission";
 import { StatusCodes } from "http-status-codes";
 import { PullMessage } from "./services/messages/PullMessage";
 
@@ -53,7 +52,7 @@ export = (app: Application) => {
       });
 
       router.get(
-        "/repos/:owner/:repo/pull/:number/permissions",
+        "/repos/:owner/:repo/pulls/:number/reviewers",
         async (req, res) => {
           const installationId = await getInstallationId(req.params.owner);
           if (installationId === null) {
@@ -69,12 +68,7 @@ export = (app: Application) => {
           }
 
           const github = await app.auth(installationId);
-          await listPermissions(
-            req,
-            res,
-            Container.get(PermissionService),
-            github
-          );
+          await listReviewers(req, res, Container.get(PullService), github);
         }
       );
     })
