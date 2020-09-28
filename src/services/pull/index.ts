@@ -1,7 +1,9 @@
-import { PullFormatQuery } from "../../queries/PullFormatQuery";
-import { Reply, Status } from "../reply";
-import { DEFAULT_SIG_INFO_FILE_EXT } from "../../config/Config";
 import { ValidateFunction } from "ajv";
+import { Service } from "typedi";
+import { InjectRepository } from "typeorm-typedi-extensions";
+import { Repository } from "typeorm";
+import { StatusCodes } from "http-status-codes";
+
 import {
   contributorHasMultipleRoleWarning,
   mustBeJSONFileMessage,
@@ -9,11 +11,11 @@ import {
   PullMessage,
   migrateToJSONTip,
 } from "../messages/PullMessage";
-import { Service } from "typedi";
+import { PullFormatQuery } from "../../queries/PullFormatQuery";
+import { Reply, Status } from "../reply";
+import { DEFAULT_SIG_INFO_FILE_EXT } from "../../config/Config";
 import { ContributorSchema, SigInfoSchema } from "../../config/SigInfoSchema";
-import { InjectRepository } from "typeorm-typedi-extensions";
 import { Sig } from "../../db/entities/Sig";
-import { Repository } from "typeorm";
 import { SigMember, SigMemberLevel } from "../../db/entities/SigMember";
 import {
   collectContributorsByLevel,
@@ -23,7 +25,6 @@ import { ContributorInfo } from "../../db/entities/ContributorInfo";
 import { PullReviewersDTO } from "../dtos/PullReviewersDTO";
 import { PullReviewersQuery } from "../../queries/PullReviewersQuery";
 import { Response } from "../response";
-import { StatusCodes } from "http-status-codes";
 
 const axios = require("axios").default;
 const equal = require("deep-equal");
