@@ -4,6 +4,7 @@ export enum PullMessage {
   FormatSuccess = "Format Success.",
   OnlyOneRole = "Contributors can only have one role.",
   ConfigNotFound = "The community bot configuration file could not be found.",
+  InstallationIdNotFound = "The installation ID could not be found.",
 }
 
 export function mustBeJSONFileMessage(fileName: string) {

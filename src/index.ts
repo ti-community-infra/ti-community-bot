@@ -8,6 +8,8 @@ import PullService from "./services/pull";
 import { SigService } from "./services/sig";
 import { PermissionService } from "./services/permission";
 import listPermissions from "./api/permission";
+import { StatusCodes } from "http-status-codes";
+import { PullMessage } from "./services/messages/PullMessage";
 
 const commands = require("probot-commands-pro");
 const bodyParser = require("body-parser");
@@ -21,16 +23,16 @@ export = (app: Application) => {
   router.use(bodyParser.json());
   router.use(cors());
 
-  const getInstallationId = async (
-    owner: string
-  ): Promise<number | undefined> => {
+  // Get app installation id.
+  const getInstallationId = async (owner: string): Promise<number | null> => {
     const github = await app.auth();
+
     const { data: installationInfos } = await github.apps.listInstallations();
     const installations = installationInfos.filter((i) => {
       return i.account.login === owner;
     });
 
-    return installations.length > 0 ? installations[0].id : undefined;
+    return installations.length > 0 ? installations[0].id : null;
   };
 
   createConnection()
@@ -49,11 +51,23 @@ export = (app: Application) => {
           Container.get(SigService)
         );
       });
+
       router.get(
         "/repos/:owner/:repo/pull/:number/permissions",
         async (req, res) => {
           const installationId = await getInstallationId(req.params.owner);
-          // FIXME: check installationId.
+          if (installationId === null) {
+            res.status(StatusCodes.BAD_REQUEST);
+            const response = {
+              data: null,
+              status: StatusCodes.BAD_REQUEST,
+              message: PullMessage.InstallationIdNotFound,
+            };
+            res.json(response);
+
+            return;
+          }
+
           const github = await app.auth(installationId);
           await listPermissions(
             req,
