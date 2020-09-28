@@ -1,7 +1,9 @@
-import { PullFormatQuery } from "../../queries/PullFormatQuery";
-import { Reply, Status } from "../reply";
-import { DEFAULT_SIG_INFO_FILE_EXT } from "../../config/Config";
 import { ValidateFunction } from "ajv";
+import { Service } from "typedi";
+import { InjectRepository } from "typeorm-typedi-extensions";
+import { Repository } from "typeorm";
+import { StatusCodes } from "http-status-codes";
+
 import {
   contributorHasMultipleRoleWarning,
   mustBeJSONFileMessage,
@@ -9,11 +11,29 @@ import {
   PullMessage,
   migrateToJSONTip,
 } from "../messages/PullMessage";
-import { Service } from "typedi";
+import { PullFormatQuery } from "../../queries/PullFormatQuery";
+import { Reply, Status } from "../reply";
+import { DEFAULT_SIG_INFO_FILE_EXT } from "../../config/Config";
 import { ContributorSchema, SigInfoSchema } from "../../config/SigInfoSchema";
+import { Sig } from "../../db/entities/Sig";
+import { SigMember, SigMemberLevel } from "../../db/entities/SigMember";
+import {
+  collectContributorsWithLevel,
+  ContributorInfoWithLevel,
+} from "../utils/SigInfoUtils";
+import { ContributorInfo } from "../../db/entities/ContributorInfo";
+import { PullReviewersDTO } from "../dtos/PullReviewersDTO";
+import { PullReviewersQuery } from "../../queries/PullReviewersQuery";
+import { Response } from "../response";
 
 const axios = require("axios").default;
+const equal = require("deep-equal");
 
+enum LGTM {
+  One = 1,
+  Two,
+  Three,
+}
 export enum FileStatus {
   Added = "added",
   Renamed = "renamed",
@@ -23,6 +43,13 @@ export enum FileStatus {
 
 @Service()
 export default class PullService {
+  constructor(
+    @InjectRepository(Sig)
+    private sigRepository: Repository<Sig>,
+    @InjectRepository(SigMember)
+    private sigMemberRepository: Repository<SigMember>
+  ) {}
+
   private static checkContributorHasOnlyOneRole(
     sigInfo: SigInfoSchema
   ): string | undefined {
@@ -43,6 +70,99 @@ export default class PullService {
       }
     }
     return;
+  }
+
+  /**
+   * List sig members.
+   * @param sigId SIG id.
+   * @private
+   */
+  private async listSigMembers(
+    sigId: number
+  ): Promise<ContributorInfoWithLevel[]> {
+    return (
+      await this.sigMemberRepository
+        .createQueryBuilder("sm")
+        .leftJoinAndSelect(Sig, "s", "sm.sig_id = s.id")
+        .leftJoinAndSelect(ContributorInfo, "ci", "sm.contributor_id = ci.id")
+        .where(`sig_id = ${sigId}`)
+        .select(
+          "ci.github as githubId, sm.level as level, ci.email as email, ci.company as company"
+        )
+        .getRawMany()
+    ).map((c) => {
+      return {
+        githubId: c.githubId,
+        level: c.level,
+        email: c.email,
+        company: c.company,
+      };
+    });
+  }
+
+  /**
+   * Get reviewers by member diff.
+   * @param diff Sif members diff.
+   * @param oldMembers Sig old members.
+   * @param maintainers Repo maintainers.
+   * @private
+   */
+  private getReviewersByDiff(
+    diff: ContributorInfoWithLevel[],
+    oldMembers: ContributorInfoWithLevel[],
+    maintainers: string[]
+  ): PullReviewersDTO | null {
+    for (let i = 0; i < diff.length; i++) {
+      const contributor = diff[i];
+      switch (contributor.level) {
+        case SigMemberLevel.techLeaders:
+        case SigMemberLevel.coLeaders:
+        case SigMemberLevel.committers: {
+          return {
+            reviewers: maintainers,
+            needsLGTM: LGTM.Two,
+          };
+        }
+        case SigMemberLevel.reviewers: {
+          // NOTICE: remove duplicates。
+          const reviewers = Array.from(
+            new Set(
+              oldMembers
+                .filter(
+                  (om) =>
+                    om.level !== SigMemberLevel.reviewers &&
+                    om.level !== SigMemberLevel.activeContributors
+                )
+                .map((c) => {
+                  return c.githubId;
+                })
+                .concat(maintainers)
+            )
+          );
+          return {
+            reviewers,
+            needsLGTM: LGTM.Two,
+          };
+        }
+        case SigMemberLevel.activeContributors: {
+          const reviewers = Array.from(
+            new Set(
+              oldMembers
+                .filter((om) => om.level !== SigMemberLevel.activeContributors)
+                .map((c) => {
+                  return c.githubId;
+                })
+                .concat(maintainers)
+            )
+          );
+          return {
+            reviewers,
+            needsLGTM: LGTM.One,
+          };
+        }
+      }
+    }
+    return null;
   }
 
   /**
@@ -109,6 +229,95 @@ export default class PullService {
       data: null,
       status: Status.Success,
       message: PullMessage.FormatSuccess,
+    };
+  }
+
+  /**
+   * List legal reviewers for pull request.
+   * @param pullReviewQuery Pull request review query.
+   */
+  public async listReviewers(
+    pullReviewQuery: PullReviewersQuery
+  ): Promise<Response<PullReviewersDTO | null>> {
+    // Filter sig file name.
+    const files = pullReviewQuery.files.filter((f) => {
+      return (
+        f.filename.toLowerCase().includes(pullReviewQuery.sigInfoFileName) &&
+        f.status !== FileStatus.Deleted // Ignore when the file deleted.
+      );
+    });
+
+    if (files.length > 1) {
+      return {
+        data: null,
+        status: StatusCodes.CONFLICT,
+        message: PullMessage.CanNotHandleMultipleSigFiles,
+      };
+    }
+
+    // Notice: if the sig information file is not changed, the reviewer will use the collaborator.
+    const collaborators = pullReviewQuery.collaborators.map((c) => {
+      return c.githubId;
+    });
+
+    if (files.length === 0) {
+      return {
+        data: {
+          reviewers: collaborators,
+          needsLGTM: LGTM.Two,
+        },
+        status: StatusCodes.OK,
+        message: PullMessage.ListReviewersSuccess,
+      };
+    }
+
+    // Get sig info.
+    const { data } = await axios.get(files[0].raw_url);
+    const sigInfo = <SigInfoSchema>data;
+    // Find sig.
+    const sig = await this.sigRepository.findOne({
+      where: {
+        name: sigInfo.name,
+      },
+    });
+
+    // If the sig is not found, it means a new sig is created, so we ask the maintainers to review the PR.
+    if (sig === undefined) {
+      const maintainers = pullReviewQuery.maintainers.map((m) => {
+        return m.githubId;
+      });
+      return {
+        data: {
+          reviewers: maintainers,
+          needsLGTM: LGTM.Two,
+        },
+        status: StatusCodes.OK,
+        message: PullMessage.ListReviewersSuccess,
+      };
+    }
+
+    // Get the PR's members diff.
+    const oldMembersWithLevel = await this.listSigMembers(sig.id);
+    const newMembersWithLevel = collectContributorsWithLevel(sigInfo);
+    const difference = [...newMembersWithLevel].filter((nm) =>
+      [...oldMembersWithLevel].every((om) => !equal(om, nm))
+    );
+
+    const reviewersDTO = this.getReviewersByDiff(
+      difference,
+      oldMembersWithLevel,
+      pullReviewQuery.maintainers.map((m) => {
+        return m.githubId;
+      })
+    );
+
+    return {
+      data: reviewersDTO || {
+        reviewers: collaborators,
+        needsLGTM: 2,
+      },
+      status: StatusCodes.OK,
+      message: PullMessage.ListReviewersSuccess,
     };
   }
 }

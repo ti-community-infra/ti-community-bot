@@ -1,19 +1,19 @@
 import { Service } from "typedi";
 import { InjectRepository } from "typeorm-typedi-extensions";
-import { Sig } from "../../db/entities/Sig";
+import assert from "assert";
 import { Repository } from "typeorm";
-import { SigMember, SigMemberLevel } from "../../db/entities/SigMember";
+
+import { Sig } from "../../db/entities/Sig";
+import { SigMember } from "../../db/entities/SigMember";
 import { ContributorInfo } from "../../db/entities/ContributorInfo";
 import { PullFormatQuery } from "../../queries/PullFormatQuery";
 import { Reply, Status } from "../reply";
 import { FileStatus } from "../pull";
 import { ContributorSchema, SigInfoSchema } from "../../config/SigInfoSchema";
-import assert from "assert";
 import { SigMessage } from "../messages/SigMessage";
+import { collectContributorsWithLevel } from "../utils/SigInfoUtils";
 
 const axios = require("axios").default;
-
-type ContributorSchemaWithLevel = ContributorSchema & { level: string };
 
 @Service()
 export class SigService {
@@ -74,31 +74,6 @@ export class SigService {
     );
   }
 
-  private collectContributorsByLevel(
-    sigInfo: SigInfoSchema
-  ): ContributorSchemaWithLevel[] {
-    const contributorInfos: ContributorSchemaWithLevel[] = [];
-
-    Object.keys(sigInfo).forEach((key) => {
-      Object.keys(SigMemberLevel).forEach((memberLevelKey) => {
-        if (key === memberLevelKey) {
-          console.log(key, memberLevelKey);
-          const contributors = sigInfo[key];
-          if (Array.isArray(contributors)) {
-            contributors.forEach((c) => {
-              contributorInfos.push({
-                ...c,
-                level:
-                  SigMemberLevel[memberLevelKey as keyof typeof SigMemberLevel],
-              });
-            });
-          }
-        }
-      });
-    });
-    return contributorInfos;
-  }
-
   /**
    * Update sig info when PR merged.
    * It will delete all members and add members from the sig info file.
@@ -120,7 +95,7 @@ export class SigService {
     for (let i = 0; i < files.length; i++) {
       const { data: sigInfo } = await axios.get(files[i].raw_url);
       const sig = await this.findOrAddSig(sigInfo);
-      const contributorInfos = this.collectContributorsByLevel(sigInfo);
+      const contributorInfos = collectContributorsWithLevel(sigInfo);
 
       const contributorInfosMap = new Map(
         contributorInfos.map((c) => [c.githubId, c])
