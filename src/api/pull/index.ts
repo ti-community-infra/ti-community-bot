@@ -8,11 +8,11 @@ import {
   DEFAULT_CONFIG_FILE_PATH,
   DEFAULT_SIG_INFO_FILE_NAME,
 } from "../../config/Config";
-import { config } from "../../services/utils/ConfigUtil";
 import { ContributorSchema } from "../../config/SigInfoSchema";
 import { StatusCodes } from "http-status-codes";
 import { PullMessage } from "../../services/messages/PullMessage";
 import PullService from "../../services/pull";
+import path from "path";
 
 const listReviews = async (
   req: Request,
@@ -38,15 +38,16 @@ const listReviews = async (
   });
 
   // Get config form repo.
-  const repoConfig = await config<Config>(
+  const { config: repoConfig } = await github.config.get({
     owner,
     repo,
-    DEFAULT_CONFIG_FILE_PATH,
-    github
-  );
+    path: path.posix.join(".github", DEFAULT_CONFIG_FILE_PATH),
+    defaults: {},
+  });
 
+  const config = <Config>repoConfig;
   // Because we need this config to get maintainer team.
-  if (repoConfig === null) {
+  if (config === null) {
     res.status(StatusCodes.BAD_REQUEST);
     const response = {
       data: null,
@@ -61,7 +62,7 @@ const listReviews = async (
   // Get maintainers and repo collaborators.
   const { data: maintainerInfos } = await github.teams.listMembersInOrg({
     org: owner,
-    team_slug: repoConfig.maintainerTeamSlug,
+    team_slug: config.maintainerTeamSlug,
   });
 
   const maintainers: ContributorSchema[] = maintainerInfos.map((m) => {
@@ -81,7 +82,7 @@ const listReviews = async (
   });
 
   const pullReviewersQuery: PullReviewersQuery = {
-    sigInfoFileName: repoConfig.sigInfoFileName || DEFAULT_SIG_INFO_FILE_NAME,
+    sigInfoFileName: config.sigInfoFileName || DEFAULT_SIG_INFO_FILE_NAME,
     maintainers,
     collaborators,
     files,
