@@ -5,6 +5,7 @@ import { PullFileQuery } from "../../queries/PullFileQuery";
 import { PullReviewersQuery } from "../../queries/PullReviewersQuery";
 import {
   Config,
+  DEFAULT_BASE,
   DEFAULT_CONFIG_FILE_PATH,
   DEFAULT_SIG_INFO_FILE_NAME,
 } from "../../config/Config";
@@ -41,7 +42,7 @@ const listReviews = async (
   const { config: repoConfig } = await github.config.get({
     owner,
     repo,
-    path: path.posix.join(".github", DEFAULT_CONFIG_FILE_PATH),
+    path: path.posix.join(DEFAULT_BASE, DEFAULT_CONFIG_FILE_PATH),
     defaults: {},
   });
 
