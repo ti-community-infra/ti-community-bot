@@ -1,0 +1,9 @@
+version: '3'
+
+services:
+  ti-community-bot:
+    build: ./
+    image: ti-community-bot:latest
+    ports:
+      - 3100:3100
+    restart: always
