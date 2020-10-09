@@ -18,7 +18,7 @@ export = (app: Application) => {
   useContainer(Container);
 
   // Get an express router to expose new HTTP endpoints.
-  const router = app.route();
+  const router = app.route("/ti-community-bot");
   router.use(bodyParser.json());
   router.use(cors());
 
