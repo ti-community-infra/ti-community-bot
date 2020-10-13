@@ -439,6 +439,135 @@ describe("Pull Service", () => {
     expect(res.data!.needsLGTM).toBe(2);
   });
 
+  test("list owners when change sig info file's active contributors part", async () => {
+    const oldSigMembersWithLevel: ContributorInfoWithLevel[] = [
+      {
+        githubId: "Rustin-Liu1",
+        level: "leader",
+        email: undefined,
+        company: undefined,
+      },
+      {
+        githubId: "Rustin-Liu2",
+        level: "co-leader",
+        email: undefined,
+        company: undefined,
+      },
+      {
+        githubId: "Rustin-Liu3",
+        level: "committer",
+        email: undefined,
+        company: undefined,
+      },
+      {
+        githubId: "Rustin-Liu4",
+        level: "reviewer",
+        email: undefined,
+        company: undefined,
+      },
+      {
+        githubId: "Rustin-Liu5",
+        level: "active-contributor",
+        email: undefined,
+        company: undefined,
+      },
+    ];
+
+    const newSigInfo: SigInfoSchema = {
+      name: "Test",
+      techLeaders: [
+        {
+          githubId: "Rustin-Liu1",
+        },
+      ],
+      coLeaders: [
+        {
+          githubId: "Rustin-Liu2",
+        },
+      ],
+      committers: [
+        {
+          githubId: "Rustin-Liu3",
+        },
+      ],
+      reviewers: [
+        {
+          githubId: "Rustin-Liu4",
+        },
+      ],
+      activeContributors: [
+        {
+          githubId: "Rustin-Liu5",
+        },
+        {
+          githubId: "Rustin-Liu6",
+        },
+      ],
+    };
+
+    const getSigInfoMock = jest.spyOn(sigInfoUtil, "getSigInfo");
+    getSigInfoMock.mockReturnValue(Promise.resolve(newSigInfo));
+
+    const sigFindOneMock = jest.spyOn(sigRepository, "findOne");
+    sigFindOneMock.mockReturnValue(Promise.resolve(new Sig()));
+
+    const listSigMembersMock = jest.spyOn(pullService as any, "listSigMembers");
+    listSigMembersMock.mockReturnValue(oldSigMembersWithLevel);
+
+    const contributor = {
+      githubId: "Rustin-Liu",
+    };
+
+    const pullOwnersQuery: PullOwnersQuery = {
+      sigInfoFileName: "member-list",
+      files: [
+        {
+          sha: "string",
+          filename: "member-list1",
+          status: "string",
+          raw_url: "string",
+        },
+      ],
+      maintainers: [contributor],
+      collaborators: [contributor],
+    };
+
+    // Owners should > reviewers.
+    const res = await pullService.listOwners(pullOwnersQuery);
+
+    // Assert status.
+    expect(res.status).toBe(StatusCodes.OK);
+
+    // Assert reviewers.
+    expect(res.data!.reviewers.length).toBe(5);
+    expect(
+      res.data!.reviewers.find((r) => {
+        return r === contributor.githubId;
+      })
+    ).not.toBe(undefined);
+    expect(
+      res.data!.reviewers.find((r) => {
+        return r === "Rustin-Liu6";
+      })
+    ).toBe(undefined);
+
+    // Assert committers.
+    expect(res.data!.committers.length).toBe(5);
+    expect(
+      res.data!.committers.find((r) => {
+        return r === "Rustin-Liu1";
+      })
+    ).not.toBe(undefined);
+    expect(
+      res.data!.committers.find((r) => {
+        return r === "Rustin-Liu6";
+      })
+    ).toBe(undefined);
+
+    // Assert needsLGTM.
+    expect(res.data!.needsLGTM).toBe(1);
+  });
+
   test("list owners when add a sig info file", async () => {
     const newSigInfo: SigInfoSchema = {
       name: "Test",
