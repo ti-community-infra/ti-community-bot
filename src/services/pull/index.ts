@@ -23,13 +23,13 @@ import { SigMember, SigMemberLevel } from "../../db/entities/SigMember";
 import {
   gatherContributorsWithLevel,
   ContributorInfoWithLevel,
+  getSigInfo,
 } from "../utils/SigInfoUtils";
 import { ContributorInfo } from "../../db/entities/ContributorInfo";
 import { PullOwnersDTO } from "../dtos/PullOwnersDTO";
 import { PullOwnersQuery } from "../../queries/PullOwnersQuery";
 import { Response } from "../response";
 
-const axios = require("axios").default;
 const equal = require("deep-equal");
 
 export interface IPullService {
@@ -233,7 +233,7 @@ export default class PullService implements IPullService {
     // Check sig ingo file format.
     const sigInfoFile = files[MAX_SIG_INFO_FILE_CHANGE_NUMBER - 1];
 
-    const { data: sigInfo } = await axios.get(sigInfoFile.raw_url);
+    const sigInfo = await getSigInfo(sigInfoFile.raw_url);
     if (!validate(sigInfo)) {
       return {
         data: null,
@@ -243,9 +243,7 @@ export default class PullService implements IPullService {
         warning: JSON.stringify(validate.errors),
       };
     }
-    const githubId = PullService.checkContributorHasOnlyOneRole(
-      <SigInfoSchema>sigInfo
-    );
+    const githubId = PullService.checkContributorHasOnlyOneRole(sigInfo);
     if (githubId !== null) {
       return {
         data: null,
@@ -303,11 +301,10 @@ export default class PullService implements IPullService {
       };
     }
 
-    // Get sig info.
-    const { data } = await axios.get(
+    const sigInfo = await getSigInfo(
       files[MAX_SIG_INFO_FILE_CHANGE_NUMBER - 1].raw_url
     );
-    const sigInfo = <SigInfoSchema>data;
+
     // Find sig.
     const sig = await this.sigRepository.findOne({
       where: {
