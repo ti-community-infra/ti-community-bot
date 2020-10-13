@@ -1,7 +1,7 @@
 import { PullFileQuery } from "./PullFileQuery";
 import { ContributorSchema } from "../config/SigInfoSchema";
 
-export interface PullReviewersQuery {
+export interface PullOwnersQuery {
   sigInfoFileName: string;
   files: PullFileQuery[];
   maintainers: ContributorSchema[];

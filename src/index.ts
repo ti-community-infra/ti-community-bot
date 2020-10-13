@@ -37,6 +37,8 @@ export = (app: Application) => {
   createConnection()
     .then(() => {
       app.log.info("App starting...");
+
+      // Ping command.
       commands(app, "ping", async (context: Context) => {
         await context.github.issues.createComment(
           context.issue({ body: "pong! I am community bot." })
@@ -51,10 +53,13 @@ export = (app: Application) => {
         );
       });
 
+      // Pull request owners API.
       router.get(
-        "/repos/:owner/:repo/pulls/:number/reviewers",
+        "/repos/:owner/:repo/pulls/:number/owners",
         async (req, res) => {
+          // It must installed bot.
           const installationId = await getInstallationId(req.params.owner);
+
           if (installationId === null) {
             res.status(StatusCodes.BAD_REQUEST);
             const response = {
@@ -67,6 +72,7 @@ export = (app: Application) => {
             return;
           }
 
+          // Create github client with installed token.
           const github = await app.auth(installationId);
           await listReviewers(req, res, Container.get(PullService), github);
         }
