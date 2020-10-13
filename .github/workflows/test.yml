@@ -32,3 +32,9 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm run lint && npm test
+      - name: codecov
+        run: npx codecov
+        # run codecov only once
+        if: matrix.os == 'ubuntu-latest' && matrix.node-version == '12.x'
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

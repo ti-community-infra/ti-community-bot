@@ -1,8 +1,10 @@
 import { Request, Response } from "express";
 import { ProbotOctokit } from "probot/lib/octokit/probot-octokit";
+import { StatusCodes } from "http-status-codes";
+import path from "path";
 
 import { PullFileQuery } from "../../queries/PullFileQuery";
-import { PullReviewersQuery } from "../../queries/PullReviewersQuery";
+import { PullOwnersQuery } from "../../queries/PullOwnersQuery";
 import {
   Config,
   DEFAULT_BASE,
@@ -10,18 +12,16 @@ import {
   DEFAULT_SIG_INFO_FILE_NAME,
 } from "../../config/Config";
 import { ContributorSchema } from "../../config/SigInfoSchema";
-import { StatusCodes } from "http-status-codes";
 import { PullMessage } from "../../services/messages/PullMessage";
-import PullService from "../../services/pull";
-import path from "path";
+import { IPullService } from "../../services/pull";
 
-const listReviews = async (
+const listOwners = async (
   req: Request,
   res: Response,
-  pullService: PullService,
+  pullService: IPullService,
   github: InstanceType<typeof ProbotOctokit>
 ) => {
-  // Collect params.
+  // Gather params.
   const owner = req.params.owner;
   const repo = req.params.repo;
   const pullNumber = Number(req.params.number);
@@ -82,17 +82,17 @@ const listReviews = async (
     };
   });
 
-  const pullReviewersQuery: PullReviewersQuery = {
+  const pullReviewersQuery: PullOwnersQuery = {
     sigInfoFileName: config.sigInfoFileName || DEFAULT_SIG_INFO_FILE_NAME,
     maintainers,
     collaborators,
     files,
   };
 
-  const response = await pullService.listReviewers(pullReviewersQuery);
+  const response = await pullService.listOwners(pullReviewersQuery);
 
   res.status(response.status);
   res.json(response);
 };
 
-export default listReviews;
+export default listOwners;

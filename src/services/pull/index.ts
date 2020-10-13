@@ -21,22 +21,35 @@ import { ContributorSchema, SigInfoSchema } from "../../config/SigInfoSchema";
 import { Sig } from "../../db/entities/Sig";
 import { SigMember, SigMemberLevel } from "../../db/entities/SigMember";
 import {
-  collectContributorsWithLevel,
+  gatherContributorsWithLevel,
   ContributorInfoWithLevel,
 } from "../utils/SigInfoUtils";
 import { ContributorInfo } from "../../db/entities/ContributorInfo";
-import { PullReviewersDTO } from "../dtos/PullReviewersDTO";
-import { PullReviewersQuery } from "../../queries/PullReviewersQuery";
+import { PullOwnersDTO } from "../dtos/PullOwnersDTO";
+import { PullOwnersQuery } from "../../queries/PullOwnersQuery";
 import { Response } from "../response";
 
 const axios = require("axios").default;
 const equal = require("deep-equal");
 
+export interface IPullService {
+  listOwners(
+    pullReviewQuery: PullOwnersQuery
+  ): Promise<Response<PullOwnersDTO | null>>;
+}
+
+/**
+ * LGTM number.
+ */
 enum LGTM {
   One = 1,
   Two,
   Three,
 }
+
+/**
+ * Github change file status.
+ */
 export enum FileStatus {
   Added = "added",
   Renamed = "renamed",
@@ -45,7 +58,7 @@ export enum FileStatus {
 }
 
 @Service()
-export default class PullService {
+export default class PullService implements IPullService {
   constructor(
     @InjectRepository(Sig)
     private sigRepository: Repository<Sig>,
@@ -115,11 +128,11 @@ export default class PullService {
    * @param maintainers Repo maintainers.
    * @private
    */
-  private getReviewersByDiff(
+  private getOwnersByDiff(
     diff: ContributorInfoWithLevel[],
     oldMembers: ContributorInfoWithLevel[],
     maintainers: string[]
-  ): PullReviewersDTO | null {
+  ): PullOwnersDTO | null {
     for (let i = 0; i < diff.length; i++) {
       const contributor = diff[i];
       switch (contributor.level) {
@@ -127,6 +140,7 @@ export default class PullService {
         case SigMemberLevel.coLeaders:
         case SigMemberLevel.committers: {
           return {
+            committers: maintainers,
             reviewers: maintainers,
             needsLGTM: LGTM.Two,
           };
@@ -148,6 +162,7 @@ export default class PullService {
             )
           );
           return {
+            committers: reviewers,
             reviewers,
             needsLGTM: LGTM.Two,
           };
@@ -164,6 +179,7 @@ export default class PullService {
             )
           );
           return {
+            committers: reviewers,
             reviewers,
             needsLGTM: LGTM.One,
           };
@@ -250,17 +266,18 @@ export default class PullService {
    * List legal reviewers for pull request.
    * @param pullReviewQuery Pull request review query.
    */
-  public async listReviewers(
-    pullReviewQuery: PullReviewersQuery
-  ): Promise<Response<PullReviewersDTO | null>> {
+  public async listOwners(
+    pullReviewQuery: PullOwnersQuery
+  ): Promise<Response<PullOwnersDTO | null>> {
     // Filter sig file name.
     const files = pullReviewQuery.files.filter((f) => {
       return (
         f.filename.toLowerCase().includes(pullReviewQuery.sigInfoFileName) &&
-        f.status !== FileStatus.Deleted // Ignore when the file deleted.
+        f.status !== FileStatus.Deleted // FIXME: Why ignore when the file deleted?
       );
     });
 
+    // Can not change multiple files at same time.
     if (files.length > MAX_SIG_INFO_FILE_CHANGE_NUMBER) {
       return {
         data: null,
@@ -269,7 +286,7 @@ export default class PullService {
       };
     }
 
-    // Notice: if the sig information file is not changed, the reviewer will use the collaborator.
+    // Notice: if the sig information file is not changed, the reviewer and committer will use the collaborator.
     const collaborators = pullReviewQuery.collaborators.map((c) => {
       return c.githubId;
     });
@@ -277,6 +294,7 @@ export default class PullService {
     if (files.length === 0) {
       return {
         data: {
+          committers: collaborators,
           reviewers: collaborators,
           needsLGTM: LGTM.Two,
         },
@@ -304,6 +322,7 @@ export default class PullService {
       });
       return {
         data: {
+          committers: maintainers,
           reviewers: maintainers,
           needsLGTM: LGTM.Two,
         },
@@ -314,12 +333,12 @@ export default class PullService {
 
     // Get the PR's members diff.
     const oldMembersWithLevel = await this.listSigMembers(sig.id);
-    const newMembersWithLevel = collectContributorsWithLevel(sigInfo);
+    const newMembersWithLevel = gatherContributorsWithLevel(sigInfo);
     const difference = [...newMembersWithLevel].filter((nm) =>
       [...oldMembersWithLevel].every((om) => !equal(om, nm))
     );
 
-    const reviewersDTO = this.getReviewersByDiff(
+    const ownersDTO = this.getOwnersByDiff(
       difference,
       oldMembersWithLevel,
       pullReviewQuery.maintainers.map((m) => {
@@ -328,7 +347,8 @@ export default class PullService {
     );
 
     return {
-      data: reviewersDTO || {
+      data: ownersDTO || {
+        committers: collaborators,
         reviewers: collaborators,
         needsLGTM: 2,
       },

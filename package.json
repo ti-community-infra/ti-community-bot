@@ -18,7 +18,7 @@
     "start": "probot run ./lib/index.js",
     "build:watch": "tsc && (tsc -w --preserveWatchOutput & nodemon)",
     "dev": "npm run build:watch",
-    "test": "jest",
+    "test": "jest --coverage",
     "lint": "prettier --check 'src/**/*.ts' 'test/**/*.ts' *.md package.json tsconfig.json",
     "lint:fix": "prettier --write 'src/**/*.ts' 'test/**/*.ts' *.md package.json tsconfig.json",
     "typeorm": "ts-node ./node_modules/.bin/typeorm"
