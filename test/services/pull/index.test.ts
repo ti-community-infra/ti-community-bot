@@ -5,10 +5,17 @@ import { Sig } from "../../../src/db/entities/Sig";
 import { SigMember } from "../../../src/db/entities/SigMember";
 import { PullOwnersQuery } from "../../../src/queries/PullOwnersQuery";
 import PullService from "../../../src/services/pull";
-import { PullMessage } from "../../../src/services/messages/PullMessage";
+import {
+  migrateToJSONTip,
+  PullMessage,
+} from "../../../src/services/messages/PullMessage";
 import * as sigInfoUtil from "../../../src/services/utils/SigInfoUtils";
 import { SigInfoSchema } from "../../../src/config/SigInfoSchema";
 import { ContributorInfoWithLevel } from "../../../src/services/utils/SigInfoUtils";
+import Ajv from "ajv";
+import sigInfoSchema from "../../../src/config/sig.info.schema.json";
+import { PullFormatQuery } from "../../../src/queries/PullFormatQuery";
+import { Status } from "../../../src/services/reply";
 
 describe("Pull Service", () => {
   let pullService: PullService;
@@ -17,6 +24,133 @@ describe("Pull Service", () => {
 
   beforeEach(() => {
     pullService = new PullService(sigRepository, sigMemberRepository);
+  });
+
+  test("formatting PR when not change sig info file", async () => {
+    const ajv = Ajv();
+    const validate = ajv.compile(sigInfoSchema);
+    const pullFormatQuery: PullFormatQuery = {
+      sigInfoFileName: "member-list",
+      files: [
+        {
+          sha: "string",
+          filename: "string",
+          status: "string",
+          raw_url: "string",
+        },
+      ],
+    };
+    const reply = await pullService.formatting(validate, pullFormatQuery);
+
+    expect(reply).toBe(null);
+  });
+
+  test("formatting PR when first change sig info file", async () => {
+    const ajv = Ajv();
+    const validate = ajv.compile(sigInfoSchema);
+    const pullFormatQuery: PullFormatQuery = {
+      sigInfoFileName: "member-list",
+      files: [
+        {
+          sha: "string",
+          filename: "member-list.md",
+          status: "string",
+          raw_url: "string",
+        },
+      ],
+    };
+
+    const reply = await pullService.formatting(validate, pullFormatQuery);
+
+    expect(reply).not.toBe(null);
+    expect(reply!.status).toBe(Status.Problematic);
+    expect(reply!.tip).toStrictEqual(migrateToJSONTip());
+  });
+
+  test("formatting PR when change sig info file", async () => {
+    const ajv = Ajv();
+    const validate = ajv.compile(sigInfoSchema);
+    const pullFormatQuery: PullFormatQuery = {
+      sigInfoFileName: "member-list",
+      files: [
+        {
+          sha: "string",
+          filename: "member-list.json",
+          status: "string",
+          raw_url: "string",
+        },
+      ],
+    };
+
+    const newSigInfo: SigInfoSchema = {
+      name: "Test",
+      techLeaders: [
+        {
+          githubId: "Rustin-Liu2",
+        },
+      ],
+      coLeaders: [],
+      committers: [],
+      reviewers: [],
+      activeContributors: [
+        {
+          githubId: "Rustin-Liu6",
+        },
+      ],
+    };
+
+    // Mock get sig info and return new sig info.
+    const getSigInfoMock = jest.spyOn(sigInfoUtil, "getSigInfo");
+    getSigInfoMock.mockReturnValue(Promise.resolve(newSigInfo));
+
+    const reply = await pullService.formatting(validate, pullFormatQuery);
+
+    expect(reply).not.toBe(null);
+    expect(reply!.status).toBe(Status.Success);
+  });
+
+  test("formatting PR when change sig info file to add multiple roles", async () => {
+    const ajv = Ajv();
+    const validate = ajv.compile(sigInfoSchema);
+    const pullFormatQuery: PullFormatQuery = {
+      sigInfoFileName: "member-list",
+      files: [
+        {
+          sha: "string",
+          filename: "member-list.json",
+          status: "string",
+          raw_url: "string",
+        },
+      ],
+    };
+
+    const newSigInfo: SigInfoSchema = {
+      name: "Test",
+      techLeaders: [
+        {
+          githubId: "Rustin-Liu2",
+        },
+      ],
+      coLeaders: [],
+      committers: [],
+      reviewers: [],
+      activeContributors: [
+        {
+          // NOTICE: same as techLeaders.
+          githubId: "Rustin-Liu2",
+        },
+      ],
+    };
+
+    // Mock get sig info and return new sig info.
+    const getSigInfoMock = jest.spyOn(sigInfoUtil, "getSigInfo");
+    getSigInfoMock.mockReturnValue(Promise.resolve(newSigInfo));
+
+    const reply = await pullService.formatting(validate, pullFormatQuery);
+
+    expect(reply).not.toBe(null);
+    expect(reply!.status).toBe(Status.Problematic);
+    expect(reply!.message).toBe(PullMessage.OnlyOneRole);
   });
 
   test("list owners when not change sig info file", async () => {
@@ -115,7 +249,7 @@ describe("Pull Service", () => {
       name: "Test",
       techLeaders: [
         {
-          githubId: "Rustin-Li2",
+          githubId: "Rustin-Liu2",
         },
       ],
       coLeaders: [],

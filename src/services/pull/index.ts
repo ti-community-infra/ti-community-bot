@@ -197,7 +197,7 @@ export default class PullService implements IPullService {
   public async formatting(
     validate: ValidateFunction,
     pullRequestFormatQuery: PullFormatQuery
-  ): Promise<Reply<null>> {
+  ): Promise<Reply<null> | null> {
     // Filter sig file name.
     const files = pullRequestFormatQuery.files.filter((f) => {
       return (
@@ -207,6 +207,10 @@ export default class PullService implements IPullService {
         f.status !== FileStatus.Deleted // Ignore when the file deleted.
       );
     });
+
+    if (files.length === 0) {
+      return null;
+    }
 
     if (files.length > MAX_SIG_INFO_FILE_CHANGE_NUMBER) {
       return {
