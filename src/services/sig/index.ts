@@ -40,10 +40,9 @@ export class SigService {
     if (sig === undefined) {
       sig = new Sig();
       sig.name = sigInfo.name;
-      await this.sigRepository.save(sig);
     }
 
-    return sig;
+    return await this.sigRepository.save(sig);
   }
 
   /**
@@ -70,8 +69,7 @@ export class SigService {
       }
       contributor.email = contributorInfo.email;
       contributor.company = contributorInfo.company;
-      await this.contributorInfoRepository.save(contributor);
-      contributors.push(contributor);
+      contributors.push(await this.contributorInfoRepository.save(contributor));
     }
 
     return contributors;
