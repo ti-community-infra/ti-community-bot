@@ -116,10 +116,13 @@ const checkPullFormat = async (context: Context, pullService: PullService) => {
 
 const updateSigInfo = async (context: Context, sigService: SigService) => {
   const pullFormatQuery = await constructPullFormatQuery(context);
+  const { files } = pullFormatQuery;
 
   const reply = await sigService.updateSigInfo(pullFormatQuery);
 
-  const { files } = pullFormatQuery;
+  if (reply === null) {
+    return;
+  }
 
   switch (reply.status) {
     case Status.Failed: {
