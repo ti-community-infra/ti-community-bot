@@ -111,24 +111,29 @@ describe("Sig Service", () => {
 
     const reply = await sigService.updateSigInfo(pullFormatQuery);
 
+    // Assert sig find.
     expect(sigFindOneMock.mock.calls.length).toBe(1);
     expect(sigFindOneMock.mock.calls[0][0]).toStrictEqual({
       where: { name: newSigInfo.name },
     });
 
+    // Assert contributor find.
     expect(contributorFindOneMock.mock.calls.length).toBe(1);
     expect(contributorFindOneMock.mock.calls[0][0]).toStrictEqual({
       where: { github: newSigInfo.techLeaders[0].githubId },
     });
 
+    // Assert contributor save.
     expect(contributorSaveMock.mock.calls.length).toBe(1);
     expect(contributorSaveMock.mock.calls[0][0]).toStrictEqual(contributorInfo);
 
+    // Assert sig member delete.
     expect(sigMemberDeleteMock.mock.calls.length).toBe(1);
     expect(sigMemberDeleteMock.mock.calls[0][0]).toStrictEqual(
       `delete from sig_member where sig_id = '${sig.id}'`
     );
 
+    // Assert sig member find.
     expect(sigMemberFindOneMock.mock.calls.length).toBe(1);
     expect(sigMemberFindOneMock.mock.calls[0][0]).toStrictEqual({
       where: {
@@ -137,9 +142,11 @@ describe("Sig Service", () => {
       },
     });
 
+    // Assert sig member save.
     expect(sigMemberSaveMock.mock.calls.length).toBe(1);
     expect(sigMemberSaveMock.mock.calls[0][0]).toStrictEqual(sigMember);
 
+    // Assert reply.
     expect(reply).not.toBe(null);
     expect(reply!.status).toBe(Status.Success);
   });
