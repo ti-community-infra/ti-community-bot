@@ -7,6 +7,7 @@ import { PullOwnersQuery } from "../../../src/queries/PullOwnersQuery";
 import PullService from "../../../src/services/pull";
 import {
   migrateToJSONTip,
+  mustMatchSchemaMessage,
   PullMessage,
 } from "../../../src/services/messages/PullMessage";
 import * as sigInfoUtil from "../../../src/services/utils/SigInfoUtils";
@@ -151,6 +152,74 @@ describe("Pull Service", () => {
     expect(reply).not.toBe(null);
     expect(reply!.status).toBe(Status.Problematic);
     expect(reply!.message).toBe(PullMessage.OnlyOneRole);
+  });
+
+  test("formatting PR when change sig info file to illegal", async () => {
+    const ajv = Ajv();
+    const validate = ajv.compile(sigInfoSchema);
+    const pullFormatQuery: PullFormatQuery = {
+      sigInfoFileName: "member-list",
+      files: [
+        {
+          sha: "string",
+          filename: "member-list.json",
+          status: "string",
+          raw_url: "string",
+        },
+      ],
+    };
+
+    const newSigInfo: any = {
+      name: "Test",
+      techLeaders: [
+        {
+          githubId: "Rustin-Liu2",
+        },
+      ],
+      coLeaders: [],
+      committers: [],
+      reviewers: [],
+    };
+
+    // Mock get sig info and return new sig info.
+    const getSigInfoMock = jest.spyOn(sigInfoUtil, "getSigInfo");
+    getSigInfoMock.mockReturnValue(Promise.resolve(newSigInfo));
+
+    const reply = await pullService.formatting(validate, pullFormatQuery);
+
+    expect(reply).not.toBe(null);
+    expect(reply!.status).toBe(Status.Problematic);
+    expect(reply!.message).toBe(
+      mustMatchSchemaMessage(pullFormatQuery.sigInfoFileName)
+    );
+  });
+
+  test("formatting PR when change multiple sig info files", async () => {
+    const ajv = Ajv();
+    const validate = ajv.compile(sigInfoSchema);
+    const pullFormatQuery: PullFormatQuery = {
+      sigInfoFileName: "member-list",
+      files: [
+        {
+          sha: "string",
+          filename: "member-list.json",
+          status: "string",
+          raw_url: "string",
+        },
+        {
+          sha: "string",
+          filename: "member-list1.json",
+          status: "string",
+          raw_url: "string",
+        },
+      ],
+    };
+
+    const reply = await pullService.formatting(validate, pullFormatQuery);
+
+    expect(reply).not.toBe(null);
+    expect(reply!.status).toBe(Status.Failed);
+    expect(reply!.message).toBe(PullMessage.CanNotModifyMultipleSigFiles);
   });
 
   test("list owners when not change sig info file", async () => {
