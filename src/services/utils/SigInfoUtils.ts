@@ -1,3 +1,5 @@
+import axios from "axios";
+
 import { SigInfoSchema } from "../../config/SigInfoSchema";
 import { SigMemberLevel } from "../../db/entities/SigMember";
 
@@ -10,7 +12,7 @@ export interface ContributorInfoWithLevel {
 }
 
 /**
- * Collect contributor info with level.
+ * Gather contributor info with level.
  * @param sigInfo Sig info.
  */
 export function gatherContributorsWithLevel(
@@ -37,4 +39,14 @@ export function gatherContributorsWithLevel(
     });
   });
   return contributorInfos;
+}
+
+/**
+ * Get sig info from remote.
+ * @param url
+ */
+export async function getSigInfo(url: string): Promise<SigInfoSchema> {
+  // Get sig info.
+  const { data } = await axios.get(url);
+  return <SigInfoSchema>data;
 }

@@ -1,15 +1,15 @@
 import { Reply } from "../reply";
 
-export function combineReplay(replay: Reply<any>) {
+export function combineReplay(reply: Reply<any>) {
   return `
-${replay.message}
+${reply.message}
 
 <details>
-<summary>More</summary>
+<summary>Details</summary>
 
-**Tip**    : ${replay.tip ? replay.tip : "None"}
+**Tip**    : ${reply.tip ? reply.tip : "None"}
 
-**Warning**: ${replay.warning ? replay.warning : "None"}
+**Warning**: ${reply.warning ? reply.warning : "None"}
 </details>
     `;
 }

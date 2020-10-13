@@ -64,6 +64,10 @@ const checkPullFormat = async (context: Context, pullService: PullService) => {
 
   const reply = await pullService.formatting(validate, pullFormatQuery);
 
+  if (reply === null) {
+    return;
+  }
+
   const status = {
     sha: head.sha,
     state: reply.status === Status.Success ? "success" : "failure",
