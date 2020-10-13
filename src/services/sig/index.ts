@@ -11,10 +11,8 @@ import { Reply, Status } from "../reply";
 import { FileStatus } from "../pull";
 import { ContributorSchema, SigInfoSchema } from "../../config/SigInfoSchema";
 import { SigMessage } from "../messages/SigMessage";
-import { gatherContributorsWithLevel } from "../utils/SigInfoUtils";
+import { gatherContributorsWithLevel, getSigInfo } from "../utils/SigInfoUtils";
 import { MAX_SIG_INFO_FILE_CHANGE_NUMBER } from "../../config/Config";
-
-const axios = require("axios").default;
 
 @Service()
 export class SigService {
@@ -42,10 +40,9 @@ export class SigService {
     if (sig === undefined) {
       sig = new Sig();
       sig.name = sigInfo.name;
-      await this.sigRepository.save(sig);
     }
 
-    return sig;
+    return await this.sigRepository.save(sig);
   }
 
   /**
@@ -72,8 +69,7 @@ export class SigService {
       }
       contributor.email = contributorInfo.email;
       contributor.company = contributorInfo.company;
-      await this.contributorInfoRepository.save(contributor);
-      contributors.push(contributor);
+      contributors.push(await this.contributorInfoRepository.save(contributor));
     }
 
     return contributors;
@@ -93,35 +89,38 @@ export class SigService {
   /**
    * Update sig info when PR merged.
    * It will delete all members and add members from the sig info file.
-   * @param pullRequestFormatQuery
+   * @param pullFormatQuery
    */
   public async updateSigInfo(
-    pullRequestFormatQuery: PullFormatQuery
-  ): Promise<Reply<null>> {
+    pullFormatQuery: PullFormatQuery
+  ): Promise<Reply<null> | null> {
     // Filter sig file name.
-    const files = pullRequestFormatQuery.files.filter((f) => {
+    const files = pullFormatQuery.files.filter((f) => {
       return (
-        f.filename
-          .toLowerCase()
-          .includes(pullRequestFormatQuery.sigInfoFileName) &&
+        f.filename.toLowerCase().includes(pullFormatQuery.sigInfoFileName) &&
         f.status !== FileStatus.Deleted // Ignore when the file deleted.
       );
     });
 
+    if (files.length === 0) {
+      return null;
+    }
+
     const sigInfoFile = files[MAX_SIG_INFO_FILE_CHANGE_NUMBER - 1];
-
-    const { data: sigInfo } = await axios.get(sigInfoFile.raw_url);
-    const sig = await this.findOrAddSig(sigInfo);
+    const sigInfo = await getSigInfo(sigInfoFile.raw_url);
     const contributorsInfo = gatherContributorsWithLevel(sigInfo);
-
     const contributorsInfoMap = new Map(
       contributorsInfo.map((c) => [c.githubId, c])
     );
 
+    const sig = await this.findOrAddSig(sigInfo);
+
     const contributors = await this.updateOrAddContributors(contributorsInfo);
     assert(contributorsInfo.length === contributors.length);
 
+    // Delete sig members.
     await this.deleteSigMembers(sig.id);
+
     for (let j = 0; j < contributors.length; j++) {
       const contributor = contributors[j];
       let sigMember = await this.sigMemberRepository.findOne({
