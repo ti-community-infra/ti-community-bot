@@ -247,8 +247,8 @@ describe("Pull Service", () => {
     expect(res.status).toBe(StatusCodes.OK);
 
     // Assert committers.
-    expect(res.data!.committers.length).toBe(1);
-    expect(res.data!.committers[0]).toBe(collaborator.githubId);
+    expect(res.data!.approvers.length).toBe(1);
+    expect(res.data!.approvers[0]).toBe(collaborator.githubId);
 
     // Assert reviewers.
     expect(res.data!.reviewers.length).toBe(1);
@@ -372,8 +372,8 @@ describe("Pull Service", () => {
     expect(res.data!.reviewers[0]).toBe(maintainer.githubId);
 
     // Assert committers.
-    expect(res.data!.committers.length).toBe(1);
-    expect(res.data!.committers[0]).toBe(maintainer.githubId);
+    expect(res.data!.approvers.length).toBe(1);
+    expect(res.data!.approvers[0]).toBe(maintainer.githubId);
 
     // Assert needsLGTM.
     expect(res.data!.needsLGTM).toBe(2);
@@ -492,14 +492,14 @@ describe("Pull Service", () => {
     ).toBe(undefined);
 
     // Assert committers.
-    expect(res.data!.committers.length).toBe(4);
+    expect(res.data!.approvers.length).toBe(4);
     expect(
-      res.data!.committers.find((r) => {
+      res.data!.approvers.find((r) => {
         return r === "Rustin-Liu1";
       })
     ).not.toBe(undefined);
     expect(
-      res.data!.committers.find((r) => {
+      res.data!.approvers.find((r) => {
         return r === "Rustin-Liu6";
       })
     ).toBe(undefined);
@@ -621,14 +621,14 @@ describe("Pull Service", () => {
     ).toBe(undefined);
 
     // Assert committers.
-    expect(res.data!.committers.length).toBe(5);
+    expect(res.data!.approvers.length).toBe(5);
     expect(
-      res.data!.committers.find((r) => {
+      res.data!.approvers.find((r) => {
         return r === "Rustin-Liu1";
       })
     ).not.toBe(undefined);
     expect(
-      res.data!.committers.find((r) => {
+      res.data!.approvers.find((r) => {
         return r === "Rustin-Liu6";
       })
     ).toBe(undefined);
@@ -706,8 +706,8 @@ describe("Pull Service", () => {
     expect(res.data!.reviewers[0]).toBe(maintainer.githubId);
 
     // Assert committers.
-    expect(res.data!.committers.length).toBe(1);
-    expect(res.data!.committers[0]).toBe(maintainer.githubId);
+    expect(res.data!.approvers.length).toBe(1);
+    expect(res.data!.approvers[0]).toBe(maintainer.githubId);
 
     // Assert needsLGTM.
     expect(res.data!.needsLGTM).toBe(2);
@@ -814,8 +814,8 @@ describe("Pull Service", () => {
     expect(res.data!.reviewers[0]).toBe(collaborator.githubId);
 
     // Assert committers.
-    expect(res.data!.committers.length).toBe(1);
-    expect(res.data!.committers[0]).toBe(collaborator.githubId);
+    expect(res.data!.approvers.length).toBe(1);
+    expect(res.data!.approvers[0]).toBe(collaborator.githubId);
 
     // Assert needsLGTM.
     expect(res.data!.needsLGTM).toBe(2);
