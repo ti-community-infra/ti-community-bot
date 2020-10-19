@@ -30,8 +30,6 @@ import { PullOwnersDTO } from "../dtos/PullOwnersDTO";
 import { PullOwnersQuery } from "../../queries/PullOwnersQuery";
 import { Response } from "../response";
 
-const equal = require("deep-equal");
-
 export interface IPullService {
   listOwners(
     pullReviewQuery: PullOwnersQuery
@@ -113,10 +111,7 @@ export default class PullService implements IPullService {
         .getRawMany()
     ).map((c) => {
       return {
-        githubId: c.githubId,
-        level: c.level,
-        email: c.email,
-        company: c.company,
+        ...c,
       };
     });
   }
@@ -350,7 +345,15 @@ export default class PullService implements IPullService {
     const oldMembersWithLevel = await this.listSigMembers(sig.id);
     const newMembersWithLevel = gatherContributorsWithLevel(sigInfo);
     const difference = [...newMembersWithLevel].filter((nm) =>
-      [...oldMembersWithLevel].every((om) => !equal(om, nm))
+      [...oldMembersWithLevel].every(
+        (om) =>
+          !(
+            om.githubId === nm.githubId &&
+            om.level === nm.level &&
+            om.company === nm.company &&
+            om.email === nm.email
+          )
+      )
     );
 
     const ownersDTO = this.getOwnersByDiff(
