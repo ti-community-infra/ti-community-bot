@@ -810,14 +810,14 @@ describe("Pull Service", () => {
     expect(res.status).toBe(StatusCodes.OK);
 
     // Assert reviewers.
-    expect(res.data!.reviewers.length).toBe(1);
-    expect(res.data!.reviewers[0]).toBe(collaborator.githubId);
+    expect(res.data!.reviewers.length).toBe(5);
+    expect(res.data!.reviewers[0]).toBe(oldSigMembersWithLevel[0].githubId);
 
     // Assert committers.
-    expect(res.data!.approvers.length).toBe(1);
-    expect(res.data!.approvers[0]).toBe(collaborator.githubId);
+    expect(res.data!.approvers.length).toBe(5);
+    expect(res.data!.approvers[0]).toBe(oldSigMembersWithLevel[0].githubId);
 
     // Assert needsLGTM.
-    expect(res.data!.needsLGTM).toBe(2);
+    expect(res.data!.needsLGTM).toBe(1);
   });
 });

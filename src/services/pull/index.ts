@@ -186,7 +186,21 @@ export default class PullService implements IPullService {
         }
       }
     }
-    return null;
+    const reviewers = Array.from(
+      new Set(
+        oldMembers
+          .filter((om) => om.level !== SigMemberLevel.activeContributors)
+          .map((c) => {
+            return c.githubId;
+          })
+          .concat(maintainers)
+      )
+    );
+    return {
+      approvers: reviewers,
+      reviewers,
+      needsLGTM: LGTM.One,
+    };
   }
 
   /**
@@ -348,11 +362,7 @@ export default class PullService implements IPullService {
     );
 
     return {
-      data: ownersDTO || {
-        approvers: collaborators,
-        reviewers: collaborators,
-        needsLGTM: 2,
-      },
+      data: ownersDTO,
       status: StatusCodes.OK,
       message: PullMessage.ListReviewersSuccess,
     };
