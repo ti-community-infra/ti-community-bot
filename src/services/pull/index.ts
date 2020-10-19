@@ -54,7 +54,7 @@ export enum FileStatus {
   Added = "added",
   Renamed = "renamed",
   Modified = "modified",
-  Deleted = "deleted",
+  Removed = "removed",
 }
 
 @Service()
@@ -218,7 +218,7 @@ export default class PullService implements IPullService {
         f.filename
           .toLowerCase()
           .includes(pullRequestFormatQuery.sigInfoFileName) &&
-        f.status !== FileStatus.Deleted // Ignore when the file deleted.
+        f.status !== FileStatus.Removed // Ignore when the file removed.
       );
     });
 
@@ -289,7 +289,7 @@ export default class PullService implements IPullService {
     const files = pullReviewQuery.files.filter((f) => {
       return (
         f.filename.toLowerCase().includes(pullReviewQuery.sigInfoFileName) &&
-        f.status !== FileStatus.Deleted // FIXME: Why ignore when the file deleted?
+        f.status !== FileStatus.Removed // Notice: because it maybe delete old files.
       );
     });
 

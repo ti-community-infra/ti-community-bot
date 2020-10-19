@@ -98,7 +98,7 @@ export class SigService {
     const files = pullFormatQuery.files.filter((f) => {
       return (
         f.filename.toLowerCase().includes(pullFormatQuery.sigInfoFileName) &&
-        f.status !== FileStatus.Deleted // Ignore when the file deleted.
+        f.status !== FileStatus.Removed // Ignore when the file removed.
       );
     });
 
