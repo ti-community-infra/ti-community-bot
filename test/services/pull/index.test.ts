@@ -384,32 +384,22 @@ describe("Pull Service", () => {
       {
         githubId: "Rustin-Liu1",
         level: "leader",
-        email: undefined,
-        company: undefined,
       },
       {
         githubId: "Rustin-Liu2",
         level: "co-leader",
-        email: undefined,
-        company: undefined,
       },
       {
         githubId: "Rustin-Liu3",
         level: "committer",
-        email: undefined,
-        company: undefined,
       },
       {
         githubId: "Rustin-Liu4",
         level: "reviewer",
-        email: undefined,
-        company: undefined,
       },
       {
         githubId: "Rustin-Liu5",
         level: "active-contributor",
-        email: undefined,
-        company: undefined,
       },
     ];
 
@@ -513,32 +503,22 @@ describe("Pull Service", () => {
       {
         githubId: "Rustin-Liu1",
         level: "leader",
-        email: undefined,
-        company: undefined,
       },
       {
         githubId: "Rustin-Liu2",
         level: "co-leader",
-        email: undefined,
-        company: undefined,
       },
       {
         githubId: "Rustin-Liu3",
         level: "committer",
-        email: undefined,
-        company: undefined,
       },
       {
         githubId: "Rustin-Liu4",
         level: "reviewer",
-        email: undefined,
-        company: undefined,
       },
       {
         githubId: "Rustin-Liu5",
         level: "active-contributor",
-        email: undefined,
-        company: undefined,
       },
     ];
 
@@ -718,32 +698,22 @@ describe("Pull Service", () => {
       {
         githubId: "Rustin-Liu1",
         level: "leader",
-        email: undefined,
-        company: undefined,
       },
       {
         githubId: "Rustin-Liu2",
         level: "co-leader",
-        email: undefined,
-        company: undefined,
       },
       {
         githubId: "Rustin-Liu3",
         level: "committer",
-        email: undefined,
-        company: undefined,
       },
       {
         githubId: "Rustin-Liu4",
         level: "reviewer",
-        email: undefined,
-        company: undefined,
       },
       {
         githubId: "Rustin-Liu5",
         level: "active-contributor",
-        email: undefined,
-        company: undefined,
       },
     ];
 
