@@ -57,7 +57,7 @@ describe("Sig Service", () => {
       name: "Test",
       techLeaders: [
         {
-          githubId: "Rustin-Liu6",
+          githubName: "Rustin-Liu6",
         },
       ],
       coLeaders: [],
@@ -86,7 +86,7 @@ describe("Sig Service", () => {
       "findOne"
     );
     const contributorInfo = new ContributorInfo();
-    contributorInfo.github = newSigInfo.techLeaders[0].githubId;
+    contributorInfo.github = newSigInfo.techLeaders[0].githubName;
     contributorInfo.id = 1;
     contributorFindOneMock.mockReturnValue(Promise.resolve(contributorInfo));
 
@@ -120,7 +120,7 @@ describe("Sig Service", () => {
     // Assert contributor find.
     expect(contributorFindOneMock.mock.calls.length).toBe(1);
     expect(contributorFindOneMock.mock.calls[0][0]).toStrictEqual({
-      where: { github: newSigInfo.techLeaders[0].githubId },
+      where: { github: newSigInfo.techLeaders[0].githubName },
     });
 
     // Assert contributor save.
@@ -168,7 +168,7 @@ describe("Sig Service", () => {
       name: "Test",
       techLeaders: [
         {
-          githubId: "Rustin-Liu6",
+          githubName: "Rustin-Liu6",
         },
       ],
       coLeaders: [],
@@ -198,7 +198,7 @@ describe("Sig Service", () => {
       "findOne"
     );
     const contributorInfo = new ContributorInfo();
-    contributorInfo.github = newSigInfo.techLeaders[0].githubId;
+    contributorInfo.github = newSigInfo.techLeaders[0].githubName;
     contributorInfo.id = 1;
     contributorFindOneMock.mockReturnValue(Promise.resolve(contributorInfo));
 
@@ -236,7 +236,7 @@ describe("Sig Service", () => {
     // Assert contributor find.
     expect(contributorFindOneMock.mock.calls.length).toBe(1);
     expect(contributorFindOneMock.mock.calls[0][0]).toStrictEqual({
-      where: { github: newSigInfo.techLeaders[0].githubId },
+      where: { github: newSigInfo.techLeaders[0].githubName },
     });
 
     // Assert contributor save.
@@ -284,7 +284,7 @@ describe("Sig Service", () => {
       name: "Test",
       techLeaders: [
         {
-          githubId: "Rustin-Liu6",
+          githubName: "Rustin-Liu6",
         },
       ],
       coLeaders: [],
@@ -318,7 +318,7 @@ describe("Sig Service", () => {
     // Mock save contributor.
     const contributorSaveMock = jest.spyOn(contributorInfoRepository, "save");
     const contributorInfo = new ContributorInfo();
-    contributorInfo.github = newSigInfo.techLeaders[0].githubId;
+    contributorInfo.github = newSigInfo.techLeaders[0].githubName;
     contributorInfo.id = 1;
     contributorSaveMock.mockReturnValue(Promise.resolve(contributorInfo));
 
@@ -352,7 +352,7 @@ describe("Sig Service", () => {
     // Assert contributor find.
     expect(contributorFindOneMock.mock.calls.length).toBe(1);
     expect(contributorFindOneMock.mock.calls[0][0]).toStrictEqual({
-      where: { github: newSigInfo.techLeaders[0].githubId },
+      where: { github: newSigInfo.techLeaders[0].githubName },
     });
 
     // Assert contributor save.

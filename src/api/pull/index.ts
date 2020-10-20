@@ -68,7 +68,7 @@ const listOwners = async (
 
   const maintainers: ContributorSchema[] = maintainerInfos.map((m) => {
     return {
-      githubId: m.login,
+      githubName: m.login,
     };
   });
 
@@ -78,7 +78,7 @@ const listOwners = async (
   });
   const collaborators = collaboratorInfos.map((c) => {
     return {
-      githubId: c.login,
+      githubName: c.login,
     };
   });
 

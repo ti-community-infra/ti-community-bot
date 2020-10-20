@@ -30,6 +30,6 @@ export function migrateToJSONTip() {
   `;
 }
 
-export function contributorHasMultipleRoleWarning(githubId: string) {
-  return `${githubId} has multiple roles.`;
+export function contributorHasMultipleRoleWarning(githubName: string) {
+  return `${githubName} has multiple roles.`;
 }

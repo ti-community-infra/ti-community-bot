@@ -4,11 +4,8 @@ import { SigInfoSchema } from "../../config/SigInfoSchema";
 import { SigMemberLevel } from "../../db/entities/SigMember";
 
 export interface ContributorInfoWithLevel {
-  // TODO: clarify githubId and github.
-  githubId: string;
+  githubName: string;
   level: string;
-  email?: string;
-  company?: string;
 }
 
 /**

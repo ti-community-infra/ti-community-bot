@@ -82,10 +82,10 @@ export default class PullService implements IPullService {
     });
 
     for (let contributor of contributors) {
-      if (!contributorsMap.has(contributor.githubId)) {
-        contributorsMap.add(contributor.githubId);
+      if (!contributorsMap.has(contributor.githubName)) {
+        contributorsMap.add(contributor.githubName);
       } else {
-        return contributor.githubId;
+        return contributor.githubName;
       }
     }
     return null;
@@ -106,7 +106,7 @@ export default class PullService implements IPullService {
         .leftJoinAndSelect(ContributorInfo, "ci", "sm.contributor_id = ci.id")
         .where(`sig_id = ${sigId}`)
         .select(
-          "ci.github as githubId, sm.level as level, ci.email as email, ci.company as company"
+          "ci.github as githubName, sm.level as level, ci.email as email, ci.company as company"
         )
         .getRawMany()
     ).map((c) => {
@@ -151,7 +151,7 @@ export default class PullService implements IPullService {
                     om.level !== SigMemberLevel.activeContributors
                 )
                 .map((c) => {
-                  return c.githubId;
+                  return c.githubName;
                 })
                 .concat(maintainers)
             )
@@ -168,7 +168,7 @@ export default class PullService implements IPullService {
               oldMembers
                 .filter((om) => om.level !== SigMemberLevel.activeContributors)
                 .map((c) => {
-                  return c.githubId;
+                  return c.githubName;
                 })
                 .concat(maintainers)
             )
@@ -186,7 +186,7 @@ export default class PullService implements IPullService {
         oldMembers
           .filter((om) => om.level !== SigMemberLevel.activeContributors)
           .map((c) => {
-            return c.githubId;
+            return c.githubName;
           })
           .concat(maintainers)
       )
@@ -256,13 +256,13 @@ export default class PullService implements IPullService {
         warning: JSON.stringify(validate.errors),
       };
     }
-    const githubId = PullService.checkContributorHasOnlyOneRole(sigInfo);
-    if (githubId !== null) {
+    const githubName = PullService.checkContributorHasOnlyOneRole(sigInfo);
+    if (githubName !== null) {
       return {
         data: null,
         status: Status.Problematic,
         message: PullMessage.OnlyOneRole,
-        warning: contributorHasMultipleRoleWarning(githubId),
+        warning: contributorHasMultipleRoleWarning(githubName),
       };
     }
 
@@ -299,7 +299,7 @@ export default class PullService implements IPullService {
 
     // Notice: if the sig information file is not changed, the reviewer and committer will use the collaborator.
     const collaborators = pullReviewQuery.collaborators.map((c) => {
-      return c.githubId;
+      return c.githubName;
     });
 
     if (files.length === 0) {
@@ -328,7 +328,7 @@ export default class PullService implements IPullService {
     // If the sig is not found, it means a new sig is created, so we ask the maintainers to review the PR.
     if (sig === undefined) {
       const maintainers = pullReviewQuery.maintainers.map((m) => {
-        return m.githubId;
+        return m.githubName;
       });
       return {
         data: {
@@ -346,13 +346,7 @@ export default class PullService implements IPullService {
     const newMembersWithLevel = gatherContributorsWithLevel(sigInfo);
     const difference = [...newMembersWithLevel].filter((nm) =>
       [...oldMembersWithLevel].every(
-        (om) =>
-          !(
-            om.githubId === nm.githubId &&
-            om.level === nm.level &&
-            om.company === nm.company &&
-            om.email === nm.email
-          )
+        (om) => !(om.githubName === nm.githubName && om.level === nm.level)
       )
     );
 
@@ -360,7 +354,7 @@ export default class PullService implements IPullService {
       difference,
       oldMembersWithLevel,
       pullReviewQuery.maintainers.map((m) => {
-        return m.githubId;
+        return m.githubName;
       })
     );
 
