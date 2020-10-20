@@ -1,7 +1,5 @@
 export interface ContributorSchema {
-  githubId: string;
-  email?: string;
-  company?: string;
+  githubName: string;
 }
 
 export interface SigInfoSchema {

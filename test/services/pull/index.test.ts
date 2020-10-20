@@ -87,7 +87,7 @@ describe("Pull Service", () => {
       name: "Test",
       techLeaders: [
         {
-          githubId: "Rustin-Liu2",
+          githubName: "Rustin-Liu2",
         },
       ],
       coLeaders: [],
@@ -95,7 +95,7 @@ describe("Pull Service", () => {
       reviewers: [],
       activeContributors: [
         {
-          githubId: "Rustin-Liu6",
+          githubName: "Rustin-Liu6",
         },
       ],
     };
@@ -129,7 +129,7 @@ describe("Pull Service", () => {
       name: "Test",
       techLeaders: [
         {
-          githubId: "Rustin-Liu2",
+          githubName: "Rustin-Liu2",
         },
       ],
       coLeaders: [],
@@ -138,7 +138,7 @@ describe("Pull Service", () => {
       activeContributors: [
         {
           // NOTICE: same as techLeaders.
-          githubId: "Rustin-Liu2",
+          githubName: "Rustin-Liu2",
         },
       ],
     };
@@ -173,7 +173,7 @@ describe("Pull Service", () => {
       name: "Test",
       techLeaders: [
         {
-          githubId: "Rustin-Liu2",
+          githubName: "Rustin-Liu2",
         },
       ],
       coLeaders: [],
@@ -224,7 +224,7 @@ describe("Pull Service", () => {
 
   test("list owners when not change sig info file", async () => {
     const collaborator = {
-      githubId: "Rustin-Liu",
+      githubName: "Rustin-Liu",
     };
 
     const pullOwnersQuery: PullOwnersQuery = {
@@ -248,11 +248,11 @@ describe("Pull Service", () => {
 
     // Assert committers.
     expect(res.data!.approvers.length).toBe(1);
-    expect(res.data!.approvers[0]).toBe(collaborator.githubId);
+    expect(res.data!.approvers[0]).toBe(collaborator.githubName);
 
     // Assert reviewers.
     expect(res.data!.reviewers.length).toBe(1);
-    expect(res.data!.reviewers[0]).toBe(collaborator.githubId);
+    expect(res.data!.reviewers[0]).toBe(collaborator.githubName);
 
     // Assert needs LGTM.
     expect(res.data!.needsLGTM).toBe(2);
@@ -260,7 +260,7 @@ describe("Pull Service", () => {
 
   test("list owners when change multiple sig info files", async () => {
     const collaborator = {
-      githubId: "Rustin-Liu",
+      githubName: "Rustin-Liu",
     };
 
     const pullOwnersQuery: PullOwnersQuery = {
@@ -293,23 +293,23 @@ describe("Pull Service", () => {
   test("list owners when change sig info file's leaders part", async () => {
     const oldSigMembersWithLevel: ContributorInfoWithLevel[] = [
       {
-        githubId: "Rustin-liu1",
+        githubName: "Rustin-liu1",
         level: "leader",
       },
       {
-        githubId: "Rustin-liu2",
+        githubName: "Rustin-liu2",
         level: "co-leader",
       },
       {
-        githubId: "Rustin-liu3",
+        githubName: "Rustin-liu3",
         level: "committer",
       },
       {
-        githubId: "Rustin-liu4",
+        githubName: "Rustin-liu4",
         level: "reviewer",
       },
       {
-        githubId: "Rustin-liu5",
+        githubName: "Rustin-liu5",
         level: "active-contributor",
       },
     ];
@@ -318,7 +318,7 @@ describe("Pull Service", () => {
       name: "Test",
       techLeaders: [
         {
-          githubId: "Rustin-Liu2",
+          githubName: "Rustin-Liu2",
         },
       ],
       coLeaders: [],
@@ -326,7 +326,7 @@ describe("Pull Service", () => {
       reviewers: [],
       activeContributors: [
         {
-          githubId: "Rustin-Liu6",
+          githubName: "Rustin-Liu6",
         },
       ],
     };
@@ -344,7 +344,7 @@ describe("Pull Service", () => {
     listSigMembersMock.mockReturnValue(oldSigMembersWithLevel);
 
     const maintainer = {
-      githubId: "Rustin-Liu",
+      githubName: "Rustin-Liu",
     };
 
     const pullOwnersQuery: PullOwnersQuery = {
@@ -369,11 +369,11 @@ describe("Pull Service", () => {
 
     // Assert reviewers.
     expect(res.data!.reviewers.length).toBe(1);
-    expect(res.data!.reviewers[0]).toBe(maintainer.githubId);
+    expect(res.data!.reviewers[0]).toBe(maintainer.githubName);
 
     // Assert committers.
     expect(res.data!.approvers.length).toBe(1);
-    expect(res.data!.approvers[0]).toBe(maintainer.githubId);
+    expect(res.data!.approvers[0]).toBe(maintainer.githubName);
 
     // Assert needsLGTM.
     expect(res.data!.needsLGTM).toBe(2);
@@ -382,23 +382,23 @@ describe("Pull Service", () => {
   test("list owners when change sig info file's reviewers part", async () => {
     const oldSigMembersWithLevel: ContributorInfoWithLevel[] = [
       {
-        githubId: "Rustin-Liu1",
+        githubName: "Rustin-Liu1",
         level: "leader",
       },
       {
-        githubId: "Rustin-Liu2",
+        githubName: "Rustin-Liu2",
         level: "co-leader",
       },
       {
-        githubId: "Rustin-Liu3",
+        githubName: "Rustin-Liu3",
         level: "committer",
       },
       {
-        githubId: "Rustin-Liu4",
+        githubName: "Rustin-Liu4",
         level: "reviewer",
       },
       {
-        githubId: "Rustin-Liu5",
+        githubName: "Rustin-Liu5",
         level: "active-contributor",
       },
     ];
@@ -407,30 +407,30 @@ describe("Pull Service", () => {
       name: "Test",
       techLeaders: [
         {
-          githubId: "Rustin-Liu1",
+          githubName: "Rustin-Liu1",
         },
       ],
       coLeaders: [
         {
-          githubId: "Rustin-Liu2",
+          githubName: "Rustin-Liu2",
         },
       ],
       committers: [
         {
-          githubId: "Rustin-Liu3",
+          githubName: "Rustin-Liu3",
         },
       ],
       reviewers: [
         {
-          githubId: "Rustin-Liu4",
+          githubName: "Rustin-Liu4",
         },
         {
-          githubId: "Rustin-Liu5",
+          githubName: "Rustin-Liu5",
         },
       ],
       activeContributors: [
         {
-          githubId: "Rustin-Liu6",
+          githubName: "Rustin-Liu6",
         },
       ],
     };
@@ -445,7 +445,7 @@ describe("Pull Service", () => {
     listSigMembersMock.mockReturnValue(oldSigMembersWithLevel);
 
     const maintainer = {
-      githubId: "Rustin-Liu",
+      githubName: "Rustin-Liu",
     };
 
     const pullOwnersQuery: PullOwnersQuery = {
@@ -472,7 +472,7 @@ describe("Pull Service", () => {
     expect(res.data!.reviewers.length).toBe(4);
     expect(
       res.data!.reviewers.find((r) => {
-        return r === maintainer.githubId;
+        return r === maintainer.githubName;
       })
     ).not.toBe(undefined);
     expect(
@@ -501,23 +501,23 @@ describe("Pull Service", () => {
   test("list owners when change sig info file's active contributors part", async () => {
     const oldSigMembersWithLevel: ContributorInfoWithLevel[] = [
       {
-        githubId: "Rustin-Liu1",
+        githubName: "Rustin-Liu1",
         level: "leader",
       },
       {
-        githubId: "Rustin-Liu2",
+        githubName: "Rustin-Liu2",
         level: "co-leader",
       },
       {
-        githubId: "Rustin-Liu3",
+        githubName: "Rustin-Liu3",
         level: "committer",
       },
       {
-        githubId: "Rustin-Liu4",
+        githubName: "Rustin-Liu4",
         level: "reviewer",
       },
       {
-        githubId: "Rustin-Liu5",
+        githubName: "Rustin-Liu5",
         level: "active-contributor",
       },
     ];
@@ -526,30 +526,30 @@ describe("Pull Service", () => {
       name: "Test",
       techLeaders: [
         {
-          githubId: "Rustin-Liu1",
+          githubName: "Rustin-Liu1",
         },
       ],
       coLeaders: [
         {
-          githubId: "Rustin-Liu2",
+          githubName: "Rustin-Liu2",
         },
       ],
       committers: [
         {
-          githubId: "Rustin-Liu3",
+          githubName: "Rustin-Liu3",
         },
       ],
       reviewers: [
         {
-          githubId: "Rustin-Liu4",
+          githubName: "Rustin-Liu4",
         },
       ],
       activeContributors: [
         {
-          githubId: "Rustin-Liu5",
+          githubName: "Rustin-Liu5",
         },
         {
-          githubId: "Rustin-Liu6",
+          githubName: "Rustin-Liu6",
         },
       ],
     };
@@ -564,7 +564,7 @@ describe("Pull Service", () => {
     listSigMembersMock.mockReturnValue(oldSigMembersWithLevel);
 
     const maintainer = {
-      githubId: "Rustin-Liu",
+      githubName: "Rustin-Liu",
     };
 
     const pullOwnersQuery: PullOwnersQuery = {
@@ -591,7 +591,7 @@ describe("Pull Service", () => {
     expect(res.data!.reviewers.length).toBe(5);
     expect(
       res.data!.reviewers.find((r) => {
-        return r === maintainer.githubId;
+        return r === maintainer.githubName;
       })
     ).not.toBe(undefined);
     expect(
@@ -622,30 +622,30 @@ describe("Pull Service", () => {
       name: "Test",
       techLeaders: [
         {
-          githubId: "Rustin-Liu1",
+          githubName: "Rustin-Liu1",
         },
       ],
       coLeaders: [
         {
-          githubId: "Rustin-Liu2",
+          githubName: "Rustin-Liu2",
         },
       ],
       committers: [
         {
-          githubId: "Rustin-Liu3",
+          githubName: "Rustin-Liu3",
         },
       ],
       reviewers: [
         {
-          githubId: "Rustin-Liu4",
+          githubName: "Rustin-Liu4",
         },
         {
-          githubId: "Rustin-Liu5",
+          githubName: "Rustin-Liu5",
         },
       ],
       activeContributors: [
         {
-          githubId: "Rustin-Liu6",
+          githubName: "Rustin-Liu6",
         },
       ],
     };
@@ -658,7 +658,7 @@ describe("Pull Service", () => {
     sigFindOneMock.mockReturnValue(Promise.resolve(undefined));
 
     const maintainer = {
-      githubId: "Rustin-Liu",
+      githubName: "Rustin-Liu",
     };
 
     const pullOwnersQuery: PullOwnersQuery = {
@@ -683,11 +683,11 @@ describe("Pull Service", () => {
 
     // Assert reviewers.
     expect(res.data!.reviewers.length).toBe(1);
-    expect(res.data!.reviewers[0]).toBe(maintainer.githubId);
+    expect(res.data!.reviewers[0]).toBe(maintainer.githubName);
 
     // Assert committers.
     expect(res.data!.approvers.length).toBe(1);
-    expect(res.data!.approvers[0]).toBe(maintainer.githubId);
+    expect(res.data!.approvers[0]).toBe(maintainer.githubName);
 
     // Assert needsLGTM.
     expect(res.data!.needsLGTM).toBe(2);
@@ -696,23 +696,23 @@ describe("Pull Service", () => {
   test("list owners when only fmt sig info file", async () => {
     const oldSigMembersWithLevel: ContributorInfoWithLevel[] = [
       {
-        githubId: "Rustin-Liu1",
+        githubName: "Rustin-Liu1",
         level: "leader",
       },
       {
-        githubId: "Rustin-Liu2",
+        githubName: "Rustin-Liu2",
         level: "co-leader",
       },
       {
-        githubId: "Rustin-Liu3",
+        githubName: "Rustin-Liu3",
         level: "committer",
       },
       {
-        githubId: "Rustin-Liu4",
+        githubName: "Rustin-Liu4",
         level: "reviewer",
       },
       {
-        githubId: "Rustin-Liu5",
+        githubName: "Rustin-Liu5",
         level: "active-contributor",
       },
     ];
@@ -721,27 +721,27 @@ describe("Pull Service", () => {
       name: "Test",
       techLeaders: [
         {
-          githubId: "Rustin-Liu1",
+          githubName: "Rustin-Liu1",
         },
       ],
       coLeaders: [
         {
-          githubId: "Rustin-Liu2",
+          githubName: "Rustin-Liu2",
         },
       ],
       committers: [
         {
-          githubId: "Rustin-Liu3",
+          githubName: "Rustin-Liu3",
         },
       ],
       reviewers: [
         {
-          githubId: "Rustin-Liu4",
+          githubName: "Rustin-Liu4",
         },
       ],
       activeContributors: [
         {
-          githubId: "Rustin-Liu5",
+          githubName: "Rustin-Liu5",
         },
       ],
     };
@@ -756,7 +756,7 @@ describe("Pull Service", () => {
     listSigMembersMock.mockReturnValue(oldSigMembersWithLevel);
 
     const collaborator = {
-      githubId: "Rustin-Liu",
+      githubName: "Rustin-Liu",
     };
 
     const pullOwnersQuery: PullOwnersQuery = {
@@ -781,11 +781,11 @@ describe("Pull Service", () => {
 
     // Assert reviewers.
     expect(res.data!.reviewers.length).toBe(5);
-    expect(res.data!.reviewers[0]).toBe(oldSigMembersWithLevel[0].githubId);
+    expect(res.data!.reviewers[0]).toBe(oldSigMembersWithLevel[0].githubName);
 
     // Assert committers.
     expect(res.data!.approvers.length).toBe(5);
-    expect(res.data!.approvers[0]).toBe(oldSigMembersWithLevel[0].githubId);
+    expect(res.data!.approvers[0]).toBe(oldSigMembersWithLevel[0].githubName);
 
     // Assert needsLGTM.
     expect(res.data!.needsLGTM).toBe(1);

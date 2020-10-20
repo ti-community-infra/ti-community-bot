@@ -9,16 +9,9 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required":["githubId"],
+        "required":["githubName"],
         "properties": {
-          "githubId": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string",
-            "format": "email"
-          },
-          "company": {
+          "githubName": {
             "type": "string"
           }
         }
@@ -28,16 +21,9 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required":["githubId"],
+        "required":["githubName"],
         "properties": {
-          "githubId": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string",
-            "format": "email"
-          },
-          "company": {
+          "githubName": {
             "type": "string"
           }
         }
@@ -47,16 +33,9 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required":["githubId"],
+        "required":["githubName"],
         "properties": {
-          "githubId": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string",
-            "format": "email"
-          },
-          "company": {
+          "githubName": {
             "type": "string"
           }
         }
@@ -66,16 +45,9 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required":["githubId"],
+        "required":["githubName"],
         "properties": {
-          "githubId": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string",
-            "format": "email"
-          },
-          "company": {
+          "githubName": {
             "type": "string"
           }
         }
@@ -85,16 +57,9 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required":["githubId"],
+        "required":["githubName"],
         "properties": {
-          "githubId": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string",
-            "format": "email"
-          },
-          "company": {
+          "githubName": {
             "type": "string"
           }
         }

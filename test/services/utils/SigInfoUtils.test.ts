@@ -14,7 +14,7 @@ describe("Sig Info Util", () => {
     name: "Test",
     techLeaders: [
       {
-        githubId: "Rustin-Liu",
+        githubName: "Rustin-Liu",
       },
     ],
     coLeaders: [],
@@ -22,7 +22,7 @@ describe("Sig Info Util", () => {
     reviewers: [],
     activeContributors: [
       {
-        githubId: "random",
+        githubName: "random",
       },
     ],
   };

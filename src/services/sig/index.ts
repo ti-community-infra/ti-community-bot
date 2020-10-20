@@ -59,16 +59,15 @@ export class SigService {
       const contributorInfo = contributorsInfo[i];
       let contributor = await this.contributorInfoRepository.findOne({
         where: {
-          github: contributorInfo.githubId,
+          github: contributorInfo.githubName,
         },
       });
 
       if (contributor === undefined) {
         contributor = new ContributorInfo();
-        contributor.github = contributorInfo.githubId;
+        contributor.github = contributorInfo.githubName;
       }
-      contributor.email = contributorInfo.email;
-      contributor.company = contributorInfo.company;
+
       contributors.push(await this.contributorInfoRepository.save(contributor));
     }
 
@@ -110,7 +109,7 @@ export class SigService {
     const sigInfo = await getSigInfo(sigInfoFile.raw_url);
     const contributorsInfo = gatherContributorsWithLevel(sigInfo);
     const contributorsInfoMap = new Map(
-      contributorsInfo.map((c) => [c.githubId, c])
+      contributorsInfo.map((c) => [c.githubName, c])
     );
 
     const sig = await this.findOrAddSig(sigInfo);
