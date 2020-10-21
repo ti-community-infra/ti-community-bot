@@ -206,7 +206,7 @@ export default class PullService implements IPullService {
   public async formatting(
     validate: ValidateFunction,
     pullRequestFormatQuery: PullFormatQuery
-  ): Promise<Reply<null> | null> {
+  ): Promise<Reply<null>> {
     // Filter sig file name.
     const files = pullRequestFormatQuery.files.filter((f) => {
       return (
@@ -217,8 +217,13 @@ export default class PullService implements IPullService {
       );
     });
 
+    // No formatting is required.
     if (files.length === 0) {
-      return null;
+      return {
+        data: null,
+        status: Status.Success,
+        message: PullMessage.NoFormatRequired,
+      };
     }
 
     if (files.length > MAX_SIG_INFO_FILE_CHANGE_NUMBER) {
