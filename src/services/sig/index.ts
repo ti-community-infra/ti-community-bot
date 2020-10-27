@@ -4,7 +4,7 @@ import assert from "assert";
 import { Repository } from "typeorm";
 
 import { Sig } from "../../db/entities/Sig";
-import { SigMember } from "../../db/entities/SigMember";
+import { SigMember, SigMemberLevel } from "../../db/entities/SigMember";
 import { ContributorInfo } from "../../db/entities/ContributorInfo";
 import { PullFormatQuery } from "../../queries/PullFormatQuery";
 import { Reply, Status } from "../reply";
@@ -13,14 +13,25 @@ import { ContributorSchema, SigInfoSchema } from "../../config/SigInfoSchema";
 import { SigMessage } from "../messages/SigMessage";
 import { gatherContributorsWithLevel, getSigInfo } from "../utils/SigInfoUtils";
 import { MAX_SIG_INFO_FILE_CHANGE_NUMBER } from "../../config/Config";
+import { Response } from "../response";
+import { SigDTO } from "../dtos/SigDTO";
+import { StatusCodes } from "http-status-codes";
+import SigMemberRepository from "../../repositoies/sig-member";
+
+const lodash = require("lodash");
+
+export interface ISigService {
+  getSig(sigName: string): Promise<Response<SigDTO | null>>;
+  updateSigInfo(pullFormatQuery: PullFormatQuery): Promise<Reply<null> | null>;
+}
 
 @Service()
-export class SigService {
+export class SigService implements ISigService {
   constructor(
     @InjectRepository(Sig)
     private sigRepository: Repository<Sig>,
-    @InjectRepository(SigMember)
-    private sigMemberRepository: Repository<SigMember>,
+    @InjectRepository()
+    private sigMemberRepository: SigMemberRepository,
     @InjectRepository(ContributorInfo)
     private contributorInfoRepository: Repository<ContributorInfo>
   ) {}
@@ -143,6 +154,41 @@ export class SigService {
       data: null,
       status: Status.Success,
       message: SigMessage.UpdateSuccess,
+    };
+  }
+
+  public async getSig(sigName: string): Promise<Response<SigDTO | null>> {
+    const sig = await this.sigRepository.findOne({
+      where: {
+        name: sigName,
+      },
+    });
+
+    if (sig === undefined) {
+      return {
+        data: null,
+        status: StatusCodes.NOT_FOUND,
+        message: SigMessage.NotFound,
+      };
+    }
+
+    const sigMembers = await this.sigMemberRepository.listSigMembers(sig.id);
+    const members = lodash.groupBy(sigMembers, "level");
+
+    return {
+      data: {
+        name: sig.name,
+        membership: {
+          techLeaders: members[SigMemberLevel.techLeaders],
+          coLeaders: members[SigMemberLevel.coLeaders],
+          committers: members[SigMemberLevel.committers],
+          reviewers: members[SigMemberLevel.reviewers],
+          activeContributors: members[SigMemberLevel.activeContributors],
+        },
+        needsLGTM: sig.lgtm,
+      },
+      status: StatusCodes.OK,
+      message: SigMessage.GetSigSuccess,
     };
   }
 }

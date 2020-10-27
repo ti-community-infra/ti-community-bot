@@ -19,16 +19,16 @@ import {
 } from "../../config/Config";
 import { ContributorSchema, SigInfoSchema } from "../../config/SigInfoSchema";
 import { Sig } from "../../db/entities/Sig";
-import { SigMember, SigMemberLevel } from "../../db/entities/SigMember";
+import { SigMemberLevel } from "../../db/entities/SigMember";
 import {
   gatherContributorsWithLevel,
   ContributorInfoWithLevel,
   getSigInfo,
 } from "../utils/SigInfoUtils";
-import { ContributorInfo } from "../../db/entities/ContributorInfo";
 import { PullOwnersDTO } from "../dtos/PullOwnersDTO";
 import { PullOwnersQuery } from "../../queries/PullOwnersQuery";
 import { Response } from "../response";
+import SigMemberRepository from "../../repositoies/sig-member";
 
 export interface IPullService {
   listOwners(
@@ -60,8 +60,8 @@ export default class PullService implements IPullService {
   constructor(
     @InjectRepository(Sig)
     private sigRepository: Repository<Sig>,
-    @InjectRepository(SigMember)
-    private sigMemberRepository: Repository<SigMember>
+    @InjectRepository()
+    private sigMemberRepository: SigMemberRepository
   ) {}
 
   /**
@@ -89,31 +89,6 @@ export default class PullService implements IPullService {
       }
     }
     return null;
-  }
-
-  /**
-   * List sig members.
-   * @param sigId SIG id.
-   * @private
-   */
-  private async listSigMembers(
-    sigId: number
-  ): Promise<ContributorInfoWithLevel[]> {
-    return (
-      await this.sigMemberRepository
-        .createQueryBuilder("sm")
-        .leftJoinAndSelect(Sig, "s", "sm.sig_id = s.id")
-        .leftJoinAndSelect(ContributorInfo, "ci", "sm.contributor_id = ci.id")
-        .where(`sig_id = ${sigId}`)
-        .select(
-          "ci.github as githubName, sm.level as level, ci.email as email, ci.company as company"
-        )
-        .getRawMany()
-    ).map((c) => {
-      return {
-        ...c,
-      };
-    });
   }
 
   /**
@@ -347,7 +322,9 @@ export default class PullService implements IPullService {
     }
 
     // Get the PR's members diff.
-    const oldMembersWithLevel = await this.listSigMembers(sig.id);
+    const oldMembersWithLevel = await this.sigMemberRepository.listSigMembers(
+      sig.id
+    );
     const newMembersWithLevel = gatherContributorsWithLevel(sigInfo);
     const difference = [...newMembersWithLevel].filter((nm) =>
       [...oldMembersWithLevel].every(

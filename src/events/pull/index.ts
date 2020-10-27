@@ -27,9 +27,9 @@ enum PullRequestActions {
   Reopened = "reopened",
 }
 
-const constructPullFormatQuery = async (
+async function constructPullFormatQuery(
   context: Context
-): Promise<PullFormatQuery> => {
+): Promise<PullFormatQuery> {
   const { number } = context.payload.pull_request;
 
   const { data: filesData } = await context.github.pulls.listFiles({
@@ -50,14 +50,14 @@ const constructPullFormatQuery = async (
     sigInfoFileName: config?.sigInfoFileName || DEFAULT_SIG_INFO_FILE_NAME,
     files,
   };
-};
+}
 
 /**
  * Check pull format.
  * @param context Probot context.
  * @param pullService Pull request service.
  */
-const checkPullFormat = async (context: Context, pullService: PullService) => {
+async function checkPullFormat(context: Context, pullService: PullService) {
   const { head } = context.payload.pull_request;
 
   const pullFormatQuery = await constructPullFormatQuery(context);
@@ -108,9 +108,9 @@ const checkPullFormat = async (context: Context, pullService: PullService) => {
       break;
     }
   }
-};
+}
 
-const updateSigInfo = async (context: Context, sigService: SigService) => {
+async function updateSigInfo(context: Context, sigService: SigService) {
   const pullFormatQuery = await constructPullFormatQuery(context);
   const { files } = pullFormatQuery;
 
@@ -142,13 +142,13 @@ const updateSigInfo = async (context: Context, sigService: SigService) => {
       );
     }
   }
-};
+}
 
-const handlePullRequestEvents = async (
+export async function handlePullRequestEvents(
   context: Context,
   pullRequestFormatService: PullService,
   sigService: SigService
-) => {
+) {
   switch (context.payload.action) {
     case PullRequestActions.Closed: {
       const { merged_at: mergedAt } = context.payload.pull_request;
@@ -169,6 +169,4 @@ const handlePullRequestEvents = async (
       break;
     }
   }
-};
-
-export default handlePullRequestEvents;
+}

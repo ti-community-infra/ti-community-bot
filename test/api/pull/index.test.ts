@@ -4,11 +4,11 @@ import { Probot, ProbotOctokit } from "probot";
 import { Request as Req, Response as Res } from "express";
 import typeorm = require("typeorm");
 
-import listOwners from "../../../src/api/pull";
 import { IPullService } from "../../../src/services/pull";
 import { PullOwnersQuery } from "../../../src/queries/PullOwnersQuery";
 import { PullOwnersDTO } from "../../../src/services/dtos/PullOwnersDTO";
 import { Response } from "../../../src/services/response";
+import { listOwners } from "../../../src/api/pull";
 
 const fs = require("fs");
 const path = require("path");

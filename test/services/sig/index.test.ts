@@ -7,11 +7,12 @@ import { PullFormatQuery } from "../../../src/queries/PullFormatQuery";
 import * as sigInfoUtil from "../../../src/services/utils/SigInfoUtils";
 import { SigInfoSchema } from "../../../src/config/SigInfoSchema";
 import { Status } from "../../../src/services/reply";
+import SigMemberRepository from "../../../src/repositoies/sig-member";
 
 describe("Sig Service", () => {
   let sigService: SigService;
   let sigRepository = new Repository<Sig>();
-  let sigMemberRepository = new Repository<SigMember>();
+  let sigMemberRepository = new SigMemberRepository();
   let contributorInfoRepository = new Repository<ContributorInfo>();
 
   beforeEach(() => {
