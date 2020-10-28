@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
-import { SigService } from "../../services/sig";
+import { ISigService } from "../../services/sig";
 
 export async function getSig(
   req: Request,
   res: Response,
-  sigService: SigService
+  sigService: ISigService
 ) {
   const sigName = req.params.name;
 
