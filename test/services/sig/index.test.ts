@@ -7,11 +7,15 @@ import { PullFormatQuery } from "../../../src/queries/PullFormatQuery";
 import * as sigInfoUtil from "../../../src/services/utils/SigInfoUtils";
 import { SigInfoSchema } from "../../../src/config/SigInfoSchema";
 import { Status } from "../../../src/services/reply";
+import SigMemberRepository from "../../../src/repositoies/sig-member";
+import { ContributorInfoWithLevel } from "../../../src/services/utils/SigInfoUtils";
+import { StatusCodes } from "http-status-codes";
+import { SigMessage } from "../../../src/services/messages/SigMessage";
 
 describe("Sig Service", () => {
   let sigService: SigService;
   let sigRepository = new Repository<Sig>();
-  let sigMemberRepository = new Repository<SigMember>();
+  let sigMemberRepository = new SigMemberRepository();
   let contributorInfoRepository = new Repository<ContributorInfo>();
 
   beforeEach(() => {
@@ -383,6 +387,65 @@ describe("Sig Service", () => {
     // Assert reply.
     expect(reply).not.toBe(null);
     expect(reply!.status).toBe(Status.Success);
+  });
+
+  test("get a sig", async () => {
+    const sigMembersWithLevel: ContributorInfoWithLevel[] = [
+      {
+        githubName: "Rustin-Liu1",
+        level: "leader",
+      },
+      {
+        githubName: "Rustin-Liu2",
+        level: "co-leader",
+      },
+      {
+        githubName: "Rustin-Liu3",
+        level: "committer",
+      },
+      {
+        githubName: "Rustin-Liu4",
+        level: "reviewer",
+      },
+      {
+        githubName: "Rustin-Liu5",
+        level: "active-contributor",
+      },
+    ];
+    const sigName = "test";
+
+    // Mock find sig and return sig
+    const sigFindOneMock = jest.spyOn(sigRepository, "findOne");
+    const sig = new Sig();
+    sig.id = 1;
+    sig.name = sigName;
+    sigFindOneMock.mockReturnValue(Promise.resolve(sig));
+
+    const listSigMembersMock = jest.spyOn(
+      sigMemberRepository,
+      "listSigMembers"
+    );
+    listSigMembersMock.mockReturnValue(Promise.resolve(sigMembersWithLevel));
+
+    const sigRes = await sigService.getSig(sigName);
+
+    expect(sigRes.status).toBe(StatusCodes.OK);
+    expect(sigRes.message).toBe(SigMessage.GetSigSuccess);
+    expect(sigRes.data!.name).toBe(sigName);
+    expect(sigRes.data!.membership.techLeaders[0]).toBe(sigMembersWithLevel[0]);
+  });
+
+  test("get a sig when sig not found", async () => {
+    const sigName = "test";
+
+    // Mock find sig and return sig
+    const sigFindOneMock = jest.spyOn(sigRepository, "findOne");
+    sigFindOneMock.mockReturnValue(Promise.resolve(undefined));
+
+    const sigRes = await sigService.getSig(sigName);
+
+    expect(sigRes.status).toBe(StatusCodes.NOT_FOUND);
+    expect(sigRes.message).toBe(SigMessage.NotFound);
   });
 
   afterEach(() => {

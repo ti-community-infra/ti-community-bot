@@ -3,12 +3,13 @@ import { Container } from "typedi";
 import { createConnection, useContainer } from "typeorm";
 import "reflect-metadata";
 
-import handlePullRequestEvents from "./events/pull";
 import PullService from "./services/pull";
 import { SigService } from "./services/sig";
-import listReviewers from "./api/pull";
 import { StatusCodes } from "http-status-codes";
 import { PullMessage } from "./services/messages/PullMessage";
+import { getSig } from "./api/sig";
+import { listOwners } from "./api/pull";
+import { handlePullRequestEvents } from "./events/pull";
 
 const commands = require("probot-commands-pro");
 const bodyParser = require("body-parser");
@@ -74,9 +75,13 @@ export = (app: Application) => {
 
           // Create github client with installed token.
           const github = await app.auth(installationId);
-          await listReviewers(req, res, Container.get(PullService), github);
+          await listOwners(req, res, Container.get(PullService), github);
         }
       );
+
+      router.get("/sigs/:name", async (req, res) => {
+        await getSig(req, res, Container.get(SigService));
+      });
     })
     .catch((err) => {
       app.log.fatal("Connect to db failed", err);

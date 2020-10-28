@@ -15,12 +15,12 @@ import { ContributorSchema } from "../../config/SigInfoSchema";
 import { PullMessage } from "../../services/messages/PullMessage";
 import { IPullService } from "../../services/pull";
 
-const listOwners = async (
+export async function listOwners(
   req: Request,
   res: Response,
   pullService: IPullService,
   github: InstanceType<typeof ProbotOctokit>
-) => {
+) {
   // Gather params.
   const owner = req.params.owner;
   const repo = req.params.repo;
@@ -93,6 +93,4 @@ const listOwners = async (
 
   res.status(response.status);
   res.json(response);
-};
-
-export default listOwners;
+}
