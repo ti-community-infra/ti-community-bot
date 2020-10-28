@@ -157,6 +157,10 @@ export class SigService implements ISigService {
     };
   }
 
+  /**
+   * Get sig by sig name.
+   * @param sigName
+   */
   public async getSig(sigName: string): Promise<Response<SigDTO | null>> {
     const sig = await this.sigRepository.findOne({
       where: {
