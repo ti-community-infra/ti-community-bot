@@ -86,17 +86,6 @@ export class SigService implements ISigService {
   }
 
   /**
-   * Delete sig members.
-   * @param sigId
-   * @private
-   */
-  private async deleteSigMembers(sigId: number) {
-    await this.sigMemberRepository.query(
-      `delete from sig_member where sig_id = '${sigId}'`
-    );
-  }
-
-  /**
    * Update sig info when PR merged.
    * It will delete all members and add members from the sig info file.
    * @param pullFormatQuery
@@ -127,9 +116,6 @@ export class SigService implements ISigService {
 
     const contributors = await this.updateOrAddContributors(contributorsInfo);
     assert(contributorsInfo.length === contributors.length);
-
-    // Delete sig members.
-    await this.deleteSigMembers(sig.id);
 
     for (let j = 0; j < contributors.length; j++) {
       const contributor = contributors[j];
