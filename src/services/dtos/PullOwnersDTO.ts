@@ -1,5 +1,5 @@
 export interface PullOwnersDTO {
-  approvers: string[];
+  committers: string[];
   reviewers: string[];
   needsLGTM: number;
 }
