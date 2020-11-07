@@ -110,7 +110,7 @@ export default class PullService implements IPullService {
         case SigMemberLevel.coLeaders:
         case SigMemberLevel.committers: {
           return {
-            approvers: maintainers,
+            committers: maintainers,
             reviewers: maintainers,
             needsLGTM: LGTM.Two,
           };
@@ -132,7 +132,7 @@ export default class PullService implements IPullService {
             )
           );
           return {
-            approvers: reviewers,
+            committers: reviewers,
             reviewers,
             needsLGTM: LGTM.Two,
           };
@@ -149,7 +149,7 @@ export default class PullService implements IPullService {
             )
           );
           return {
-            approvers: reviewers,
+            committers: reviewers,
             reviewers,
             needsLGTM: LGTM.One,
           };
@@ -167,7 +167,7 @@ export default class PullService implements IPullService {
       )
     );
     return {
-      approvers: reviewers,
+      committers: reviewers,
       reviewers,
       needsLGTM: LGTM.One,
     };
@@ -285,7 +285,7 @@ export default class PullService implements IPullService {
     if (files.length === 0) {
       return {
         data: {
-          approvers: collaborators,
+          committers: collaborators,
           reviewers: collaborators,
           needsLGTM: LGTM.Two,
         },
@@ -312,7 +312,7 @@ export default class PullService implements IPullService {
       });
       return {
         data: {
-          approvers: maintainers,
+          committers: maintainers,
           reviewers: maintainers,
           needsLGTM: LGTM.Two,
         },

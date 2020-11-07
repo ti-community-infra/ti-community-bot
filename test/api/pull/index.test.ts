@@ -159,7 +159,7 @@ describe("Pull API", () => {
 
     const response: Response<PullOwnersDTO> = {
       data: {
-        approvers: ["Rustin-Liu"],
+        committers: ["Rustin-Liu"],
         reviewers: ["Rustin-Liu"],
         needsLGTM: 2,
       },
