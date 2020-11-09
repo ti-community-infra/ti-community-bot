@@ -2,7 +2,7 @@ import sigInfoSchema from "../../config/sig.info.schema.json";
 
 export enum PullMessage {
   NoFormatRequired = "No formatting is required.",
-  FormatSuccess = "Format Success.",
+  FormatSuccess = "Sig file formatting success.",
   OnlyOneRole = "Contributors can only have one role.",
   ConfigNotFound = "The community bot configuration file could not be found.",
   InstallationIdNotFound = "The installation ID could not be found.",

@@ -72,13 +72,14 @@ async function checkPullFormat(context: Context, pullService: PullService) {
     context: "Sig Info File Format",
   };
 
-  const { files } = pullFormatQuery;
-
   switch (reply.status) {
     case Status.Failed: {
-      context.log.error("Format failed.", files);
-      await context.github.issues.createComment(
-        context.issue({ body: reply.message })
+      context.log.error("Format failed.", pullFormatQuery.files);
+      // Create or update bot comment.
+      await createOrUpdateComment(
+        context,
+        process.env.BOT_NAME!,
+        reply.message
       );
       // @ts-ignore
       await context.github.repos.createStatus({
@@ -88,17 +89,11 @@ async function checkPullFormat(context: Context, pullService: PullService) {
       break;
     }
     case Status.Success: {
-      // @ts-ignore
-      await context.github.repos.createStatus({
-        ...context.repo(),
-        ...status,
-      });
-      break;
-    }
-    case Status.Problematic: {
-      context.log.warn("Format has some problems.", files);
-      await context.github.issues.createComment(
-        context.issue({ body: combineReplay(reply) })
+      // Create or update bot comment.
+      await createOrUpdateComment(
+        context,
+        process.env.BOT_NAME!,
+        reply.message
       );
       // @ts-ignore
       await context.github.repos.createStatus({
@@ -107,6 +102,47 @@ async function checkPullFormat(context: Context, pullService: PullService) {
       });
       break;
     }
+    case Status.Problematic: {
+      context.log.warn("Format has some problems.", pullFormatQuery.files);
+      // Create or update bot comment.
+      await createOrUpdateComment(
+        context,
+        process.env.BOT_NAME!,
+        combineReplay(reply)
+      );
+      // @ts-ignore
+      await context.github.repos.createStatus({
+        ...context.repo(),
+        ...status,
+      });
+      break;
+    }
+  }
+}
+
+async function createOrUpdateComment(
+  context: Context,
+  commenter: string,
+  body: string
+) {
+  const { data: comments } = await context.github.issues.listComments({
+    ...context.issue(),
+  });
+
+  const botComment = comments.find((c) => {
+    return c.user.login === commenter;
+  });
+
+  if (botComment === undefined) {
+    await context.github.issues.createComment(context.issue({ body }));
+  } else {
+    botComment.body = body;
+    const comment = {
+      ...context.issue(),
+      ...botComment,
+      comment_id: botComment.id,
+    };
+    await context.github.issues.updateComment(comment);
   }
 }
 
