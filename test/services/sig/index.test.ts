@@ -98,16 +98,21 @@ describe("Sig Service", () => {
     const contributorSaveMock = jest.spyOn(contributorInfoRepository, "save");
     contributorSaveMock.mockReturnValue(Promise.resolve(contributorInfo));
 
-    // Mock find sig member.
-    const sigMemberFindOneMock = jest.spyOn(sigMemberRepository, "findOne");
+    // Mock find sig members.
+    const sigMemberFindMock = jest.spyOn(sigMemberRepository, "find");
     const sigMember = new SigMember();
     sigMember.level = "co-leader";
-    sigMemberFindOneMock.mockReturnValue(Promise.resolve(sigMember));
+    sigMember.contributorId = 1;
+    sigMemberFindMock.mockReturnValue(Promise.resolve([sigMember]));
 
     // Mock save sig member.
     const sigMemberSaveMock = jest.spyOn(sigMemberRepository, "save");
     sigMember.level = "leader";
     sigMemberSaveMock.mockReturnValue(Promise.resolve(sigMember));
+
+    // Mock remove sig member.
+    const sigMemberRemoveMock = jest.spyOn(sigMemberRepository, "remove");
+    sigMemberRemoveMock.mockImplementation();
 
     const reply = await sigService.updateSigInfo(pullFormatQuery);
 
@@ -127,18 +132,15 @@ describe("Sig Service", () => {
     expect(contributorSaveMock.mock.calls.length).toBe(1);
     expect(contributorSaveMock.mock.calls[0][0]).toStrictEqual(contributorInfo);
 
-    // Assert sig member find.
-    expect(sigMemberFindOneMock.mock.calls.length).toBe(1);
-    expect(sigMemberFindOneMock.mock.calls[0][0]).toStrictEqual({
-      where: {
-        contributorId: contributorInfo.id,
-        sigId: sig.id,
-      },
-    });
-
     // Assert sig member save.
     expect(sigMemberSaveMock.mock.calls.length).toBe(1);
-    expect(sigMemberSaveMock.mock.calls[0][0]).toStrictEqual(sigMember);
+    expect(sigMemberSaveMock.mock.calls[0][0].level).toStrictEqual(
+      sigMember.level
+    );
+
+    // Assert sig member remove.
+    expect(sigMemberRemoveMock.mock.calls.length).toBe(1);
+    expect(sigMemberRemoveMock.mock.calls[0][0]).toStrictEqual([]);
 
     // Assert reply.
     expect(reply).not.toBe(null);
@@ -200,16 +202,21 @@ describe("Sig Service", () => {
     const contributorSaveMock = jest.spyOn(contributorInfoRepository, "save");
     contributorSaveMock.mockReturnValue(Promise.resolve(contributorInfo));
 
-    // Mock find sig member.
-    const sigMemberFindOneMock = jest.spyOn(sigMemberRepository, "findOne");
+    // Mock find sig members.
+    const sigMemberFindMock = jest.spyOn(sigMemberRepository, "find");
     const sigMember = new SigMember();
     sigMember.level = "co-leader";
-    sigMemberFindOneMock.mockReturnValue(Promise.resolve(sigMember));
+    sigMember.contributorId = 1;
+    sigMemberFindMock.mockReturnValue(Promise.resolve([sigMember]));
 
     // Mock save sig member.
     const sigMemberSaveMock = jest.spyOn(sigMemberRepository, "save");
     sigMember.level = "leader";
     sigMemberSaveMock.mockReturnValue(Promise.resolve(sigMember));
+
+    // Mock remove sig member.
+    const sigMemberRemoveMock = jest.spyOn(sigMemberRepository, "remove");
+    sigMemberRemoveMock.mockImplementation();
 
     const reply = await sigService.updateSigInfo(pullFormatQuery);
 
@@ -233,18 +240,13 @@ describe("Sig Service", () => {
     expect(contributorSaveMock.mock.calls.length).toBe(1);
     expect(contributorSaveMock.mock.calls[0][0]).toStrictEqual(contributorInfo);
 
-    // Assert sig member find.
-    expect(sigMemberFindOneMock.mock.calls.length).toBe(1);
-    expect(sigMemberFindOneMock.mock.calls[0][0]).toStrictEqual({
-      where: {
-        contributorId: contributorInfo.id,
-        sigId: sig.id,
-      },
-    });
-
-    // Assert sig member save.
+    // Assert sig member save.˚
     expect(sigMemberSaveMock.mock.calls.length).toBe(1);
     expect(sigMemberSaveMock.mock.calls[0][0]).toStrictEqual(sigMember);
+
+    // Assert sig member remove.
+    expect(sigMemberRemoveMock.mock.calls.length).toBe(1);
+    expect(sigMemberRemoveMock.mock.calls[0][0]).toStrictEqual([]);
 
     // Assert reply.
     expect(reply).not.toBe(null);
@@ -306,11 +308,16 @@ describe("Sig Service", () => {
     contributorInfo.id = 1;
     contributorSaveMock.mockReturnValue(Promise.resolve(contributorInfo));
 
-    // Mock find sig member.
-    const sigMemberFindOneMock = jest.spyOn(sigMemberRepository, "findOne");
+    // Mock find sig members.
+    const sigMemberFindMock = jest.spyOn(sigMemberRepository, "find");
     const sigMember = new SigMember();
     sigMember.level = "co-leader";
-    sigMemberFindOneMock.mockReturnValue(Promise.resolve(sigMember));
+    sigMember.contributorId = 1;
+    sigMemberFindMock.mockReturnValue(Promise.resolve([sigMember]));
+
+    // Mock remove sig member.
+    const sigMemberRemoveMock = jest.spyOn(sigMemberRepository, "remove");
+    sigMemberRemoveMock.mockImplementation();
 
     // Mock save sig member.
     const sigMemberSaveMock = jest.spyOn(sigMemberRepository, "save");
@@ -341,18 +348,13 @@ describe("Sig Service", () => {
       contributorInfo.name
     );
 
-    // Assert sig member find.
-    expect(sigMemberFindOneMock.mock.calls.length).toBe(1);
-    expect(sigMemberFindOneMock.mock.calls[0][0]).toStrictEqual({
-      where: {
-        contributorId: contributorInfo.id,
-        sigId: sig.id,
-      },
-    });
-
     // Assert sig member save.
     expect(sigMemberSaveMock.mock.calls.length).toBe(1);
     expect(sigMemberSaveMock.mock.calls[0][0]).toStrictEqual(sigMember);
+
+    // Assert sig member remove.
+    expect(sigMemberRemoveMock.mock.calls.length).toBe(1);
+    expect(sigMemberRemoveMock.mock.calls[0][0]).toStrictEqual([]);
 
     // Assert reply.
     expect(reply).not.toBe(null);
