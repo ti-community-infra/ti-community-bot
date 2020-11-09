@@ -105,26 +105,29 @@ export class SigService implements ISigService {
       return null;
     }
 
+    // Get sig info from github.
     const sigInfoFile = files[MAX_SIG_INFO_FILE_CHANGE_NUMBER - 1];
     const sigInfo = await getSigInfo(sigInfoFile.raw_url);
+
+    // Gather contributors info.
     const contributorsInfo = gatherContributorsWithLevel(sigInfo);
     const contributorsInfoMap = new Map(
       contributorsInfo.map((c) => [c.githubName, c])
     );
-
-    const sig = await this.findOrAddSig(sigInfo);
-
     const contributors = await this.updateOrAddContributors(contributorsInfo);
     assert(contributorsInfo.length === contributors.length);
 
+    const sig = await this.findOrAddSig(sigInfo);
+    const sigMembers = await this.sigMemberRepository.find({
+      where: {
+        sigId: sig.id,
+      },
+    });
+    const sigMembersMap = new Map(sigMembers.map((s) => [s.contributorId, s]));
+
     for (let j = 0; j < contributors.length; j++) {
       const contributor = contributors[j];
-      let sigMember = await this.sigMemberRepository.findOne({
-        where: {
-          sigId: sig.id,
-          contributorId: contributor.id,
-        },
-      });
+      let sigMember = sigMembersMap.get(contributor.id);
 
       if (sigMember === undefined) {
         sigMember = new SigMember();
@@ -134,7 +137,13 @@ export class SigService implements ISigService {
 
       sigMember.level = contributorsInfoMap.get(contributor.github)!.level;
       await this.sigMemberRepository.save(sigMember);
+      // Delete it after use.
+      sigMembersMap.delete(contributor.id);
     }
+
+    // Remove needs delete members.
+    const needsDeleteMembers = Array.from(sigMembersMap.values());
+    await this.sigMemberRepository.remove(needsDeleteMembers);
 
     return {
       data: null,
