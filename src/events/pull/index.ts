@@ -120,11 +120,18 @@ async function checkPullFormat(context: Context, pullService: PullService) {
   }
 }
 
+/**
+ * Create or update comment.
+ * @param context
+ * @param commenter
+ * @param body
+ */
 async function createOrUpdateComment(
   context: Context,
   commenter: string,
   body: string
 ) {
+  // List all comment.
   const { data: comments } = await context.github.issues.listComments({
     ...context.issue(),
   });
@@ -136,6 +143,7 @@ async function createOrUpdateComment(
   if (botComment === undefined) {
     await context.github.issues.createComment(context.issue({ body }));
   } else {
+    // Update.
     botComment.body = body;
     const comment = {
       ...context.issue(),
