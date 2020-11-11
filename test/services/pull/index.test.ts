@@ -238,6 +238,7 @@ describe("Pull Service", () => {
           raw_url: "string",
         },
       ],
+      labels: [],
       maintainers: [collaborator],
       collaborators: [collaborator],
     };
@@ -280,6 +281,7 @@ describe("Pull Service", () => {
           raw_url: "string",
         },
       ],
+      labels: [],
       maintainers: [collaborator],
       collaborators: [collaborator],
     };
@@ -361,6 +363,7 @@ describe("Pull Service", () => {
           raw_url: "string",
         },
       ],
+      labels: [],
       maintainers: [maintainer],
       collaborators: [maintainer],
     };
@@ -465,6 +468,7 @@ describe("Pull Service", () => {
           raw_url: "string",
         },
       ],
+      labels: [],
       maintainers: [maintainer],
       collaborators: [maintainer],
     };
@@ -587,6 +591,7 @@ describe("Pull Service", () => {
           raw_url: "string",
         },
       ],
+      labels: [],
       maintainers: [maintainer],
       collaborators: [maintainer],
     };
@@ -681,6 +686,7 @@ describe("Pull Service", () => {
           raw_url: "string",
         },
       ],
+      labels: [],
       maintainers: [maintainer],
       collaborators: [maintainer],
     };
@@ -782,6 +788,7 @@ describe("Pull Service", () => {
           raw_url: "string",
         },
       ],
+      labels: [],
       maintainers: [collaborator],
       collaborators: [collaborator],
     };

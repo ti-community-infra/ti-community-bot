@@ -63,6 +63,10 @@ describe("Pull API", () => {
           issues: "write",
         },
       })
+      .get(`/repos/${owner}/${repo}/pulls/${number}`)
+      .reply(StatusCodes.OK, {
+        labels: [],
+      })
       .get(`/repos/${owner}/${repo}/pulls/${number}/files`)
       .reply(StatusCodes.OK, [
         {
