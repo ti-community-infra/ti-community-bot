@@ -26,6 +26,16 @@ export async function listOwners(
   const repo = req.params.repo;
   const pullNumber = Number(req.params.number);
 
+  // Get pull request.
+  const { data: pullRequest } = await github.pulls.get({
+    owner,
+    repo,
+    pull_number: pullNumber,
+  });
+
+  const labels = pullRequest.labels;
+
+  // Get pull request change files.
   const { data: filesData } = await github.pulls.listFiles({
     owner,
     repo,
@@ -87,6 +97,7 @@ export async function listOwners(
     maintainers,
     collaborators,
     files,
+    labels,
   };
 
   const response = await pullService.listOwners(pullReviewersQuery);

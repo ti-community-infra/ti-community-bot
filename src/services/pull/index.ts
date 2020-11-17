@@ -24,11 +24,13 @@ import {
   gatherContributorsWithLevel,
   ContributorInfoWithLevel,
   getSigInfo,
+  findSigNameByLabels,
 } from "../utils/SigInfoUtils";
 import { PullOwnersDTO } from "../dtos/PullOwnersDTO";
 import { PullOwnersQuery } from "../../queries/PullOwnersQuery";
 import { Response } from "../response";
 import SigMemberRepository from "../../repositoies/sig-member";
+import { PullFileQuery } from "../../queries/PullFileQuery";
 
 export interface IPullService {
   listOwners(
@@ -255,15 +257,15 @@ export default class PullService implements IPullService {
 
   /**
    * List legal reviewers for pull request.
-   * @param pullReviewQuery Pull request review query.
+   * @param pullOwnersQuery Pull request owners query.
    */
   public async listOwners(
-    pullReviewQuery: PullOwnersQuery
+    pullOwnersQuery: PullOwnersQuery
   ): Promise<Response<PullOwnersDTO | null>> {
     // Filter sig file name.
-    const files = pullReviewQuery.files.filter((f) => {
+    const files = pullOwnersQuery.files.filter((f) => {
       return (
-        f.filename.toLowerCase().includes(pullReviewQuery.sigInfoFileName) &&
+        f.filename.toLowerCase().includes(pullOwnersQuery.sigInfoFileName) &&
         f.status !== FileStatus.Removed // Notice: because it maybe delete old files.
       );
     });
@@ -277,12 +279,23 @@ export default class PullService implements IPullService {
       };
     }
 
-    // Notice: if the sig information file is not changed, the reviewer and committer will use the collaborator.
-    const collaborators = pullReviewQuery.collaborators.map((c) => {
+    if (files.length === 0) {
+      return this.listOwnersByLabels(pullOwnersQuery);
+    } else {
+      return this.listOwnersByFiles(pullOwnersQuery, files);
+    }
+  }
+
+  private async listOwnersByLabels(
+    pullOwnersQuery: PullOwnersQuery
+  ): Promise<Response<PullOwnersDTO | null>> {
+    const sigName = findSigNameByLabels(pullOwnersQuery.labels);
+    // Notice: if the sig not found, the reviewer and committer will use the collaborator.
+    const collaborators = pullOwnersQuery.collaborators.map((c) => {
       return c.githubName;
     });
 
-    if (files.length === 0) {
+    if (sigName === null) {
       return {
         data: {
           committers: collaborators,
@@ -294,6 +307,64 @@ export default class PullService implements IPullService {
       };
     }
 
+    // Find sig.
+    const sig = await this.sigRepository.findOne({
+      where: {
+        name: sigName,
+      },
+    });
+
+    if (sig === undefined) {
+      return {
+        data: {
+          committers: collaborators,
+          reviewers: collaborators,
+          needsLGTM: LGTM.Two,
+        },
+        status: StatusCodes.OK,
+        message: PullMessage.ListReviewersSuccess,
+      };
+    } else {
+      const sigMembers = await this.sigMemberRepository.listSigMembers(sig.id);
+
+      const committers = sigMembers
+        .filter((m) => {
+          return (
+            m.level === SigMemberLevel.techLeaders ||
+            m.level === SigMemberLevel.coLeaders ||
+            m.level === SigMemberLevel.committers
+          );
+        })
+        .map((m) => {
+          return m.githubName;
+        });
+
+      const reviewers = committers.concat(
+        sigMembers
+          .filter((m) => {
+            return m.level === SigMemberLevel.reviewers;
+          })
+          .map((m) => {
+            return m.githubName;
+          })
+      );
+
+      return {
+        data: {
+          committers,
+          reviewers,
+          needsLGTM: LGTM.Two,
+        },
+        status: StatusCodes.OK,
+        message: PullMessage.ListReviewersSuccess,
+      };
+    }
+  }
+
+  private async listOwnersByFiles(
+    pullOwnersQuery: PullOwnersQuery,
+    files: PullFileQuery[]
+  ): Promise<Response<PullOwnersDTO | null>> {
     const sigInfo = await getSigInfo(
       files[MAX_SIG_INFO_FILE_CHANGE_NUMBER - 1].raw_url
     );
@@ -307,7 +378,7 @@ export default class PullService implements IPullService {
 
     // If the sig is not found, it means a new sig is created, so we ask the maintainers to review the PR.
     if (sig === undefined) {
-      const maintainers = pullReviewQuery.maintainers.map((m) => {
+      const maintainers = pullOwnersQuery.maintainers.map((m) => {
         return m.githubName;
       });
       return {
@@ -335,7 +406,7 @@ export default class PullService implements IPullService {
     const ownersDTO = this.getOwnersByDiff(
       difference,
       oldMembersWithLevel,
-      pullReviewQuery.maintainers.map((m) => {
+      pullOwnersQuery.maintainers.map((m) => {
         return m.githubName;
       })
     );

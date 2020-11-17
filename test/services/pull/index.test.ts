@@ -238,6 +238,7 @@ describe("Pull Service", () => {
           raw_url: "string",
         },
       ],
+      labels: [],
       maintainers: [collaborator],
       collaborators: [collaborator],
     };
@@ -280,6 +281,7 @@ describe("Pull Service", () => {
           raw_url: "string",
         },
       ],
+      labels: [],
       maintainers: [collaborator],
       collaborators: [collaborator],
     };
@@ -361,6 +363,7 @@ describe("Pull Service", () => {
           raw_url: "string",
         },
       ],
+      labels: [],
       maintainers: [maintainer],
       collaborators: [maintainer],
     };
@@ -465,6 +468,7 @@ describe("Pull Service", () => {
           raw_url: "string",
         },
       ],
+      labels: [],
       maintainers: [maintainer],
       collaborators: [maintainer],
     };
@@ -587,6 +591,7 @@ describe("Pull Service", () => {
           raw_url: "string",
         },
       ],
+      labels: [],
       maintainers: [maintainer],
       collaborators: [maintainer],
     };
@@ -681,6 +686,7 @@ describe("Pull Service", () => {
           raw_url: "string",
         },
       ],
+      labels: [],
       maintainers: [maintainer],
       collaborators: [maintainer],
     };
@@ -782,6 +788,7 @@ describe("Pull Service", () => {
           raw_url: "string",
         },
       ],
+      labels: [],
       maintainers: [collaborator],
       collaborators: [collaborator],
     };
@@ -802,5 +809,83 @@ describe("Pull Service", () => {
 
     // Assert needsLGTM.
     expect(res.data!.needsLGTM).toBe(1);
+  });
+
+  test("list owners by sig label", async () => {
+    const oldSigMembersWithLevel: ContributorInfoWithLevel[] = [
+      {
+        githubName: "Rustin-Liu1",
+        level: "leader",
+      },
+      {
+        githubName: "Rustin-Liu2",
+        level: "co-leader",
+      },
+      {
+        githubName: "Rustin-Liu3",
+        level: "committer",
+      },
+      {
+        githubName: "Rustin-Liu4",
+        level: "reviewer",
+      },
+      {
+        githubName: "Rustin-Liu5",
+        level: "active-contributor",
+      },
+    ];
+
+    const sigFindOneMock = jest.spyOn(sigRepository, "findOne");
+    const sig = new Sig();
+    sig.name = "test";
+    sigFindOneMock.mockReturnValue(Promise.resolve(new Sig()));
+
+    const listSigMembersMock = jest.spyOn(
+      sigMemberRepository,
+      "listSigMembers"
+    );
+    listSigMembersMock.mockReturnValue(Promise.resolve(oldSigMembersWithLevel));
+
+    const collaborator = {
+      githubName: "Rustin-Liu",
+    };
+
+    const pullOwnersQuery: PullOwnersQuery = {
+      sigInfoFileName: "member-list",
+      files: [
+        {
+          sha: "string",
+          filename: "some-file",
+          status: "string",
+          raw_url: "string",
+        },
+      ],
+      labels: [
+        {
+          id: 1,
+          name: "sig/test",
+          description: "description",
+          default: false,
+        },
+      ],
+      maintainers: [collaborator],
+      collaborators: [collaborator],
+    };
+
+    const res = await pullService.listOwners(pullOwnersQuery);
+
+    // Assert status.
+    expect(res.status).toBe(StatusCodes.OK);
+
+    // Assert reviewers.
+    expect(res.data!.reviewers.length).toBe(4);
+    expect(res.data!.reviewers[0]).toBe(oldSigMembersWithLevel[0].githubName);
+
+    // Assert committers.
+    expect(res.data!.committers.length).toBe(3);
+    expect(res.data!.committers[0]).toBe(oldSigMembersWithLevel[0].githubName);
+
+    // Assert needsLGTM.
+    expect(res.data!.needsLGTM).toBe(2);
   });
 });

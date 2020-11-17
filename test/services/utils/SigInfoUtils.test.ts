@@ -3,11 +3,13 @@ import MockAdapter from "axios-mock-adapter";
 
 import { SigInfoSchema } from "../../../src/config/SigInfoSchema";
 import {
+  findSigNameByLabels,
   gatherContributorsWithLevel,
   getSigInfo,
 } from "../../../src/services/utils/SigInfoUtils";
 import { SigMemberLevel } from "../../../src/db/entities/SigMember";
 import { StatusCodes } from "http-status-codes";
+import { LabelQuery } from "../../../src/queries/LabelQuery";
 
 describe("Sig Info Util", () => {
   const sigInfo: SigInfoSchema = {
@@ -26,6 +28,7 @@ describe("Sig Info Util", () => {
       },
     ],
   };
+
   test("gather contributors with level ", () => {
     const contributorsWithLevel = gatherContributorsWithLevel(sigInfo);
 
@@ -41,5 +44,32 @@ describe("Sig Info Util", () => {
     const mock = new MockAdapter(axios);
     mock.onGet(url).reply(StatusCodes.OK, JSON.stringify(sigInfo));
     expect(await getSigInfo(url)).toStrictEqual(sigInfo);
+  });
+
+  test("find sig name by labels", async () => {
+    const labels: LabelQuery[] = [
+      {
+        id: 1,
+        name: "random",
+        description: "random",
+        default: false,
+      },
+      {
+        id: 2,
+        name: "sig/test",
+        description: "random",
+        default: false,
+      },
+      {
+        id: 3,
+        name: "random",
+        description: "random",
+        default: false,
+      },
+    ];
+
+    const sig = findSigNameByLabels(labels);
+
+    expect(sig).toBe("test");
   });
 });
