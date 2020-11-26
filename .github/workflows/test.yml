@@ -19,7 +19,7 @@ jobs:
     strategy:
       matrix:
         node-version: [ 10.x, 12.x ]
-        os: [ ubuntu-latest, macos-latest, windows-latest ]
+        os: [ ubuntu-latest, macos-latest ]
 
     runs-on: ${{ matrix.os }}
 
@@ -31,7 +31,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - run: npm ci
       - run: npm run build
-      - run: npm test
+      - run: npm run lint && npm test
       - name: codecov
         run: npx codecov
         # run codecov only once
