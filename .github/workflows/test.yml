@@ -19,7 +19,7 @@ jobs:
     strategy:
       matrix:
         node-version: [ 10.x, 12.x ]
-        os: [ ubuntu-latest, macos-latest ]
+        os: [ ubuntu-latest, macos-latest ] # FIXME: prettier can not working on windows.
 
     runs-on: ${{ matrix.os }}
 
