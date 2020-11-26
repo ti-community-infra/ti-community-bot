@@ -86,11 +86,18 @@ export async function listOwners(
     owner,
     repo,
   });
-  const collaborators = collaboratorInfos.map((c) => {
-    return {
-      githubName: c.login,
-    };
-  });
+
+  const collaborators = collaboratorInfos
+    .filter((collaboratorInfo) => {
+      return (
+        collaboratorInfo.permissions.admin || collaboratorInfo.permissions.push
+      );
+    })
+    .map((c) => {
+      return {
+        githubName: c.login,
+      };
+    });
 
   const pullReviewersQuery: PullOwnersQuery = {
     sigInfoFileName: config.sigInfoFileName || DEFAULT_SIG_INFO_FILE_NAME,
