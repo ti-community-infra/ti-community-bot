@@ -31,7 +31,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - run: npm ci
       - run: npm run build
-      - run: npm run lint && npm test
+      - run: npm test
       - name: codecov
         run: npx codecov
         # run codecov only once
