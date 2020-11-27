@@ -4,14 +4,11 @@ import { Probot, ProbotOctokit } from "probot";
 import { Request as Req, Response as Res } from "express";
 import typeorm = require("typeorm");
 
-import PullService, { IPullService } from "../../../src/services/pull";
+import { IPullService } from "../../../src/services/pull";
 import { PullOwnersQuery } from "../../../src/queries/PullOwnersQuery";
 import { PullOwnersDTO } from "../../../src/services/dtos/PullOwnersDTO";
 import { Response } from "../../../src/services/response";
 import { listOwners } from "../../../src/api/pull";
-import { Repository } from "typeorm";
-import { Sig } from "../../../src/db/entities/Sig";
-import SigMemberRepository from "../../../src/repositoies/sig-member";
 
 const fs = require("fs");
 const path = require("path");
@@ -20,46 +17,40 @@ const privateKey = fs.readFileSync(
   "utf-8"
 );
 
-const collaborator = function (
+// construct a collaborator info
+const createCollaborator = function (
   login: string,
   permissions: {
     pull: boolean;
     push: boolean;
     admin: boolean;
-  },
-  rest?: any
+  }
 ) {
-  return Object.assign(
-    {
-      login: login,
-      id: 1,
-      node_id: "MDQ6VXNlcjE=",
-      avatar_url: "https://github.com/images/error/octocat_happy.gif",
-      gravatar_id: "",
-      url: `https://api.github.com/users/${login}`,
-      html_url: `https://github.com/${login}`,
-      followers_url: `https://api.github.com/users/${login}/followers`,
-      following_url: `https://api.github.com/users/${login}/following{/other_user}`,
-      gists_url: "https://api.github.com/users/${ login }/gists{/gist_id}",
-      starred_url: `https://api.github.com/users/${login}/starred{/owner}{/repo}`,
-      subscriptions_url: `https://api.github.com/users/${login}/subscriptions`,
-      organizations_url: `https://api.github.com/users/${login}/orgs`,
-      repos_url: `https://api.github.com/users/${login}/repos`,
-      events_url: `https://api.github.com/users/${login}/events{/privacy}`,
-      received_events_url: `https://api.github.com/users/${login}/received_events`,
-      type: "User",
-      site_admin: false,
-      permissions: permissions,
-    },
-    rest
-  );
+  return {
+    login: login,
+    id: 1,
+    node_id: "MDQ6VXNlcjE=",
+    avatar_url: "https://github.com/images/error/octocat_happy.gif",
+    gravatar_id: "",
+    url: `https://api.github.com/users/${login}`,
+    html_url: `https://github.com/${login}`,
+    followers_url: `https://api.github.com/users/${login}/followers`,
+    following_url: `https://api.github.com/users/${login}/following{/other_user}`,
+    gists_url: "https://api.github.com/users/${ login }/gists{/gist_id}",
+    starred_url: `https://api.github.com/users/${login}/starred{/owner}{/repo}`,
+    subscriptions_url: `https://api.github.com/users/${login}/subscriptions`,
+    organizations_url: `https://api.github.com/users/${login}/orgs`,
+    repos_url: `https://api.github.com/users/${login}/repos`,
+    events_url: `https://api.github.com/users/${login}/events{/privacy}`,
+    received_events_url: `https://api.github.com/users/${login}/received_events`,
+    type: "User",
+    site_admin: false,
+    permissions: permissions,
+  };
 };
 
 describe("Pull API", () => {
   let github: InstanceType<typeof ProbotOctokit>;
-  let pullService: PullService;
-  let sigRepository = new Repository<Sig>();
-  let sigMemberRepository = new SigMemberRepository();
 
   // Maintainer team slug.
   const team_slug = "bots-test";
@@ -89,8 +80,6 @@ describe("Pull API", () => {
         },
       });
     });
-
-    pullService = new PullService(sigRepository, sigMemberRepository);
   });
 
   test("list Owners", async () => {
@@ -159,7 +148,7 @@ describe("Pull API", () => {
       ])
       .get(`/repos/${owner}/${repo}/collaborators`)
       .reply(StatusCodes.OK, [
-        collaborator("octocat", {
+        createCollaborator("octocat", {
           pull: true,
           push: true,
           admin: false,
@@ -261,22 +250,22 @@ describe("Pull API", () => {
       ])
       .get(`/repos/${owner}/${repo}/collaborators`)
       .reply(StatusCodes.OK, [
-        collaborator("octocat", {
+        createCollaborator("octocat", {
           pull: true,
           push: true,
           admin: false,
         }),
-        collaborator("Mini256", {
+        createCollaborator("Mini256", {
           pull: false,
           push: false,
           admin: false,
         }),
-        collaborator("Rustin-Liu", {
+        createCollaborator("Rustin-Liu", {
           pull: true,
           push: true,
           admin: true,
         }),
-        collaborator("Rustin-Liu2", {
+        createCollaborator("Rustin-Liu2", {
           pull: true,
           push: false,
           admin: true,
@@ -298,7 +287,7 @@ describe("Pull API", () => {
       json,
     } as unknown) as Res;
 
-    const response: Response<PullOwnersDTO> = {
+    const exceptResponse: Response<PullOwnersDTO> = {
       data: {
         committers: ["octocat", "Rustin-Liu", "Rustin-Liu2"],
         reviewers: ["octocat", "Rustin-Liu", "Rustin-Liu2"],
@@ -308,12 +297,32 @@ describe("Pull API", () => {
       message: "List reviewers success.",
     };
 
+    const mockPullService: IPullService = {
+      async listOwners(
+        _: PullOwnersQuery
+      ): Promise<Response<PullOwnersDTO | null>> {
+        return Promise.resolve({
+          data: {
+            committers: _.collaborators.map(
+              (collaborator) => collaborator.githubName
+            ),
+            reviewers: _.collaborators.map(
+              (collaborator) => collaborator.githubName
+            ),
+            needsLGTM: 2,
+          },
+          status: StatusCodes.OK,
+          message: "List reviewers success.",
+        });
+      },
+    };
+
     // List Owners.
-    await listOwners(mockRequest, mockResponse, pullService, github);
+    await listOwners(mockRequest, mockResponse, mockPullService, github);
 
     // Assert response.
     expect(json.mock.calls.length).toBe(1);
-    expect(json.mock.calls[0][0]).toStrictEqual(response);
+    expect(json.mock.calls[0][0]).toStrictEqual(exceptResponse);
     // Assert status.
     expect(status.mock.calls.length).toBe(1);
     expect(status.mock.calls[0][0]).toBe(StatusCodes.OK);

@@ -82,6 +82,7 @@ export async function listOwners(
     };
   });
 
+  // FIXME: Fetch the collaborator list completely, not pagination
   const { data: collaboratorInfos } = await github.repos.listCollaborators({
     owner,
     repo,
