@@ -1,5 +1,10 @@
 export interface ContributorSchema {
   githubName: string;
+  permissions?: {
+    pull: boolean;
+    push: boolean;
+    admin: boolean;
+  };
 }
 
 export interface SigInfoSchema {

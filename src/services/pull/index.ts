@@ -291,9 +291,13 @@ export default class PullService implements IPullService {
   ): Promise<Response<PullOwnersDTO | null>> {
     const sigName = findSigNameByLabels(pullOwnersQuery.labels);
     // Notice: if the sig not found, the reviewer and committer will use the collaborator.
-    const collaborators = pullOwnersQuery.collaborators.map((c) => {
-      return c.githubName;
-    });
+    const collaborators = pullOwnersQuery.collaborators
+      .filter((c) => {
+        return c.permissions?.admin || c.permissions?.push;
+      })
+      .map((c) => {
+        return c.githubName;
+      });
 
     if (sigName === null) {
       return {
