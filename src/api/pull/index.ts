@@ -82,11 +82,16 @@ export async function listOwners(
     };
   });
 
-  // FIXME: Fetch the collaborator list completely, not pagination
-  const { data: collaboratorInfos } = await github.repos.listCollaborators({
-    owner,
-    repo,
-  });
+  // Notice：The `github.paginate` API loads the next page data against the link attribute in response's header
+  // TODO: Add paginated test case for the listCollaborators API
+  const collaboratorInfos = await github.paginate(
+    github.repos.listCollaborators,
+    {
+      owner,
+      repo,
+    },
+    (res) => res.data
+  );
 
   const collaborators = collaboratorInfos.map((c) => {
     return {

@@ -1,5 +1,6 @@
 export interface ContributorSchema {
   githubName: string;
+  // The optional flag is set for some api returned the contributor without permissions
   permissions?: {
     pull: boolean;
     push: boolean;
