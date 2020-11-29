@@ -224,9 +224,43 @@ describe("Pull Service", () => {
   });
 
   test("list owners when not change sig info file", async () => {
-    const collaborator = {
-      githubName: "Rustin-Liu",
-    };
+    const sigFindOneMock = jest.spyOn(sigRepository, "findOne");
+    sigFindOneMock.mockReturnValue(Promise.resolve(undefined));
+
+    const collaborators = [
+      {
+        githubName: "octocat",
+        permissions: {
+          pull: true,
+          push: true,
+          admin: false,
+        },
+      },
+      {
+        githubName: "Mini256",
+        permissions: {
+          pull: false,
+          push: false,
+          admin: false,
+        },
+      },
+      {
+        githubName: "Rustin-Liu",
+        permissions: {
+          pull: true,
+          push: true,
+          admin: true,
+        },
+      },
+      {
+        githubName: "Rustin-Liu2",
+        permissions: {
+          pull: true,
+          push: false,
+          admin: true,
+        },
+      },
+    ];
 
     const pullOwnersQuery: PullOwnersQuery = {
       sigInfoFileName: "member-list",
@@ -239,22 +273,25 @@ describe("Pull Service", () => {
         },
       ],
       labels: [],
-      maintainers: [collaborator],
-      collaborators: [collaborator],
+      maintainers: [...collaborators],
+      collaborators: [...collaborators],
     };
 
     // Owners should be collaborator.
     const res = await pullService.listOwners(pullOwnersQuery);
 
+    const exceptCommitters = ["octocat", "Rustin-Liu", "Rustin-Liu2"];
+    const exceptReviewers = ["octocat", "Rustin-Liu", "Rustin-Liu2"];
+
     expect(res.status).toBe(StatusCodes.OK);
 
     // Assert committers.
-    expect(res.data!.committers.length).toBe(1);
-    expect(res.data!.committers[0]).toBe(collaborator.githubName);
+    expect(res.data!.committers.length).toBe(3);
+    expect(res.data!.committers).toStrictEqual(exceptCommitters);
 
     // Assert reviewers.
-    expect(res.data!.reviewers.length).toBe(1);
-    expect(res.data!.reviewers[0]).toBe(collaborator.githubName);
+    expect(res.data!.reviewers.length).toBe(3);
+    expect(res.data!.reviewers).toStrictEqual(exceptReviewers);
 
     // Assert needs LGTM.
     expect(res.data!.needsLGTM).toBe(2);
@@ -838,7 +875,7 @@ describe("Pull Service", () => {
     const sigFindOneMock = jest.spyOn(sigRepository, "findOne");
     const sig = new Sig();
     sig.name = "test";
-    sigFindOneMock.mockReturnValue(Promise.resolve(new Sig()));
+    sigFindOneMock.mockReturnValue(Promise.resolve(sig));
 
     const listSigMembersMock = jest.spyOn(
       sigMemberRepository,

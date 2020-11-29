@@ -17,8 +17,41 @@ const privateKey = fs.readFileSync(
   "utf-8"
 );
 
+// construct a collaborator info
+const createCollaborator = function (
+  login: string,
+  permissions: {
+    pull: boolean;
+    push: boolean;
+    admin: boolean;
+  }
+) {
+  return {
+    login: login,
+    id: 1,
+    node_id: "MDQ6VXNlcjE=",
+    avatar_url: "https://github.com/images/error/octocat_happy.gif",
+    gravatar_id: "",
+    url: `https://api.github.com/users/${login}`,
+    html_url: `https://github.com/${login}`,
+    followers_url: `https://api.github.com/users/${login}/followers`,
+    following_url: `https://api.github.com/users/${login}/following{/other_user}`,
+    gists_url: "https://api.github.com/users/${ login }/gists{/gist_id}",
+    starred_url: `https://api.github.com/users/${login}/starred{/owner}{/repo}`,
+    subscriptions_url: `https://api.github.com/users/${login}/subscriptions`,
+    organizations_url: `https://api.github.com/users/${login}/orgs`,
+    repos_url: `https://api.github.com/users/${login}/repos`,
+    events_url: `https://api.github.com/users/${login}/events{/privacy}`,
+    received_events_url: `https://api.github.com/users/${login}/received_events`,
+    type: "User",
+    site_admin: false,
+    permissions: permissions,
+  };
+};
+
 describe("Pull API", () => {
   let github: InstanceType<typeof ProbotOctokit>;
+
   // Maintainer team slug.
   const team_slug = "bots-test";
   const installationId = 2;
@@ -115,35 +148,11 @@ describe("Pull API", () => {
       ])
       .get(`/repos/${owner}/${repo}/collaborators`)
       .reply(StatusCodes.OK, [
-        {
-          login: "octocat",
-          id: 1,
-          node_id: "MDQ6VXNlcjE=",
-          avatar_url: "https://github.com/images/error/octocat_happy.gif",
-          gravatar_id: "",
-          url: "https://api.github.com/users/octocat",
-          html_url: "https://github.com/octocat",
-          followers_url: "https://api.github.com/users/octocat/followers",
-          following_url:
-            "https://api.github.com/users/octocat/following{/other_user}",
-          gists_url: "https://api.github.com/users/octocat/gists{/gist_id}",
-          starred_url:
-            "https://api.github.com/users/octocat/starred{/owner}{/repo}",
-          subscriptions_url:
-            "https://api.github.com/users/octocat/subscriptions",
-          organizations_url: "https://api.github.com/users/octocat/orgs",
-          repos_url: "https://api.github.com/users/octocat/repos",
-          events_url: "https://api.github.com/users/octocat/events{/privacy}",
-          received_events_url:
-            "https://api.github.com/users/octocat/received_events",
-          type: "User",
-          site_admin: false,
-          permissions: {
-            pull: true,
-            push: true,
-            admin: false,
-          },
-        },
+        createCollaborator("octocat", {
+          pull: true,
+          push: true,
+          admin: false,
+        }),
       ]);
 
     const mockRequest = ({
