@@ -10,16 +10,24 @@ import { PullMessage } from "./services/messages/PullMessage";
 import { getSig } from "./api/sig";
 import { listOwners } from "./api/pull";
 import { handlePullRequestEvents } from "./events/pull";
+import { Router } from "express";
 
 const commands = require("probot-commands-pro");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 
-export = (app: Application) => {
+export = (
+  app: Application,
+  {
+    getRouter,
+  }: {
+    getRouter: (path?: string) => Router;
+  }
+) => {
   useContainer(Container);
 
   // Get an express router to expose new HTTP endpoints.
-  const router = app.route("/ti-community-bot");
+  const router = getRouter("/ti-community-bot");
   router.use(bodyParser.json());
   router.use(cors());
 
