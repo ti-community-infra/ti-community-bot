@@ -56,13 +56,13 @@ describe("Pull API", () => {
   const team_slug = "bots-test";
   const installationId = 2;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     // Mock the db connection.
     typeorm.createConnection = jest.fn().mockResolvedValue(null);
     nock.disableNetConnect();
     // Create probot.
     const probot = new Probot({
-      id: 123,
+      appId: 123,
       privateKey,
       // disable request throttling and retries for testing
       Octokit: ProbotOctokit.defaults({
@@ -72,13 +72,11 @@ describe("Pull API", () => {
     });
 
     // Get github client.
-    probot.load(async (app) => {
-      github = await app.auth(installationId);
-      github.config.get = jest.fn().mockReturnValue({
-        config: {
-          maintainerTeamSlug: team_slug,
-        },
-      });
+    github = await probot.auth(installationId);
+    github.config.get = jest.fn().mockReturnValue({
+      config: {
+        maintainerTeamSlug: team_slug,
+      },
     });
   });
 

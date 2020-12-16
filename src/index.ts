@@ -41,7 +41,7 @@ export = (app: Application) => {
 
       // Ping command.
       commands(app, "ping", async (context: Context) => {
-        await context.github.issues.createComment(
+        await context.octokit.issues.createComment(
           context.issue({ body: "pong! I am community bot." })
         );
       });
