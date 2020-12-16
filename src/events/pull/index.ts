@@ -32,7 +32,7 @@ async function constructPullFormatQuery(
 ): Promise<PullFormatQuery> {
   const { number } = context.payload.pull_request;
 
-  const { data: filesData } = await context.github.pulls.listFiles({
+  const { data: filesData } = await context.octokit.pulls.listFiles({
     ...context.issue(),
     pull_number: number,
   });
@@ -82,7 +82,7 @@ async function checkPullFormat(context: Context, pullService: PullService) {
         reply.message
       );
       // @ts-ignore
-      await context.github.repos.createStatus({
+      await context.octokit.repos.createStatus({
         ...context.repo(),
         ...status,
       });
@@ -96,7 +96,7 @@ async function checkPullFormat(context: Context, pullService: PullService) {
         reply.message
       );
       // @ts-ignore
-      await context.github.repos.createStatus({
+      await context.octokit.repos.createStatus({
         ...context.repo(),
         ...status,
       });
@@ -111,7 +111,7 @@ async function checkPullFormat(context: Context, pullService: PullService) {
         combineReplay(reply)
       );
       // @ts-ignore
-      await context.github.repos.createStatus({
+      await context.octokit.repos.createStatus({
         ...context.repo(),
         ...status,
       });
@@ -132,7 +132,7 @@ async function createOrUpdateComment(
   body: string
 ) {
   // List all comment.
-  const { data: comments } = await context.github.issues.listComments({
+  const { data: comments } = await context.octokit.issues.listComments({
     ...context.issue(),
   });
 
@@ -141,7 +141,7 @@ async function createOrUpdateComment(
   });
 
   if (botComment === undefined) {
-    await context.github.issues.createComment(context.issue({ body }));
+    await context.octokit.issues.createComment(context.issue({ body }));
   } else {
     // Update.
     botComment.body = body;
@@ -150,7 +150,7 @@ async function createOrUpdateComment(
       ...botComment,
       comment_id: botComment.id,
     };
-    await context.github.issues.updateComment(comment);
+    await context.octokit.issues.updateComment(comment);
   }
 }
 
@@ -167,21 +167,21 @@ async function updateSigInfo(context: Context, sigService: SigService) {
   switch (reply.status) {
     case Status.Failed: {
       context.log.error("Update sig info.", files);
-      await context.github.issues.createComment(
+      await context.octokit.issues.createComment(
         context.issue({ body: reply.message })
       );
       break;
     }
     case Status.Success: {
       context.log.info("Update sig info.", files);
-      await context.github.issues.createComment(
+      await context.octokit.issues.createComment(
         context.issue({ body: reply.message })
       );
       break;
     }
     case Status.Problematic: {
       context.log.warn("Update sig info has some problems.", files);
-      await context.github.issues.createComment(
+      await context.octokit.issues.createComment(
         context.issue({ body: combineReplay(reply) })
       );
     }

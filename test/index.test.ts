@@ -25,7 +25,7 @@ describe("My Probot app", () => {
     typeorm.createConnection = jest.fn().mockResolvedValue(null);
     nock.disableNetConnect();
     probot = new Probot({
-      id: 123,
+      appId: 123,
       privateKey,
       // disable request throttling and retries for testing
       Octokit: ProbotOctokit.defaults({
