@@ -546,7 +546,7 @@ describe("Pull Service", () => {
     expect(res.data!.needsLGTM).toBe(2);
   });
 
-  test("list owners when change sig info file's active contributors part", async () => {
+  test("list owners when change sig info file's active contributor part", async () => {
     const oldSigMembersWithLevel: ContributorInfoWithLevel[] = [
       {
         githubName: "Rustin-Liu1",

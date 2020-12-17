@@ -29,7 +29,7 @@ describe("Sig Info Util", () => {
     ],
   };
 
-  test("gather contributors with level ", () => {
+  test("gather contributor with level ", () => {
     const contributorsWithLevel = gatherContributorsWithLevel(sigInfo);
 
     expect(contributorsWithLevel.length).toBe(2);
