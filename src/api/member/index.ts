@@ -1,20 +1,13 @@
 import { Request, Response } from "express";
+import { IMemberService } from "../../services/member";
 import { validationResult } from "express-validator";
-
-import { IContributorService } from "../../services/contributor";
-import { StatusCodes } from "http-status-codes";
 import { Response as Res } from "../../services/response";
+import { StatusCodes } from "http-status-codes";
 
-/**
- * List contributors.
- * @param req
- * @param res
- * @param contributorService
- */
-export async function listContributors(
+export async function listMembers(
   req: Request,
   res: Response,
-  contributorService: IContributorService
+  memberService: IMemberService
 ) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -30,10 +23,16 @@ export async function listContributors(
   }
 
   // Gather paginate query.
-  const { current, pageSize } = req.query;
-  let paginateQuery;
+  const { current, pageSize, level } = req.query;
 
-  // Validate paginate query.
+  let memberQuery;
+  if (level !== undefined) {
+    memberQuery = {
+      level: String(level),
+    };
+  }
+
+  let paginateQuery;
   if (current !== undefined && pageSize !== undefined) {
     paginateQuery = {
       current: Number(current),
@@ -41,7 +40,7 @@ export async function listContributors(
     };
   }
 
-  const response = await contributorService.listContributors(paginateQuery);
+  const response = await memberService.listMembers(memberQuery, paginateQuery);
 
   res.status(response.status);
   res.json(response);

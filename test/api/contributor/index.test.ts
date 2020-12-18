@@ -7,7 +7,6 @@ import { ContributorsDTO } from "../../../src/services/dtos/ContributorsDTO";
 import { IContributorService } from "../../../src/services/contributor";
 import { PaginateQuery } from "../../../src/queries/PaginateQuery";
 import { listContributors } from "../../../src/api/contributor";
-import { ContributorMessage } from "../../../src/services/messages/ContributorMessage";
 
 describe("Contributors API", () => {
   beforeEach(() => {
@@ -62,59 +61,5 @@ describe("Contributors API", () => {
     // Assert status.
     expect(status.mock.calls.length).toBe(1);
     expect(status.mock.calls[0][0]).toBe(StatusCodes.OK);
-  });
-
-  test("List all contributors with illegal paginate query", async () => {
-    // No paginate query.
-    const mockRequest = ({
-      query: {
-        current: "invalid",
-        pageSize: "invalid",
-      },
-    } as unknown) as Req;
-
-    const json = jest.fn();
-    const status = jest.fn();
-    const mockResponse = ({
-      status,
-      json,
-    } as unknown) as Res;
-
-    const response: Response<ContributorsDTO> = {
-      data: {
-        contributors: [
-          {
-            githubName: "contributor1",
-          },
-          {
-            githubName: "contributor2",
-          },
-          {
-            githubName: "contributor3",
-          },
-        ],
-        total: 3,
-      },
-      status: StatusCodes.OK,
-      message: "Test",
-    };
-
-    const mockContributorService: IContributorService = {
-      listContributors(_?: PaginateQuery): Promise<Response<ContributorsDTO>> {
-        return Promise.resolve(response);
-      },
-    };
-
-    // Get a sig.
-    await listContributors(mockRequest, mockResponse, mockContributorService);
-
-    // Assert response.
-    expect(json.mock.calls.length).toBe(1);
-    expect(json.mock.calls[0][0].message).toBe(
-      ContributorMessage.IllegalQueryParameters
-    );
-    // Assert status.
-    expect(status.mock.calls.length).toBe(1);
-    expect(status.mock.calls[0][0]).toBe(StatusCodes.BAD_REQUEST);
   });
 });
