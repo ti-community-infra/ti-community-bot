@@ -57,7 +57,7 @@ export class SigService implements ISigService {
   }
 
   /**
-   * Update or add contributor.
+   * Update or add contributors.
    * @param contributorsInfo Contributors info.
    * @private
    */
@@ -109,7 +109,7 @@ export class SigService implements ISigService {
     const sigInfoFile = files[MAX_SIG_INFO_FILE_CHANGE_NUMBER - 1];
     const sigInfo = await getSigInfo(sigInfoFile.raw_url);
 
-    // Gather contributor info.
+    // Gather contributors info.
     const contributorsInfo = gatherContributorsWithLevel(sigInfo);
     const contributorsInfoMap = new Map(
       contributorsInfo.map((c) => [c.githubName, c])

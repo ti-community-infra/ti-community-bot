@@ -10,7 +10,7 @@ import { ContributorMessage } from "../messages/ContributorMessage";
 export interface IContributorsService {
   listContributors(
     paginateQuery?: PaginateQuery
-  ): Promise<Response<ContributorsDTO[]>>;
+  ): Promise<Response<ContributorsDTO>>;
 }
 
 @Service()
@@ -22,28 +22,35 @@ export default class ContributorsService implements IContributorsService {
 
   public async listContributors(
     paginateQuery?: PaginateQuery
-  ): Promise<Response<ContributorsDTO[]>> {
+  ): Promise<Response<ContributorsDTO>> {
     if (paginateQuery === undefined) {
       const contributors = (
         await this.contributorRepository.listContributors()
       ).map((c) => {
         return { githubName: c };
       });
+
+      const total = await this.contributorRepository.getContributorsCount();
+
       return {
-        data: contributors,
+        data: { contributors: contributors, total: total },
         status: StatusCodes.OK,
         message: ContributorMessage.ListContributorSuccess,
       };
     } else {
       const { current, pageSize } = paginateQuery;
       const skip = (current - 1) * pageSize;
+
       const contributors = (
         await this.contributorRepository.listContributors(skip, pageSize)
       ).map((c) => {
         return { githubName: c };
       });
+
+      const total = await this.contributorRepository.getContributorsCount();
+
       return {
-        data: contributors,
+        data: { contributors: contributors, total: total },
         status: StatusCodes.OK,
         message: ContributorMessage.ListContributorSuccess,
       };

@@ -24,4 +24,12 @@ export default class ContributorRepository extends Repository<Pull> {
       return c.githubName;
     });
   }
+
+  public async getContributorsCount(): Promise<number> {
+    return (
+      await this.createQueryBuilder()
+        .select("count(distinct user) as total")
+        .getRawOne()
+    ).total;
+  }
 }
