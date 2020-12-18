@@ -5,9 +5,9 @@
   "description": "A bot for community.",
   "author": "Rustin-Liu <rustin.liu@gmail.com>",
   "license": "ISC",
-  "repository": "https://github.com/tidb-community-bots/ti-community-bot.git",
-  "homepage": "https://github.com/tidb-community-bots/ti-community-bot",
-  "bugs": "https://github.com/tidb-community-bots/ti-community-bot/issues",
+  "repository": "https://github.com/ti-community-infra/ti-community-bot.git",
+  "homepage": "https://github.com/ti-community-infra/ti-community-bot",
+  "bugs": "https://github.com/ti-community-infra/ti-community-bot/issues",
   "keywords": [
     "probot",
     "github",

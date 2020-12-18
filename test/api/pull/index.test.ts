@@ -81,7 +81,7 @@ describe("Pull API", () => {
   });
 
   test("list Owners", async () => {
-    const owner = "tidb-community-bots";
+    const owner = "ti-community-infra";
     const repo = "ti-community-bot";
     const number = "1";
 

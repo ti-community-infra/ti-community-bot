@@ -67,7 +67,7 @@ async function checkPullFormat(context: Context, pullService: PullService) {
   const status = {
     sha: head.sha,
     state: reply.status === Status.Success ? "success" : "failure",
-    target_url: "https://github.com/tidb-community-bots/ti-community-bot",
+    target_url: "https://github.com/ti-community-infra/ti-community-bot",
     description: reply.message,
     context: "Sig Info File Format",
   };
