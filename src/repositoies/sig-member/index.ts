@@ -12,7 +12,6 @@ export default class SigMemberRepository extends Repository<SigMember> {
   /**
    * List sig members.
    * @param sigId SIG id.
-   * @private
    */
   public async listSigMembers(
     sigId: number

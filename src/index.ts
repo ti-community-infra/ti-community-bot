@@ -11,6 +11,8 @@ import { getSig } from "./api/sig";
 import { listOwners } from "./api/pull";
 import { handlePullRequestEvents } from "./events/pull";
 import { Router } from "express";
+import { listContributors } from "./api/contributor";
+import ContributorService from "./services/contributor";
 
 const commands = require("probot-commands-pro");
 const bodyParser = require("body-parser");
@@ -89,6 +91,10 @@ export = (
 
       router.get("/sigs/:name", async (req, res) => {
         await getSig(req, res, Container.get(SigService));
+      });
+
+      router.get("/contributors", async (req, res) => {
+        await listContributors(req, res, Container.get(ContributorService));
       });
     })
     .catch((err) => {
