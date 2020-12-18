@@ -4,7 +4,7 @@ import typeorm = require("typeorm");
 
 import { Response } from "../../../src/services/response";
 import { ContributorsDTO } from "../../../src/services/dtos/ContributorsDTO";
-import { IContributorsService } from "../../../src/services/contributor";
+import { IContributorService } from "../../../src/services/contributor";
 import { PaginateQuery } from "../../../src/queries/PaginateQuery";
 import { listContributors } from "../../../src/api/contributor";
 import { ContributorMessage } from "../../../src/services/messages/ContributorMessage";
@@ -47,7 +47,7 @@ describe("Contributors API", () => {
       message: "Test",
     };
 
-    const mockContributorService: IContributorsService = {
+    const mockContributorService: IContributorService = {
       listContributors(_?: PaginateQuery): Promise<Response<ContributorsDTO>> {
         return Promise.resolve(response);
       },
@@ -99,7 +99,7 @@ describe("Contributors API", () => {
       message: "Test",
     };
 
-    const mockContributorService: IContributorsService = {
+    const mockContributorService: IContributorService = {
       listContributors(_?: PaginateQuery): Promise<Response<ContributorsDTO>> {
         return Promise.resolve(response);
       },

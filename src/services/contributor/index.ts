@@ -1,25 +1,34 @@
+import { Service } from "typedi";
+import { StatusCodes } from "http-status-codes";
+import { InjectRepository } from "typeorm-typedi-extensions";
+
 import { Response } from "../response";
 import { ContributorsDTO } from "../dtos/ContributorsDTO";
-import { Service } from "typedi";
-import { InjectRepository } from "typeorm-typedi-extensions";
 import { PaginateQuery } from "../../queries/PaginateQuery";
 import ContributorRepository from "../../repositoies/contributor";
-import { StatusCodes } from "http-status-codes";
 import { ContributorMessage } from "../messages/ContributorMessage";
 
-export interface IContributorsService {
+export interface IContributorService {
+  /**
+   * List contributors.
+   * @param paginateQuery
+   */
   listContributors(
     paginateQuery?: PaginateQuery
   ): Promise<Response<ContributorsDTO>>;
 }
 
 @Service()
-export default class ContributorsService implements IContributorsService {
+export default class ContributorService implements IContributorService {
   constructor(
     @InjectRepository()
     private contributorRepository: ContributorRepository
   ) {}
 
+  /**
+   * List contributors.
+   * @param paginateQuery
+   */
   public async listContributors(
     paginateQuery?: PaginateQuery
   ): Promise<Response<ContributorsDTO>> {

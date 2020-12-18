@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 
-import { IContributorsService } from "../../services/contributor";
+import { IContributorService } from "../../services/contributor";
 import { StatusCodes } from "http-status-codes";
 import { Response as Res } from "../../services/response";
 import { ContributorMessage } from "../../services/messages/ContributorMessage";
@@ -14,7 +14,7 @@ import { ContributorMessage } from "../../services/messages/ContributorMessage";
 export async function listContributors(
   req: Request,
   res: Response,
-  contributorService: IContributorsService
+  contributorService: IContributorService
 ) {
   // Gather paginate query.
   const { current, pageSize } = req.query;

@@ -12,7 +12,7 @@ import { listOwners } from "./api/pull";
 import { handlePullRequestEvents } from "./events/pull";
 import { Router } from "express";
 import { listContributors } from "./api/contributor";
-import ContributorsService from "./services/contributor";
+import ContributorService from "./services/contributor";
 
 const commands = require("probot-commands-pro");
 const bodyParser = require("body-parser");
@@ -94,7 +94,7 @@ export = (
       });
 
       router.get("/contributors", async (req, res) => {
-        await listContributors(req, res, Container.get(ContributorsService));
+        await listContributors(req, res, Container.get(ContributorService));
       });
     })
     .catch((err) => {
