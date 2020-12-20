@@ -8,28 +8,28 @@ import { Pull } from "../../db/entities/Pull";
 @EntityRepository(Pull)
 export default class ContributorRepository extends Repository<Pull> {
   /**
-   * List contributors.
+   * List contributors and get count.
    */
-  public async listContributors(
-    skip?: number,
-    take?: number
-  ): Promise<string[]> {
-    return (
+  public async listContributorsAndCount(
+    offset?: number,
+    limit?: number
+  ): Promise<[string[], number]> {
+    const contributors = (
       await this.createQueryBuilder()
         .select("distinct user as githubName")
-        .skip(skip)
-        .take(take)
+        .offset(offset)
+        .limit(limit)
         .getRawMany()
     ).map((c) => {
       return c.githubName;
     });
-  }
 
-  public async getContributorsCount(): Promise<number> {
-    return (
+    const total = (
       await this.createQueryBuilder()
         .select("count(distinct user) as total")
         .getRawOne()
     ).total;
+
+    return [contributors, total];
   }
 }
