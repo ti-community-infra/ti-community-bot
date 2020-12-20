@@ -329,7 +329,7 @@ export default class PullService implements IPullService {
         message: PullMessage.ListReviewersSuccess,
       };
     } else {
-      const sigMembers = await this.sigMemberRepository.listMembers({
+      const [sigMembers] = await this.sigMemberRepository.listMembersAndCount({
         sigId: sig.id,
       });
 
@@ -399,7 +399,9 @@ export default class PullService implements IPullService {
     }
 
     // Get the PR's members diff.
-    const oldMembersWithLevel = await this.sigMemberRepository.listMembers({
+    const [
+      oldMembersWithLevel,
+    ] = await this.sigMemberRepository.listMembersAndCount({
       sigId: sig.id,
     });
     const newMembersWithLevel = gatherContributorsWithLevel(sigInfo);

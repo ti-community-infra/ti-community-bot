@@ -23,14 +23,14 @@ export async function listMembers(
   }
 
   // Gather paginate query.
-  const { current, pageSize, level } = req.query;
+  const { current, pageSize, level, sigId } = req.query;
 
-  let memberQuery;
-  if (level !== undefined) {
-    memberQuery = {
-      level: String(level),
-    };
-  }
+  let memberQuery = {
+    // TODO: validate the level.
+    level: level ? String(level) : undefined,
+    // TODO: validate the sig id.
+    sigId: Number(sigId),
+  };
 
   let paginateQuery;
   if (current !== undefined && pageSize !== undefined) {

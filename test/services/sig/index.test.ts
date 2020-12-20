@@ -393,8 +393,13 @@ describe("Sig Service", () => {
     sig.name = sigName;
     sigFindOneMock.mockReturnValue(Promise.resolve(sig));
 
-    const listMembersMock = jest.spyOn(sigMemberRepository, "listMembers");
-    listMembersMock.mockReturnValue(Promise.resolve(sigMembersWithLevel));
+    const listMembersMock = jest.spyOn(
+      sigMemberRepository,
+      "listMembersAndCount"
+    );
+    listMembersMock.mockReturnValue(
+      Promise.resolve([sigMembersWithLevel, sigMembersWithLevel.length])
+    );
 
     const sigRes = await sigService.getSig(sigName);
 

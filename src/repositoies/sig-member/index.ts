@@ -10,38 +10,37 @@ import { Member } from "../../services/member";
 @Service()
 @EntityRepository(SigMember)
 export default class SigMemberRepository extends Repository<SigMember> {
-  public async listMembers(
+  public async listMembersAndCount(
     memberQuery?: MemberQuery,
     offset?: number,
     limit?: number
-  ): Promise<Member[]> {
-    return (
+  ): Promise<[Member[], number]> {
+    const sigMemberAlias = "sm";
+    const select = "ci.github as githubName, sm.level as level";
+    const wheres = memberQuery
+      ? Object.keys(memberQuery)
+          .map((k) => {
+            if (memberQuery[k] !== undefined) {
+              if (typeof memberQuery[k] === "string") {
+                return `${sigMemberAlias}.${k} = '${memberQuery[k]}'`;
+              } else {
+                return `${sigMemberAlias}.${k} = ${memberQuery[k]}`;
+              }
+            }
+            return undefined;
+          })
+          .filter((m) => {
+            return m !== undefined;
+          })
+          .join(" and ")
+      : "";
+
+    const members = (
       await this.createQueryBuilder("sm")
         .leftJoin(Sig, "s", "sm.sig_id = s.id")
         .leftJoin(ContributorInfo, "ci", "sm.contributor_id = ci.id")
-        .select(`ci.github as githubName, sm.level as level`)
-        .where(
-          `${
-            memberQuery
-              ? `${
-                  memberQuery.sigId !== undefined
-                    ? `sm.sig_id = ${memberQuery.sigId}`
-                    : ""
-                }`
-              : ""
-          }`
-        )
-        .where(
-          `${
-            memberQuery
-              ? `${
-                  memberQuery.level !== undefined
-                    ? `sm.level = '${memberQuery.level}'`
-                    : ""
-                }`
-              : ""
-          }`
-        )
+        .select(select)
+        .where(wheres)
         .offset(offset)
         .limit(limit)
         .getRawMany()
@@ -50,5 +49,16 @@ export default class SigMemberRepository extends Repository<SigMember> {
         ...c,
       };
     });
+
+    const count = (
+      await this.createQueryBuilder("sm")
+        .leftJoin(Sig, "s", "sm.sig_id = s.id")
+        .leftJoin(ContributorInfo, "ci", "sm.contributor_id = ci.id")
+        .select(`count(*) as total`)
+        .where(wheres)
+        .getRawOne()
+    ).total;
+
+    return [members, count];
   }
 }
