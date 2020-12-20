@@ -11,12 +11,12 @@ import {
 } from "../../../src/services/messages/PullMessage";
 import * as sigInfoUtil from "../../../src/services/utils/SigInfoUtils";
 import { SigInfoSchema } from "../../../src/config/SigInfoSchema";
-import { ContributorInfoWithLevel } from "../../../src/services/utils/SigInfoUtils";
 import Ajv from "ajv";
 import sigInfoSchema from "../../../src/config/sig.info.schema.json";
 import { PullFormatQuery } from "../../../src/queries/PullFormatQuery";
 import { Status } from "../../../src/services/reply";
 import SigMemberRepository from "../../../src/repositoies/sig-member";
+import { Member } from "../../../src/services/member";
 
 describe("Pull Service", () => {
   let pullService: PullService;
@@ -331,7 +331,7 @@ describe("Pull Service", () => {
   });
 
   test("list owners when change sig info file's leaders part", async () => {
-    const oldSigMembersWithLevel: ContributorInfoWithLevel[] = [
+    const oldSigMembersWithLevel: Member[] = [
       {
         githubName: "Rustin-liu1",
         level: "leader",
@@ -380,11 +380,8 @@ describe("Pull Service", () => {
     sigFindOneMock.mockReturnValue(Promise.resolve(new Sig()));
 
     // Mock list sig members.
-    const listSigMembersMock = jest.spyOn(
-      sigMemberRepository,
-      "listSigMembers"
-    );
-    listSigMembersMock.mockReturnValue(Promise.resolve(oldSigMembersWithLevel));
+    const listMembersMock = jest.spyOn(sigMemberRepository, "listMembers");
+    listMembersMock.mockReturnValue(Promise.resolve(oldSigMembersWithLevel));
 
     const maintainer = {
       githubName: "Rustin-Liu",
@@ -424,7 +421,7 @@ describe("Pull Service", () => {
   });
 
   test("list owners when change sig info file's reviewers part", async () => {
-    const oldSigMembersWithLevel: ContributorInfoWithLevel[] = [
+    const oldSigMembersWithLevel: Member[] = [
       {
         githubName: "Rustin-Liu1",
         level: "leader",
@@ -485,11 +482,8 @@ describe("Pull Service", () => {
     const sigFindOneMock = jest.spyOn(sigRepository, "findOne");
     sigFindOneMock.mockReturnValue(Promise.resolve(new Sig()));
 
-    const listSigMembersMock = jest.spyOn(
-      sigMemberRepository,
-      "listSigMembers"
-    );
-    listSigMembersMock.mockReturnValue(Promise.resolve(oldSigMembersWithLevel));
+    const listMembersMock = jest.spyOn(sigMemberRepository, "listMembers");
+    listMembersMock.mockReturnValue(Promise.resolve(oldSigMembersWithLevel));
 
     const maintainer = {
       githubName: "Rustin-Liu",
@@ -547,7 +541,7 @@ describe("Pull Service", () => {
   });
 
   test("list owners when change sig info file's active contributors part", async () => {
-    const oldSigMembersWithLevel: ContributorInfoWithLevel[] = [
+    const oldSigMembersWithLevel: Member[] = [
       {
         githubName: "Rustin-Liu1",
         level: "leader",
@@ -608,11 +602,8 @@ describe("Pull Service", () => {
     const sigFindOneMock = jest.spyOn(sigRepository, "findOne");
     sigFindOneMock.mockReturnValue(Promise.resolve(new Sig()));
 
-    const listSigMembersMock = jest.spyOn(
-      sigMemberRepository,
-      "listSigMembers"
-    );
-    listSigMembersMock.mockReturnValue(Promise.resolve(oldSigMembersWithLevel));
+    const listMembersMock = jest.spyOn(sigMemberRepository, "listMembers");
+    listMembersMock.mockReturnValue(Promise.resolve(oldSigMembersWithLevel));
 
     const maintainer = {
       githubName: "Rustin-Liu",
@@ -747,7 +738,7 @@ describe("Pull Service", () => {
   });
 
   test("list owners when only fmt sig info file", async () => {
-    const oldSigMembersWithLevel: ContributorInfoWithLevel[] = [
+    const oldSigMembersWithLevel: Member[] = [
       {
         githubName: "Rustin-Liu1",
         level: "leader",
@@ -805,11 +796,8 @@ describe("Pull Service", () => {
     const sigFindOneMock = jest.spyOn(sigRepository, "findOne");
     sigFindOneMock.mockReturnValue(Promise.resolve(new Sig()));
 
-    const listSigMembersMock = jest.spyOn(
-      sigMemberRepository,
-      "listSigMembers"
-    );
-    listSigMembersMock.mockReturnValue(Promise.resolve(oldSigMembersWithLevel));
+    const listMembersMock = jest.spyOn(sigMemberRepository, "listMembers");
+    listMembersMock.mockReturnValue(Promise.resolve(oldSigMembersWithLevel));
 
     const collaborator = {
       githubName: "Rustin-Liu",
@@ -849,7 +837,7 @@ describe("Pull Service", () => {
   });
 
   test("list owners by sig label", async () => {
-    const oldSigMembersWithLevel: ContributorInfoWithLevel[] = [
+    const oldSigMembersWithLevel: Member[] = [
       {
         githubName: "Rustin-Liu1",
         level: "leader",
@@ -877,11 +865,8 @@ describe("Pull Service", () => {
     sig.name = "test";
     sigFindOneMock.mockReturnValue(Promise.resolve(sig));
 
-    const listSigMembersMock = jest.spyOn(
-      sigMemberRepository,
-      "listSigMembers"
-    );
-    listSigMembersMock.mockReturnValue(Promise.resolve(oldSigMembersWithLevel));
+    const listMembersMock = jest.spyOn(sigMemberRepository, "listMembers");
+    listMembersMock.mockReturnValue(Promise.resolve(oldSigMembersWithLevel));
 
     const collaborator = {
       githubName: "Rustin-Liu",

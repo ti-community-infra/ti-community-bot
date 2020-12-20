@@ -8,6 +8,11 @@ import SigMemberRepository from "../../repositoies/sig-member";
 import { StatusCodes } from "http-status-codes";
 import { ContributorMessage } from "../messages/ContributorMessage";
 
+export interface Member {
+  githubName: string;
+  level: string;
+}
+
 export interface IMemberService {
   listMembers(
     memberQuery?: MemberQuery,
@@ -37,10 +42,10 @@ export default class MemberService implements IMemberService {
       };
     } else {
       const { current, pageSize } = paginateQuery;
-      const skip = (current - 1) * pageSize;
+      const offset = (current - 1) * pageSize;
       const members = await this.sigMemberRepository.listMembers(
         memberQuery,
-        skip,
+        offset,
         pageSize
       );
       return {

@@ -171,7 +171,9 @@ export class SigService implements ISigService {
       };
     }
 
-    const sigMembers = await this.sigMemberRepository.listSigMembers(sig.id);
+    const sigMembers = await this.sigMemberRepository.listMembers({
+      sigId: sig.id,
+    });
     const members = lodash.groupBy(sigMembers, "level");
 
     return {

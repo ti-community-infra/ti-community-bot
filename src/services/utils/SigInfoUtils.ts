@@ -3,22 +3,15 @@ import axios from "axios";
 import { SigInfoSchema } from "../../config/SigInfoSchema";
 import { SigMemberLevel } from "../../db/entities/SigMember";
 import { LabelQuery } from "../../queries/LabelQuery";
+import { Member } from "../member";
 
 const sigLabelPrefix = "sig/";
-
-export interface ContributorInfoWithLevel {
-  githubName: string;
-  level: string;
-}
-
 /**
  * Gather contributor info with level.
  * @param sigInfo Sig info.
  */
-export function gatherContributorsWithLevel(
-  sigInfo: SigInfoSchema
-): ContributorInfoWithLevel[] {
-  const contributorInfos: ContributorInfoWithLevel[] = [];
+export function gatherContributorsWithLevel(sigInfo: SigInfoSchema): Member[] {
+  const contributorInfos: Member[] = [];
 
   Object.keys(sigInfo).forEach((key) => {
     Object.keys(SigMemberLevel).forEach((memberLevelKey) => {
