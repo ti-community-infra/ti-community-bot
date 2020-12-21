@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
-import { IMemberService } from "../../services/member";
 import { validationResult } from "express-validator";
-import { Response as Res } from "../../services/response";
 import { StatusCodes } from "http-status-codes";
+
+import { IMemberService } from "../../services/member";
+import { Response as Res } from "../../services/response";
 
 export async function listMembers(
   req: Request,

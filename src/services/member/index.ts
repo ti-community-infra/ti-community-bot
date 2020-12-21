@@ -1,11 +1,12 @@
+import { Service } from "typedi";
+import { StatusCodes } from "http-status-codes";
+
 import { PaginateQuery } from "../../queries/PaginateQuery";
 import { Response } from "../response";
 import { MemberQuery } from "../../queries/MemberQuery";
 import { MembersDTO } from "../dtos/MembersDTO";
-import { Service } from "typedi";
 import { InjectRepository } from "typeorm-typedi-extensions";
 import SigMemberRepository from "../../repositoies/sig-member";
-import { StatusCodes } from "http-status-codes";
 import { ContributorMessage } from "../messages/ContributorMessage";
 
 export interface Member {

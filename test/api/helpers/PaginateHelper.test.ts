@@ -1,8 +1,9 @@
+import { Request as Req } from "express";
+
 import {
   validateCurrent,
   validatePageSize,
 } from "../../../src/api/helpers/PaginateHelper";
-import { Request as Req } from "express";
 
 describe("Paginate Helper", () => {
   test("valid current number", () => {

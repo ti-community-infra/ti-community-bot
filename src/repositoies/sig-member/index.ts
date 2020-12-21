@@ -1,6 +1,7 @@
 import { EntityRepository } from "typeorm";
 import { Service } from "typedi";
 import { Repository } from "typeorm/repository/Repository";
+
 import { SigMember } from "../../db/entities/SigMember";
 import { Sig } from "../../db/entities/Sig";
 import { ContributorInfo } from "../../db/entities/ContributorInfo";
