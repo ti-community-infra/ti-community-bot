@@ -49,6 +49,7 @@ export default class MemberService implements IMemberService {
         members,
         total,
       ] = await this.sigMemberRepository.listMembersAndCount(memberQuery);
+
       return {
         data: {
           members,
@@ -60,6 +61,7 @@ export default class MemberService implements IMemberService {
     } else {
       const { current, pageSize } = paginateQuery;
       const offset = (current - 1) * pageSize;
+
       const [
         members,
         total,
@@ -68,6 +70,7 @@ export default class MemberService implements IMemberService {
         offset,
         pageSize
       );
+
       return {
         data: {
           members,
