@@ -9,6 +9,7 @@ export async function listMembers(
   res: Response,
   memberService: IMemberService
 ) {
+  // Validate queries.
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const response: Res<null> = {
