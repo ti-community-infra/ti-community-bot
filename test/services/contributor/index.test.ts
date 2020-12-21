@@ -4,7 +4,7 @@ import ContributorService from "../../../src/services/contributor";
 describe("Contributor Service", () => {
   let contributorService: ContributorService;
   let contributorRepository: ContributorRepository;
-  let listContributorsMock, getContributorsCountMock;
+  let listContributorsMock;
 
   // Fake contributors.
   const contributors = [
@@ -22,23 +22,17 @@ describe("Contributor Service", () => {
     // Mock the list contributors.
     listContributorsMock = jest.spyOn(
       contributorRepository,
-      "listContributors"
+      "listContributorsAndCount"
     );
-    listContributorsMock.mockImplementation((skip?, take?) => {
-      if (skip === undefined || take === undefined) {
-        return Promise.resolve(contributors);
+    listContributorsMock.mockImplementation((offset?, limit?) => {
+      if (offset === undefined || limit === undefined) {
+        return Promise.resolve([contributors, contributors.length]);
       } else {
-        return Promise.resolve(contributors.slice(skip, skip + take));
+        return Promise.resolve([
+          contributors.slice(offset, offset + limit),
+          contributors.length,
+        ]);
       }
-    });
-
-    // Mock get contributors count.
-    getContributorsCountMock = jest.spyOn(
-      contributorRepository,
-      "getContributorsCount"
-    );
-    getContributorsCountMock.mockImplementation(() => {
-      return Promise.resolve(contributors.length);
     });
   });
 

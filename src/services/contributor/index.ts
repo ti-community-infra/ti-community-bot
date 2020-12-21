@@ -33,33 +33,36 @@ export default class ContributorService implements IContributorService {
     paginateQuery?: PaginateQuery
   ): Promise<Response<ContributorsDTO>> {
     if (paginateQuery === undefined) {
-      const contributors = (
-        await this.contributorRepository.listContributors()
-      ).map((c) => {
+      const [
+        contributors,
+        total,
+      ] = await this.contributorRepository.listContributorsAndCount();
+      const contributorDTOs = contributors.map((c) => {
         return { githubName: c };
       });
 
-      const total = await this.contributorRepository.getContributorsCount();
-
       return {
-        data: { contributors: contributors, total: total },
+        data: { contributors: contributorDTOs, total: total },
         status: StatusCodes.OK,
         message: ContributorMessage.ListContributorSuccess,
       };
     } else {
       const { current, pageSize } = paginateQuery;
-      const skip = (current - 1) * pageSize;
+      const offset = (current - 1) * pageSize;
 
-      const contributors = (
-        await this.contributorRepository.listContributors(skip, pageSize)
-      ).map((c) => {
+      const [
+        contributors,
+        total,
+      ] = await this.contributorRepository.listContributorsAndCount(
+        offset,
+        pageSize
+      );
+      const contributorDTOs = contributors.map((c) => {
         return { githubName: c };
       });
 
-      const total = await this.contributorRepository.getContributorsCount();
-
       return {
-        data: { contributors: contributors, total: total },
+        data: { contributors: contributorDTOs, total: total },
         status: StatusCodes.OK,
         message: ContributorMessage.ListContributorSuccess,
       };

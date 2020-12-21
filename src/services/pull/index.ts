@@ -19,10 +19,8 @@ import {
 } from "../../config/Config";
 import { ContributorSchema, SigInfoSchema } from "../../config/SigInfoSchema";
 import { Sig } from "../../db/entities/Sig";
-import { SigMemberLevel } from "../../db/entities/SigMember";
 import {
   gatherContributorsWithLevel,
-  ContributorInfoWithLevel,
   getSigInfo,
   findSigNameByLabels,
 } from "../utils/SigInfoUtils";
@@ -31,6 +29,7 @@ import { PullOwnersQuery } from "../../queries/PullOwnersQuery";
 import { Response } from "../response";
 import SigMemberRepository from "../../repositoies/sig-member";
 import { PullFileQuery } from "../../queries/PullFileQuery";
+import { Member, SigMemberLevel } from "../member";
 
 export interface IPullService {
   listOwners(
@@ -101,8 +100,8 @@ export default class PullService implements IPullService {
    * @private
    */
   private getOwnersByDiff(
-    diff: ContributorInfoWithLevel[],
-    oldMembers: ContributorInfoWithLevel[],
+    diff: Member[],
+    oldMembers: Member[],
     maintainers: string[]
   ): PullOwnersDTO | null {
     for (let i = 0; i < diff.length; i++) {
@@ -329,7 +328,9 @@ export default class PullService implements IPullService {
         message: PullMessage.ListReviewersSuccess,
       };
     } else {
-      const sigMembers = await this.sigMemberRepository.listSigMembers(sig.id);
+      const [sigMembers] = await this.sigMemberRepository.listMembersAndCount({
+        sigId: sig.id,
+      });
 
       const committers = sigMembers
         .filter((m) => {
@@ -397,9 +398,11 @@ export default class PullService implements IPullService {
     }
 
     // Get the PR's members diff.
-    const oldMembersWithLevel = await this.sigMemberRepository.listSigMembers(
-      sig.id
-    );
+    const [
+      oldMembersWithLevel,
+    ] = await this.sigMemberRepository.listMembersAndCount({
+      sigId: sig.id,
+    });
     const newMembersWithLevel = gatherContributorsWithLevel(sigInfo);
     const difference = [...newMembersWithLevel].filter((nm) =>
       [...oldMembersWithLevel].every(

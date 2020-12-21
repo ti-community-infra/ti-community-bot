@@ -2,15 +2,15 @@ import { SigService } from "../../../src/services/sig";
 import { Repository } from "typeorm";
 import { SigMember } from "../../../src/db/entities/SigMember";
 import { Sig } from "../../../src/db/entities/Sig";
-import { ContributorInfo } from "../../../src/db/entities/ContributorInfo";
 import { PullFormatQuery } from "../../../src/queries/PullFormatQuery";
 import * as sigInfoUtil from "../../../src/services/utils/SigInfoUtils";
 import { SigInfoSchema } from "../../../src/config/SigInfoSchema";
 import { Status } from "../../../src/services/reply";
 import SigMemberRepository from "../../../src/repositoies/sig-member";
-import { ContributorInfoWithLevel } from "../../../src/services/utils/SigInfoUtils";
 import { StatusCodes } from "http-status-codes";
 import { SigMessage } from "../../../src/services/messages/SigMessage";
+import { ContributorInfo } from "../../../src/db/entities/ContributorInfo";
+import { Member } from "../../../src/services/member";
 
 describe("Sig Service", () => {
   let sigService: SigService;
@@ -362,7 +362,7 @@ describe("Sig Service", () => {
   });
 
   test("get a sig", async () => {
-    const sigMembersWithLevel: ContributorInfoWithLevel[] = [
+    const sigMembersWithLevel: Member[] = [
       {
         githubName: "Rustin-Liu1",
         level: "leader",
@@ -393,11 +393,13 @@ describe("Sig Service", () => {
     sig.name = sigName;
     sigFindOneMock.mockReturnValue(Promise.resolve(sig));
 
-    const listSigMembersMock = jest.spyOn(
+    const listMembersMock = jest.spyOn(
       sigMemberRepository,
-      "listSigMembers"
+      "listMembersAndCount"
     );
-    listSigMembersMock.mockReturnValue(Promise.resolve(sigMembersWithLevel));
+    listMembersMock.mockReturnValue(
+      Promise.resolve([sigMembersWithLevel, sigMembersWithLevel.length])
+    );
 
     const sigRes = await sigService.getSig(sigName);
 

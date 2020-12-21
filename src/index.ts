@@ -13,10 +13,21 @@ import { handlePullRequestEvents } from "./events/pull";
 import { Router } from "express";
 import { listContributors } from "./api/contributor";
 import ContributorService from "./services/contributor";
+import {
+  validateCurrent,
+  validatePageSize,
+} from "./api/helpers/PaginateHelper";
+import { listMembers } from "./api/member";
+import MemberService from "./services/member";
+import {
+  validateMemberLevel,
+  validateSigId,
+} from "./api/helpers/MemberQueryHelper";
 
 const commands = require("probot-commands-pro");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const { query } = require("express-validator");
 
 export = (
   app: Application,
@@ -93,9 +104,25 @@ export = (
         await getSig(req, res, Container.get(SigService));
       });
 
-      router.get("/contributors", async (req, res) => {
-        await listContributors(req, res, Container.get(ContributorService));
-      });
+      router.get(
+        "/contributors",
+        query("current").custom(validateCurrent),
+        query("pageSize").custom(validatePageSize),
+        async (req, res) => {
+          await listContributors(req, res, Container.get(ContributorService));
+        }
+      );
+
+      router.get(
+        "/members",
+        query("sigId").custom(validateSigId),
+        query("level").custom(validateMemberLevel),
+        query("current").custom(validateCurrent),
+        query("pageSize").custom(validatePageSize),
+        async (req, res) => {
+          await listMembers(req, res, Container.get(MemberService));
+        }
+      );
     })
     .catch((err) => {
       app.log.fatal("Connect to db failed", err);

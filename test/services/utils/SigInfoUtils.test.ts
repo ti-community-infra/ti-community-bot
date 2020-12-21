@@ -7,9 +7,9 @@ import {
   gatherContributorsWithLevel,
   getSigInfo,
 } from "../../../src/services/utils/SigInfoUtils";
-import { SigMemberLevel } from "../../../src/db/entities/SigMember";
 import { StatusCodes } from "http-status-codes";
 import { LabelQuery } from "../../../src/queries/LabelQuery";
+import { SigMemberLevel } from "../../../src/services/member";
 
 describe("Sig Info Util", () => {
   const sigInfo: SigInfoSchema = {

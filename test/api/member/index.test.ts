@@ -3,18 +3,19 @@ import { Request as Req, Response as Res } from "express";
 import typeorm = require("typeorm");
 
 import { Response } from "../../../src/services/response";
-import { ContributorsDTO } from "../../../src/services/dtos/ContributorsDTO";
-import { IContributorService } from "../../../src/services/contributor";
 import { PaginateQuery } from "../../../src/queries/PaginateQuery";
-import { listContributors } from "../../../src/api/contributor";
+import { MembersDTO } from "../../../src/services/dtos/MembersDTO";
+import { IMemberService } from "../../../src/services/member";
+import { MemberQuery } from "../../../src/queries/MemberQuery";
+import { listMembers } from "../../../src/api/member";
 
-describe("Contributors API", () => {
+describe("Members API", () => {
   beforeEach(() => {
     // Mock the db connection.
     typeorm.createConnection = jest.fn().mockResolvedValue(null);
   });
 
-  test("List all contributors", async () => {
+  test("List all members", async () => {
     // No paginate query.
     const mockRequest = ({
       query: {},
@@ -27,17 +28,20 @@ describe("Contributors API", () => {
       json,
     } as unknown) as Res;
 
-    const response: Response<ContributorsDTO> = {
+    const response: Response<MembersDTO> = {
       data: {
-        contributors: [
+        members: [
           {
-            githubName: "contributor1",
+            githubName: "member1",
+            level: "leader",
           },
           {
-            githubName: "contributor2",
+            githubName: "member2",
+            level: "leader",
           },
           {
-            githubName: "contributor3",
+            githubName: "member3",
+            level: "leader",
           },
         ],
         total: 3,
@@ -46,14 +50,17 @@ describe("Contributors API", () => {
       message: "Test",
     };
 
-    const mockContributorService: IContributorService = {
-      listContributors(_?: PaginateQuery): Promise<Response<ContributorsDTO>> {
+    const mockMemberService: IMemberService = {
+      listMembers(
+        _?: MemberQuery,
+        __?: PaginateQuery
+      ): Promise<Response<MembersDTO>> {
         return Promise.resolve(response);
       },
     };
 
     // Get a sig.
-    await listContributors(mockRequest, mockResponse, mockContributorService);
+    await listMembers(mockRequest, mockResponse, mockMemberService);
 
     // Assert response.
     expect(json.mock.calls.length).toBe(1);
