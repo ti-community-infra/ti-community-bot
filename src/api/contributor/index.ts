@@ -16,6 +16,7 @@ export async function listContributors(
   res: Response,
   contributorService: IContributorService
 ) {
+  // Validate paginate query.
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const response: Res<null> = {
@@ -32,8 +33,6 @@ export async function listContributors(
   // Gather paginate query.
   const { current, pageSize } = req.query;
   let paginateQuery;
-
-  // Validate paginate query.
   if (current !== undefined && pageSize !== undefined) {
     paginateQuery = {
       current: Number(current),
