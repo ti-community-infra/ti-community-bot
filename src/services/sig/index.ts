@@ -4,7 +4,7 @@ import assert from "assert";
 import { Repository } from "typeorm";
 
 import { Sig } from "../../db/entities/Sig";
-import { SigMember, SigMemberLevel } from "../../db/entities/SigMember";
+import { SigMember } from "../../db/entities/SigMember";
 import { ContributorInfo } from "../../db/entities/ContributorInfo";
 import { PullFormatQuery } from "../../queries/PullFormatQuery";
 import { Reply, Status } from "../reply";
@@ -17,6 +17,7 @@ import { Response } from "../response";
 import { SigDTO } from "../dtos/SigDTO";
 import { StatusCodes } from "http-status-codes";
 import SigMemberRepository from "../../repositoies/sig-member";
+import { SigMemberLevel } from "../member";
 
 const lodash = require("lodash");
 

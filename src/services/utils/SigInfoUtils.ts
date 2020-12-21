@@ -1,9 +1,8 @@
 import axios from "axios";
 
 import { SigInfoSchema } from "../../config/SigInfoSchema";
-import { SigMemberLevel } from "../../db/entities/SigMember";
 import { LabelQuery } from "../../queries/LabelQuery";
-import { Member } from "../member";
+import { Member, SigMemberLevel } from "../member";
 
 const sigLabelPrefix = "sig/";
 /**

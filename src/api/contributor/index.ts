@@ -21,7 +21,7 @@ export async function listContributors(
     const response: Res<null> = {
       data: null,
       status: StatusCodes.BAD_REQUEST,
-      message: `${errors.array({ onlyFirstError: true })[0].msg}.`,
+      message: errors.array({ onlyFirstError: true })[0].msg,
     };
 
     res.status(response.status);

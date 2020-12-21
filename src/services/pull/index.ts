@@ -19,7 +19,6 @@ import {
 } from "../../config/Config";
 import { ContributorSchema, SigInfoSchema } from "../../config/SigInfoSchema";
 import { Sig } from "../../db/entities/Sig";
-import { SigMemberLevel } from "../../db/entities/SigMember";
 import {
   gatherContributorsWithLevel,
   getSigInfo,
@@ -30,7 +29,7 @@ import { PullOwnersQuery } from "../../queries/PullOwnersQuery";
 import { Response } from "../response";
 import SigMemberRepository from "../../repositoies/sig-member";
 import { PullFileQuery } from "../../queries/PullFileQuery";
-import { Member } from "../member";
+import { Member, SigMemberLevel } from "../member";
 
 export interface IPullService {
   listOwners(

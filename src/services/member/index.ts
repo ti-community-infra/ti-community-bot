@@ -13,6 +13,14 @@ export interface Member {
   level: string;
 }
 
+export enum SigMemberLevel {
+  techLeaders = "leader",
+  coLeaders = "co-leader",
+  committers = "committer",
+  reviewers = "reviewer",
+  activeContributors = "active-contributor",
+}
+
 export interface IMemberService {
   listMembers(
     memberQuery?: MemberQuery,

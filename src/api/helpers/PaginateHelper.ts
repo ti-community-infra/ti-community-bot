@@ -7,10 +7,10 @@ export function validateCurrent(
   if (value != undefined) {
     const current = Number(value);
     if (!Number.isInteger(current) || current <= 0) {
-      throw new Error("Illegal current num");
+      throw new Error("Illegal current num.");
     }
     if (req.query.pageSize === undefined) {
-      throw new Error("Paging queries must have pageSize");
+      throw new Error("Paging queries must have pageSize.");
     }
   }
 
@@ -24,10 +24,10 @@ export function validatePageSize(
   if (value != undefined) {
     const pageSize = Number(value);
     if (!Number.isInteger(pageSize) || pageSize <= 0) {
-      throw new Error("Illegal pageSize num");
+      throw new Error("Illegal pageSize num.");
     }
     if (req.query.current === undefined) {
-      throw new Error("Paging queries must have current");
+      throw new Error("Paging queries must have current.");
     }
   }
 

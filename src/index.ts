@@ -19,6 +19,10 @@ import {
 } from "./api/helpers/PaginateHelper";
 import { listMembers } from "./api/member";
 import MemberService from "./services/member";
+import {
+  validateMemberLevel,
+  validateSigId,
+} from "./api/helpers/MemberQueryHelper";
 
 const commands = require("probot-commands-pro");
 const bodyParser = require("body-parser");
@@ -111,6 +115,8 @@ export = (
 
       router.get(
         "/members",
+        query("sigId").custom(validateSigId),
+        query("level").custom(validateMemberLevel),
         query("current").custom(validateCurrent),
         query("pageSize").custom(validatePageSize),
         async (req, res) => {
