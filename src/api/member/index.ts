@@ -26,10 +26,8 @@ export async function listMembers(
   const { current, pageSize, level, sigId } = req.query;
 
   let memberQuery = {
-    // TODO: validate the level.
     level: level !== undefined ? String(level) : undefined,
-    // TODO: validate the sig id.
-    sigId: sigId != undefined ? Number(sigId) : undefined,
+    sigId: sigId !== undefined ? Number(sigId) : undefined,
   };
 
   let paginateQuery;
