@@ -10,6 +10,12 @@ import { Member } from "../../services/member";
 @Service()
 @EntityRepository(SigMember)
 export default class SigMemberRepository extends Repository<SigMember> {
+  /**
+   * List members and get count.
+   * @param memberQuery
+   * @param offset
+   * @param limit
+   */
   public async listMembersAndCount(
     memberQuery?: MemberQuery,
     offset?: number,
