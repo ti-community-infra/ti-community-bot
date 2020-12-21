@@ -16,7 +16,13 @@ export default class ContributorRepository extends Repository<Pull> {
   ): Promise<[string[], number]> {
     const contributors = (
       await this.createQueryBuilder()
-        .select("distinct user as githubName")
+        .select("distinct contributors.user as githubName")
+        .from((sub) => {
+          return sub
+            .select("distinct user,created_at")
+            .from(Pull, "pull")
+            .orderBy("created_at", "DESC");
+        }, "contributors")
         .offset(offset)
         .limit(limit)
         .getRawMany()

@@ -41,6 +41,7 @@ export default class SigMemberRepository extends Repository<SigMember> {
         .leftJoin(ContributorInfo, "ci", "sm.contributor_id = ci.id")
         .select(select)
         .where(wheres)
+        .orderBy("sm.create_time", "ASC")
         .offset(offset)
         .limit(limit)
         .getRawMany()

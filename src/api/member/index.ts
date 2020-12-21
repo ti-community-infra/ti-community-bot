@@ -27,9 +27,9 @@ export async function listMembers(
 
   let memberQuery = {
     // TODO: validate the level.
-    level: level ? String(level) : undefined,
+    level: level !== undefined ? String(level) : undefined,
     // TODO: validate the sig id.
-    sigId: Number(sigId),
+    sigId: sigId != undefined ? Number(sigId) : undefined,
   };
 
   let paginateQuery;
