@@ -22,6 +22,11 @@ export enum SigMemberLevel {
 }
 
 export interface IMemberService {
+  /**
+   * List sig members by quires.
+   * @param memberQuery
+   * @param paginateQuery
+   */
   listMembers(
     memberQuery?: MemberQuery,
     paginateQuery?: PaginateQuery
