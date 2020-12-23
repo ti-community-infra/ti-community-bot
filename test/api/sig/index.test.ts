@@ -1,13 +1,15 @@
 import { StatusCodes } from "http-status-codes";
 import { Request as Req, Response as Res } from "express";
-import typeorm = require("typeorm");
 
 import { Response } from "../../../src/services/response";
-import { SigDTO } from "../../../src/services/dtos/SigDTO";
+import { SigDetailsDTO } from "../../../src/services/dtos/SigDetailsDTO";
 import { ISigService } from "../../../src/services/sig";
 import { PullFormatQuery } from "../../../src/queries/PullFormatQuery";
 import { Reply } from "../../../src/services/reply";
 import { getSig } from "../../../src/api/sig";
+import { PaginateQuery } from "../../../src/queries/PaginateQuery";
+import { SigsDTO } from "../../../src/services/dtos/SigsDTO";
+import typeorm = require("typeorm");
 
 describe("Sig API", () => {
   beforeEach(() => {
@@ -31,7 +33,7 @@ describe("Sig API", () => {
       json,
     } as unknown) as Res;
 
-    const response: Response<SigDTO> = {
+    const response: Response<SigDetailsDTO> = {
       data: {
         name: "test",
         membership: {
@@ -48,11 +50,21 @@ describe("Sig API", () => {
     };
 
     const mockPullService: ISigService = {
-      getSig(_: string): Promise<Response<SigDTO | null>> {
+      getSig(_: string): Promise<Response<SigDetailsDTO | null>> {
         return Promise.resolve(response);
       },
       updateSigInfo(_: PullFormatQuery): Promise<Reply<null> | null> {
         return Promise.resolve(null);
+      },
+      listSigs(_?: PaginateQuery): Promise<Response<SigsDTO>> {
+        return Promise.resolve({
+          data: {
+            sigs: [],
+            total: 0,
+          },
+          status: StatusCodes.OK,
+          message: "Test",
+        });
       },
     };
 

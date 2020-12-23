@@ -14,15 +14,18 @@ import { SigMessage } from "../messages/SigMessage";
 import { gatherContributorsWithLevel, getSigInfo } from "../utils/SigInfoUtils";
 import { MAX_SIG_INFO_FILE_CHANGE_NUMBER } from "../../config/Config";
 import { Response } from "../response";
-import { SigDTO } from "../dtos/SigDTO";
+import { SigDetailsDTO } from "../dtos/SigDetailsDTO";
 import { StatusCodes } from "http-status-codes";
 import SigMemberRepository from "../../repositoies/sig-member";
 import { SigMemberLevel } from "../member";
+import { SigsDTO } from "../dtos/SigsDTO";
+import { PaginateQuery } from "../../queries/PaginateQuery";
 
 const lodash = require("lodash");
 
 export interface ISigService {
-  getSig(sigName: string): Promise<Response<SigDTO | null>>;
+  getSig(sigName: string): Promise<Response<SigDetailsDTO | null>>;
+  listSigs(paginateQuery?: PaginateQuery): Promise<Response<SigsDTO>>;
   updateSigInfo(pullFormatQuery: PullFormatQuery): Promise<Reply<null> | null>;
 }
 
@@ -157,7 +160,9 @@ export class SigService implements ISigService {
    * Get sig by sig name.
    * @param sigName
    */
-  public async getSig(sigName: string): Promise<Response<SigDTO | null>> {
+  public async getSig(
+    sigName: string
+  ): Promise<Response<SigDetailsDTO | null>> {
     const sig = await this.sigRepository.findOne({
       where: {
         name: sigName,
@@ -192,5 +197,51 @@ export class SigService implements ISigService {
       status: StatusCodes.OK,
       message: SigMessage.GetSigSuccess,
     };
+  }
+
+  public async listSigs(
+    paginateQuery?: PaginateQuery
+  ): Promise<Response<SigsDTO>> {
+    if (paginateQuery === undefined) {
+      const sigs = (await this.sigRepository.find()).map((s) => {
+        return {
+          ...s,
+          needsLGTM: s.lgtm,
+        };
+      });
+
+      return {
+        data: {
+          sigs,
+          total: sigs.length,
+        },
+        status: StatusCodes.OK,
+        message: SigMessage.ListSigsSuccess,
+      };
+    } else {
+      const { current, pageSize } = paginateQuery;
+      const skip = (current - 1) * pageSize;
+
+      const [sigs, total] = await this.sigRepository.findAndCount({
+        skip,
+        take: pageSize,
+      });
+
+      const sigsDTO = sigs.map((s) => {
+        return {
+          ...s,
+          needsLGTM: s.lgtm,
+        };
+      });
+
+      return {
+        data: {
+          sigs: sigsDTO,
+          total,
+        },
+        status: StatusCodes.OK,
+        message: SigMessage.ListSigsSuccess,
+      };
+    }
   }
 }
