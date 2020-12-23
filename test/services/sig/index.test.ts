@@ -1,5 +1,7 @@
-import { SigService } from "../../../src/services/sig";
 import { Repository } from "typeorm";
+import { StatusCodes } from "http-status-codes";
+
+import { SigService } from "../../../src/services/sig";
 import { SigMember } from "../../../src/db/entities/SigMember";
 import { Sig } from "../../../src/db/entities/Sig";
 import { PullFormatQuery } from "../../../src/queries/PullFormatQuery";
@@ -7,7 +9,6 @@ import * as sigInfoUtil from "../../../src/services/utils/SigInfoUtils";
 import { SigInfoSchema } from "../../../src/config/SigInfoSchema";
 import { Status } from "../../../src/services/reply";
 import SigMemberRepository from "../../../src/repositoies/sig-member";
-import { StatusCodes } from "http-status-codes";
 import { SigMessage } from "../../../src/services/messages/SigMessage";
 import { ContributorInfo } from "../../../src/db/entities/ContributorInfo";
 import { Member } from "../../../src/services/member";

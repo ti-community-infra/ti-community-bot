@@ -1,5 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 import { Request as Req, Response as Res } from "express";
+import typeorm = require("typeorm");
 
 import { Response } from "../../../src/services/response";
 import { SigDetailsDTO } from "../../../src/services/dtos/SigDetailsDTO";
@@ -9,7 +10,6 @@ import { Reply } from "../../../src/services/reply";
 import { getSig, listSigs } from "../../../src/api/sig";
 import { PaginateQuery } from "../../../src/queries/PaginateQuery";
 import { SigsDTO } from "../../../src/services/dtos/SigsDTO";
-import typeorm = require("typeorm");
 
 describe("Sig API", () => {
   beforeEach(() => {

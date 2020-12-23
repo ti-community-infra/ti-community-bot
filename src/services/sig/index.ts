@@ -199,6 +199,10 @@ export class SigService implements ISigService {
     };
   }
 
+  /**
+   * List all sigs.
+   * @param paginateQuery
+   */
   public async listSigs(
     paginateQuery?: PaginateQuery
   ): Promise<Response<SigsDTO>> {

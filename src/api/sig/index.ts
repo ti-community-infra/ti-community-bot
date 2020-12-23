@@ -1,6 +1,12 @@
 import { Request, Response } from "express";
 import { ISigService } from "../../services/sig";
 
+/**
+ * Get sig by name.
+ * @param req
+ * @param res
+ * @param sigService
+ */
 export async function getSig(
   req: Request,
   res: Response,
@@ -14,6 +20,12 @@ export async function getSig(
   res.json(response);
 }
 
+/**
+ * List all sigs.
+ * @param req
+ * @param res
+ * @param sigService
+ */
 export async function listSigs(
   req: Request,
   res: Response,
