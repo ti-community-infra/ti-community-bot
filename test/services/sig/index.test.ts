@@ -422,6 +422,100 @@ describe("Sig Service", () => {
     expect(sigRes.message).toBe(SigMessage.NotFound);
   });
 
+  test("list all sigs without paginate query", async () => {
+    // Mock find and count.
+    const sigs: Sig[] = [
+      {
+        id: 1003,
+        name: "test",
+        info: "info",
+        sigUrl: "url",
+        createTime: new Date("2020-08-27T03:18:51.000Z"),
+        channel: "channel",
+        updateTime: new Date("2020-08-27T03:18:51.000Z"),
+        status: 0,
+        lgtm: 2,
+      },
+      {
+        id: 1004,
+        name: "test1",
+        info: "info",
+        sigUrl: "url",
+        createTime: new Date("2020-08-27T03:18:51.000Z"),
+        channel: "channel",
+        updateTime: new Date("2020-08-27T03:18:51.000Z"),
+        status: 0,
+        lgtm: 2,
+      },
+    ];
+    const sigFindOneMock = jest.spyOn(sigRepository, "find");
+    sigFindOneMock.mockReturnValue(Promise.resolve(sigs));
+
+    const res = await sigService.listSigs();
+
+    expect(res.data.sigs.length).toBe(sigs.length);
+    expect(res.data.total).toBe(sigs.length);
+    expect(res.status).toBe(StatusCodes.OK);
+    expect(res.message).toBe(SigMessage.ListSigsSuccess);
+  });
+
+  test("list all sigs with query", async () => {
+    // Mock find and count.
+    const sigs: Sig[] = [
+      {
+        id: 1003,
+        name: "test",
+        info: "info",
+        sigUrl: "url",
+        createTime: new Date("2020-08-27T03:18:51.000Z"),
+        channel: "channel",
+        updateTime: new Date("2020-08-27T03:18:51.000Z"),
+        status: 0,
+        lgtm: 2,
+      },
+      {
+        id: 1004,
+        name: "test1",
+        info: "info",
+        sigUrl: "url",
+        createTime: new Date("2020-08-27T03:18:51.000Z"),
+        channel: "channel",
+        updateTime: new Date("2020-08-27T03:18:51.000Z"),
+        status: 0,
+        lgtm: 2,
+      },
+    ];
+    const sigFindOneMock = jest.spyOn(sigRepository, "findAndCount");
+    sigFindOneMock.mockImplementation((options) => {
+      // @ts-ignore
+      const { skip, take } = options;
+
+      return Promise.resolve([sigs.slice(skip, take), sigs.length]);
+    });
+
+    // One sig each page.
+    let res = await sigService.listSigs({
+      current: 1,
+      pageSize: 1,
+    });
+
+    expect(res.data.sigs.length).toBe(1);
+    expect(res.data.total).toBe(2);
+    expect(res.status).toBe(StatusCodes.OK);
+    expect(res.message).toBe(SigMessage.ListSigsSuccess);
+
+    // Two sigs each page.
+    res = await sigService.listSigs({
+      current: 1,
+      pageSize: 2,
+    });
+
+    expect(res.data.sigs.length).toBe(2);
+    expect(res.data.total).toBe(2);
+    expect(res.status).toBe(StatusCodes.OK);
+    expect(res.message).toBe(SigMessage.ListSigsSuccess);
+  });
+
   afterEach(() => {
     jest.clearAllMocks();
   });
