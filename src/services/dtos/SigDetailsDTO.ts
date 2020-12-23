@@ -1,4 +1,4 @@
-export interface SigDTO {
+export interface SigDetailsDTO {
   name: string;
   membership: {
     techLeaders: string[];

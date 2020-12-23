@@ -7,7 +7,7 @@ import PullService from "./services/pull";
 import { SigService } from "./services/sig";
 import { StatusCodes } from "http-status-codes";
 import { PullMessage } from "./services/messages/PullMessage";
-import { getSig } from "./api/sig";
+import { getSig, listSigs } from "./api/sig";
 import { listOwners } from "./api/pull";
 import { handlePullRequestEvents } from "./events/pull";
 import { Router } from "express";
@@ -97,6 +97,15 @@ export = (
           // Create github client with installed token.
           const github = await app.auth(installationId);
           await listOwners(req, res, Container.get(PullService), github);
+        }
+      );
+
+      router.get(
+        "/sigs",
+        query("current").custom(validateCurrent),
+        query("pageSize").custom(validatePageSize),
+        async (req, res) => {
+          await listSigs(req, res, Container.get(SigService));
         }
       );
 
