@@ -17,7 +17,7 @@ export interface Contribution {
 
 export interface IStatisticsService {
   listContributions(
-    contributionQuery?: ContributionQuery,
+    contributionQuery: ContributionQuery,
     paginateQuery?: PaginateQuery
   ): Promise<Response<ContributionsDTO>>;
 }
@@ -30,7 +30,7 @@ export default class StatisticsService implements IStatisticsService {
   ) {}
 
   public async listContributions(
-    contributionQuery?: ContributionQuery,
+    contributionQuery: ContributionQuery,
     paginateQuery?: PaginateQuery
   ): Promise<Response<ContributionsDTO>> {
     if (paginateQuery === undefined) {

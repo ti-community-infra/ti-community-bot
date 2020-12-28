@@ -14,10 +14,18 @@ import { Contribution } from "../../services/statistics";
 @EntityRepository(Pull)
 export default class ContributionRepository extends Repository<Pull> {
   public async listContributionsAndCount(
-    _?: ContributionQuery,
+    contributionQuery: ContributionQuery,
     offset?: number,
     limit?: number
   ): Promise<[Contribution[], number]> {
+    const where = `p.status = 'merged' ${
+      contributionQuery.startDate !== undefined &&
+      contributionQuery.endDate !== undefined
+        ? ` and p.created_at >= '${contributionQuery.startDate.toISOString()}' and p.created_at <= '${contributionQuery.endDate.toISOString()}'`
+        : ""
+    }`;
+
+    console.log(where);
     const contributions = await this.createQueryBuilder()
       .select(
         "contributions.githubName, contributions.prCount, contributions.score, GROUP_CONCAT(DISTINCT sig.name) as sigs"
@@ -29,22 +37,22 @@ export default class ContributionRepository extends Repository<Pull> {
           )
           .from(Pull, "p")
           .leftJoin(ChallengePull, "cp", "p.id = cp.pull_id")
-          .where("p.status = 'merged'")
+          .where(where)
           .groupBy("p.user");
       }, "contributions")
       .leftJoin(ContributorInfo, "ci", "ci.github = contributions.githubName")
       .leftJoin(SigMember, "sm", "sm.contributor_id = ci.id")
       .leftJoin(Sig, "sig", "sig.id = sm.sig_id")
       .groupBy("contributions.githubName")
+      .orderBy(`contributions.${contributionQuery.orderBy}`, "DESC")
       .offset(offset)
       .limit(limit)
       .getRawMany();
 
     const { total } = await this.createQueryBuilder("p")
       .leftJoin(ChallengePull, "cp", "p.id = cp.pull_id")
-      .select("count(distinct p.user) as total")
-      .where("p.status = 'merged'")
-      .groupBy("p.user")
+      .select("count(p.id) as total")
+      .where(where)
       .getRawOne();
 
     return [contributions, total];

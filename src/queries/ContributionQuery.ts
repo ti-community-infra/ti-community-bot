@@ -4,7 +4,7 @@ export interface ContributionQuery {
   orderBy: string;
 }
 
-export enum Order {
-  Count = "count",
+export enum ContributionOrder {
+  Count = "prCount",
   Score = "score",
 }

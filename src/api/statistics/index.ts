@@ -3,7 +3,10 @@ import { IStatisticsService } from "../../services/statistics";
 import { validationResult } from "express-validator";
 import { Response as Res } from "../../services/response";
 import { StatusCodes } from "http-status-codes";
-import { ContributionQuery, Order } from "../../queries/ContributionQuery";
+import {
+  ContributionQuery,
+  ContributionOrder,
+} from "../../queries/ContributionQuery";
 
 export async function listContributions(
   req: Request,
@@ -30,7 +33,7 @@ export async function listContributions(
     startDate:
       startDate !== undefined ? new Date(String(startDate)) : undefined,
     endDate: endDate !== undefined ? new Date(String(endDate)) : undefined,
-    orderBy: orderBy !== undefined ? Order.Count : String(orderBy),
+    orderBy: orderBy === undefined ? ContributionOrder.Count : String(orderBy),
   };
 
   // Gather paginate query.

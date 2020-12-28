@@ -25,6 +25,11 @@ import {
 } from "./api/helpers/MemberQueryHelper";
 import { listContributions } from "./api/statistics";
 import StatisticsService from "./services/statistics";
+import {
+  validateEndDate,
+  validateOrderBy,
+  validateStartDate,
+} from "./api/helpers/ContributionQueryHelper";
 
 const commands = require("probot-commands-pro");
 const bodyParser = require("body-parser");
@@ -136,7 +141,10 @@ export = (
       );
 
       router.get(
-        "/contributions",
+        "/statistics/contributions",
+        query("startDate").custom(validateStartDate),
+        query("endDate").custom(validateEndDate),
+        query("orderBy").custom(validateOrderBy),
         query("current").custom(validateCurrent),
         query("pageSize").custom(validatePageSize),
         async (req, res) => {
