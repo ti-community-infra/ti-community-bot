@@ -23,6 +23,8 @@ import {
   validateMemberLevel,
   validateSigId,
 } from "./api/helpers/MemberQueryHelper";
+import { listContributions } from "./api/statistics";
+import StatisticsService from "./services/statistics";
 
 const commands = require("probot-commands-pro");
 const bodyParser = require("body-parser");
@@ -130,6 +132,15 @@ export = (
         query("pageSize").custom(validatePageSize),
         async (req, res) => {
           await listMembers(req, res, Container.get(MemberService));
+        }
+      );
+
+      router.get(
+        "/contributions",
+        query("current").custom(validateCurrent),
+        query("pageSize").custom(validatePageSize),
+        async (req, res) => {
+          await listContributions(req, res, Container.get(StatisticsService));
         }
       );
     })
