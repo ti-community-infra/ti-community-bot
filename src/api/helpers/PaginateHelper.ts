@@ -6,10 +6,10 @@ import { Request } from "express";
  * @param req
  */
 export function validateCurrent(
-  value: string,
+  value: string | undefined,
   { req }: { req: Request }
 ): boolean {
-  if (value != undefined) {
+  if (value !== undefined) {
     const current = Number(value);
     if (!Number.isInteger(current) || current <= 0) {
       throw new Error("Illegal current num.");
@@ -29,10 +29,10 @@ export function validateCurrent(
  * @param req
  */
 export function validatePageSize(
-  value: string,
+  value: string | undefined,
   { req }: { req: Request }
 ): boolean {
-  if (value != undefined) {
+  if (value !== undefined) {
     const pageSize = Number(value);
     if (!Number.isInteger(pageSize) || pageSize <= 0) {
       throw new Error("Illegal pageSize num.");
