@@ -1,6 +1,7 @@
 import { Request as Req } from "express";
 import {
   validateEndDate,
+  validateOrderBy,
   validateStartDate,
 } from "../../../src/api/helpers/ContributionQueryHelper";
 
@@ -65,6 +66,18 @@ describe("Contribution Query Helper", () => {
     } as unknown) as Req;
     const validator = () => {
       validateEndDate("2020-12-30", { req: mockRequest });
+    };
+    expect(validator).toThrow();
+  });
+
+  test("valid order", () => {
+    const isValid = validateOrderBy("prCount");
+    expect(isValid).toBe(true);
+  });
+
+  test("invalid order", () => {
+    const validator = () => {
+      validateOrderBy("random");
     };
     expect(validator).toThrow();
   });
