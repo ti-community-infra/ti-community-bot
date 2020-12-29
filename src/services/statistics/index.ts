@@ -59,6 +59,7 @@ export default class StatisticsService implements IStatisticsService {
     } else {
       const { current, pageSize } = paginateQuery;
       const offset = (current - 1) * pageSize;
+
       const [
         contributions,
         total,
