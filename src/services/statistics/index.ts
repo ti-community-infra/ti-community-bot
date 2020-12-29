@@ -1,13 +1,17 @@
+import { Service } from "typedi";
+import { InjectRepository } from "typeorm-typedi-extensions";
+import { StatusCodes } from "http-status-codes";
+
 import { PaginateQuery } from "../../queries/PaginateQuery";
 import { Response } from "../response";
 import { ContributionQuery } from "../../queries/ContributionQuery";
 import { ContributionsDTO } from "../dtos/ContributionsDTO";
-import { Service } from "typedi";
-import { InjectRepository } from "typeorm-typedi-extensions";
 import ContributionRepository from "../../repositoies/contribution";
-import { StatusCodes } from "http-status-codes";
 import { StatisticsMessage } from "../messages/StatisticsMessage";
 
+/**
+ * Contribution info.
+ */
 export interface Contribution {
   githubName: string;
   prCount: number;
@@ -16,6 +20,11 @@ export interface Contribution {
 }
 
 export interface IStatisticsService {
+  /**
+   * List all contributions.
+   * @param contributionQuery
+   * @param paginateQuery
+   */
   listContributions(
     contributionQuery: ContributionQuery,
     paginateQuery?: PaginateQuery
@@ -33,6 +42,7 @@ export default class StatisticsService implements IStatisticsService {
     contributionQuery: ContributionQuery,
     paginateQuery?: PaginateQuery
   ): Promise<Response<ContributionsDTO>> {
+    // No paginate.
     if (paginateQuery === undefined) {
       const [
         contributions,

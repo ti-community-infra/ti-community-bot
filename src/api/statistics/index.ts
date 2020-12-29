@@ -1,13 +1,20 @@
 import { Request, Response } from "express";
-import { IStatisticsService } from "../../services/statistics";
 import { validationResult } from "express-validator";
-import { Response as Res } from "../../services/response";
 import { StatusCodes } from "http-status-codes";
+
+import { IStatisticsService } from "../../services/statistics";
+import { Response as Res } from "../../services/response";
 import {
   ContributionQuery,
   ContributionOrder,
 } from "../../queries/ContributionQuery";
 
+/**
+ * List contribution.
+ * @param req
+ * @param res
+ * @param statisticsService
+ */
 export async function listContributions(
   req: Request,
   res: Response,
@@ -33,6 +40,7 @@ export async function listContributions(
     startDate:
       startDate !== undefined ? new Date(String(startDate)) : undefined,
     endDate: endDate !== undefined ? new Date(String(endDate)) : undefined,
+    // Default order by count.
     orderBy: orderBy === undefined ? ContributionOrder.Count : String(orderBy),
   };
 
