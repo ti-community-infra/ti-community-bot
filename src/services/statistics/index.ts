@@ -14,8 +14,17 @@ import { StatisticsMessage } from "../messages/StatisticsMessage";
  */
 export interface Contribution {
   githubName: string;
+  /**
+   * PR total count.
+   */
   prCount: number;
+  /**
+   * Challenge program total score.
+   */
   score: number;
+  /**
+   * The user's sigs.
+   */
   sigs: string;
 }
 
