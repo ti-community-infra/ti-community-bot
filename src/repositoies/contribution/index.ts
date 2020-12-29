@@ -47,7 +47,7 @@ export default class ContributionRepository extends Repository<Pull> {
           .where(where)
           .groupBy("p.user");
       }, "contributions")
-      // Get the sigs.
+      // Get the sig list of contributors according to their GitHub name.
       .leftJoin(ContributorInfo, "ci", "ci.github = contributions.githubName")
       .leftJoin(SigMember, "sm", "sm.contributor_id = ci.id")
       .leftJoin(Sig, "sig", "sig.id = sm.sig_id")
