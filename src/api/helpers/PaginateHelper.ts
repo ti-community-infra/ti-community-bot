@@ -6,7 +6,7 @@ import { Request } from "express";
  * @param req
  */
 export function validateCurrent(
-  value: string,
+  value: string | undefined,
   { req }: { req: Request }
 ): boolean {
   if (value !== undefined) {
@@ -29,7 +29,7 @@ export function validateCurrent(
  * @param req
  */
 export function validatePageSize(
-  value: string,
+  value: string | undefined,
   { req }: { req: Request }
 ): boolean {
   if (value !== undefined) {
