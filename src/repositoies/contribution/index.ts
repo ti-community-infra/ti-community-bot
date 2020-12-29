@@ -13,11 +13,18 @@ import { Contribution } from "../../services/statistics";
 @Service()
 @EntityRepository(Pull)
 export default class ContributionRepository extends Repository<Pull> {
+  /**
+   * List contributions and count.
+   * @param contributionQuery
+   * @param offset
+   * @param limit
+   */
   public async listContributionsAndCount(
     contributionQuery: ContributionQuery,
     offset?: number,
     limit?: number
   ): Promise<[Contribution[], number]> {
+    // Construct where.
     const where = `p.status = 'merged' ${
       contributionQuery.startDate !== undefined &&
       contributionQuery.endDate !== undefined
@@ -25,12 +32,12 @@ export default class ContributionRepository extends Repository<Pull> {
         : ""
     }`;
 
-    console.log(where);
     const contributions = await this.createQueryBuilder()
       .select(
         "contributions.githubName, contributions.prCount, contributions.score, GROUP_CONCAT(DISTINCT sig.name) as sigs"
       )
       .from((sub) => {
+        // Get the contributions.
         return sub
           .select(
             "p.user as githubName, count(p.id) as prCount, sum(cp.reward) as score"
@@ -40,20 +47,25 @@ export default class ContributionRepository extends Repository<Pull> {
           .where(where)
           .groupBy("p.user");
       }, "contributions")
+      // Get the sigs.
       .leftJoin(ContributorInfo, "ci", "ci.github = contributions.githubName")
       .leftJoin(SigMember, "sm", "sm.contributor_id = ci.id")
       .leftJoin(Sig, "sig", "sig.id = sm.sig_id")
       .groupBy("contributions.githubName")
+      // Order the contributions.
       .orderBy(`contributions.${contributionQuery.orderBy}`, "DESC")
       .offset(offset)
       .limit(limit)
       .getRawMany();
 
-    const { total } = await this.createQueryBuilder("p")
-      .leftJoin(ChallengePull, "cp", "p.id = cp.pull_id")
-      .select("count(p.id) as total")
-      .where(where)
-      .getRawOne();
+    const total = (
+      await this.createQueryBuilder("p")
+        .leftJoin(ChallengePull, "cp", "p.id = cp.pull_id")
+        .select("p.user")
+        .where(where)
+        .groupBy("p.user")
+        .getRawMany()
+    ).length;
 
     return [contributions, total];
   }
