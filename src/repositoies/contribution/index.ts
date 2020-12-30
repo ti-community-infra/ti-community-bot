@@ -32,7 +32,8 @@ export default class ContributionRepository extends Repository<Pull> {
         : ""
     }`;
 
-    const contributions = await this.createQueryBuilder()
+    const contributions = await this.manager.connection
+      .createQueryBuilder()
       .select(
         "contributions.githubName, contributions.prCount, contributions.score, GROUP_CONCAT(DISTINCT sig.name) as sigs"
       )
