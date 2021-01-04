@@ -206,8 +206,18 @@ export class SigService implements ISigService {
   public async listSigs(
     paginateQuery?: PaginateQuery
   ): Promise<Response<SigsDTO>> {
+    const publicSigStatus = 0;
+
     if (paginateQuery === undefined) {
-      const sigs = (await this.sigRepository.find()).map((s) => {
+      const sigs = (
+        await this.sigRepository.find({
+          where: [
+            {
+              status: publicSigStatus,
+            },
+          ],
+        })
+      ).map((s) => {
         return {
           ...s,
           needsLGTM: s.lgtm,
@@ -227,6 +237,9 @@ export class SigService implements ISigService {
       const skip = (current - 1) * pageSize;
 
       const [sigs, total] = await this.sigRepository.findAndCount({
+        where: {
+          status: publicSigStatus,
+        },
         skip,
         take: pageSize,
       });
