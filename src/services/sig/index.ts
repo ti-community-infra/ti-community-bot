@@ -200,7 +200,7 @@ export class SigService implements ISigService {
   }
 
   /**
-   * List all sigs.
+   * List all public sigs.
    * @param paginateQuery
    */
   public async listSigs(
