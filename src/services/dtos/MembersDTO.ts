@@ -6,4 +6,5 @@ export interface MembersDTO {
 interface MemberDTO {
   githubName: string;
   level: string;
+  sigName?: string;
 }

@@ -23,7 +23,6 @@ export default class SigMemberRepository extends Repository<SigMember> {
     limit?: number
   ): Promise<[Member[], number]> {
     const sigMemberAlias = "sm";
-    const select = "ci.github as githubName, sm.level as level";
     const wheres = memberQuery
       ? Object.keys(memberQuery)
           .map((k) => {
@@ -43,10 +42,10 @@ export default class SigMemberRepository extends Repository<SigMember> {
       : "";
 
     const members = (
-      await this.createQueryBuilder("sm")
+      await this.createQueryBuilder(sigMemberAlias)
         .leftJoin(Sig, "s", "sm.sig_id = s.id")
         .leftJoin(ContributorInfo, "ci", "sm.contributor_id = ci.id")
-        .select(select)
+        .select("ci.github as githubName, sm.level as level, s.name as sigName")
         .where(wheres)
         .orderBy("sm.create_time", "ASC")
         .offset(offset)
@@ -59,7 +58,7 @@ export default class SigMemberRepository extends Repository<SigMember> {
     });
 
     const count = (
-      await this.createQueryBuilder("sm")
+      await this.createQueryBuilder(sigMemberAlias)
         .leftJoin(Sig, "s", "sm.sig_id = s.id")
         .leftJoin(ContributorInfo, "ci", "sm.contributor_id = ci.id")
         .select(`count(*) as total`)
