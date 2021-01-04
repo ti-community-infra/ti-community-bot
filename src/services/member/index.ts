@@ -12,6 +12,7 @@ import { ContributorMessage } from "../messages/ContributorMessage";
 export interface Member {
   githubName: string;
   level: string;
+  sigName?: string;
 }
 
 export enum SigMemberLevel {
