@@ -15,7 +15,8 @@ export default class ContributorRepository extends Repository<Pull> {
     limit?: number
   ): Promise<[string[], number]> {
     const contributors = (
-      await this.createQueryBuilder()
+      await this.manager.connection
+        .createQueryBuilder()
         .select("distinct contributors.user as githubName")
         .from((sub) => {
           return sub
