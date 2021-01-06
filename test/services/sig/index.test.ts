@@ -485,8 +485,11 @@ describe("Sig Service", () => {
       },
     ];
 
-    const sigFindOneMock = jest.spyOn(sigRepository, "listSigsAndCount");
-    sigFindOneMock.mockImplementation((offset?, limit?) => {
+    const sigListSigsAndCountMock = jest.spyOn(
+      sigRepository,
+      "listSigsAndCount"
+    );
+    sigListSigsAndCountMock.mockImplementation((offset?, limit?) => {
       return Promise.resolve([sigs.slice(offset, limit), sigs.length]);
     });
 

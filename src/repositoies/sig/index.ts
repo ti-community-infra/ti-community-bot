@@ -29,9 +29,9 @@ export default class SigRepository extends Repository<Sig> {
           .leftJoin(SigMember, "sm", "sm.sig_id = s.id")
           .where(`s.status = ${publicSigStatus}`)
           .groupBy("s.id");
-      }, "sigs")
-      .leftJoin(Sig, "sig", "sig.id = sigs.id")
-      .orderBy("membersCount", "DESC")
+      }, "sig_summary")
+      .leftJoin(Sig, "sig", "sig.id = sig_summary.id")
+      .orderBy("sig_summary.membersCount", "DESC")
       .offset(offset)
       .limit(limit)
       .getRawMany();
