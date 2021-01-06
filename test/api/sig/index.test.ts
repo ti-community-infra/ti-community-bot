@@ -101,6 +101,7 @@ describe("Sig API", () => {
             info: "info",
             sigUrl: "url",
             channel: "channel",
+            membersCount: 7,
             needsLGTM: 2,
           },
           {
@@ -109,6 +110,7 @@ describe("Sig API", () => {
             info: "info",
             sigUrl: "url",
             channel: "channel",
+            membersCount: 5,
             needsLGTM: 2,
           },
         ],

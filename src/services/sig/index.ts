@@ -20,8 +20,19 @@ import SigMemberRepository from "../../repositoies/sig-member";
 import { SigMemberLevel } from "../member";
 import { SigsDTO } from "../dtos/SigsDTO";
 import { PaginateQuery } from "../../queries/PaginateQuery";
+import SigRepository from "../../repositoies/sig";
 
 const lodash = require("lodash");
+
+export interface SigBasicInfo {
+  id: number;
+  name: string;
+  info: string;
+  sigUrl: string;
+  channel: string;
+  membersCount: number;
+  needsLGTM: number;
+}
 
 export interface ISigService {
   getSig(sigName: string): Promise<Response<SigDetailsDTO | null>>;
@@ -32,8 +43,8 @@ export interface ISigService {
 @Service()
 export class SigService implements ISigService {
   constructor(
-    @InjectRepository(Sig)
-    private sigRepository: Repository<Sig>,
+    @InjectRepository()
+    private sigRepository: SigRepository,
     @InjectRepository()
     private sigMemberRepository: SigMemberRepository,
     @InjectRepository(ContributorInfo)
@@ -206,28 +217,13 @@ export class SigService implements ISigService {
   public async listSigs(
     paginateQuery?: PaginateQuery
   ): Promise<Response<SigsDTO>> {
-    const publicSigStatus = 0;
-
     if (paginateQuery === undefined) {
-      const sigs = (
-        await this.sigRepository.find({
-          where: [
-            {
-              status: publicSigStatus,
-            },
-          ],
-        })
-      ).map((s) => {
-        return {
-          ...s,
-          needsLGTM: s.lgtm,
-        };
-      });
+      const [sigs, count] = await this.sigRepository.listSigsAndCount();
 
       return {
         data: {
           sigs,
-          total: sigs.length,
+          total: count,
         },
         status: StatusCodes.OK,
         message: SigMessage.ListSigsSuccess,
@@ -236,25 +232,15 @@ export class SigService implements ISigService {
       const { current, pageSize } = paginateQuery;
       const skip = (current - 1) * pageSize;
 
-      const [sigs, total] = await this.sigRepository.findAndCount({
-        where: {
-          status: publicSigStatus,
-        },
+      const [sigs, count] = await this.sigRepository.listSigsAndCount(
         skip,
-        take: pageSize,
-      });
-
-      const sigsDTO = sigs.map((s) => {
-        return {
-          ...s,
-          needsLGTM: s.lgtm,
-        };
-      });
+        pageSize
+      );
 
       return {
         data: {
-          sigs: sigsDTO,
-          total,
+          sigs,
+          total: count,
         },
         status: StatusCodes.OK,
         message: SigMessage.ListSigsSuccess,
