@@ -25,7 +25,7 @@ export default class ContributionRepository extends Repository<Pull> {
     limit?: number
   ): Promise<[Contribution[], number]> {
     // Construct where.
-    const where = `p.status = 'merged' ${
+    const where = `p.status = 'merged' and p.user not in ('ti-srebot', 'sre-bot', 'ti-community-prow-bot', 'dependabot[bot]') ${
       contributionQuery.startDate !== undefined &&
       contributionQuery.endDate !== undefined
         ? ` and p.created_at >= '${contributionQuery.startDate.toISOString()}' and p.created_at <= '${contributionQuery.endDate.toISOString()}'`
