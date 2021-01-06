@@ -31,6 +31,7 @@ export default class SigRepository extends Repository<Sig> {
           .groupBy("s.id");
       }, "sigs")
       .leftJoin(Sig, "sig", "sig.id = sigs.id")
+      .orderBy("membersCount", "DESC")
       .offset(offset)
       .limit(limit)
       .getRawMany();
