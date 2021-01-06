@@ -20,10 +20,13 @@ export default class ContributorRepository extends Repository<Pull> {
         .select("distinct contributors.user as githubName")
         .from((sub) => {
           return sub
-            .select("distinct user,created_at")
+            .select("user,created_at")
             .from(Pull, "pull")
-            .orderBy("created_at", "DESC");
+            .where(
+              "user not in ('ti-srebot', 'sre-bot', 'ti-community-prow-bot', 'dependabot[bot]')"
+            );
         }, "contributors")
+        .orderBy("created_at", "DESC")
         .offset(offset)
         .limit(limit)
         .getRawMany()
@@ -34,6 +37,9 @@ export default class ContributorRepository extends Repository<Pull> {
     const total = (
       await this.createQueryBuilder()
         .select("count(distinct user) as total")
+        .where(
+          "user not in ('ti-srebot', 'sre-bot', 'ti-community-prow-bot', 'dependabot[bot]')"
+        )
         .getRawOne()
     ).total;
 
