@@ -9,6 +9,11 @@ import { SigMember } from "../../db/entities/SigMember";
 @Service()
 @EntityRepository(Sig)
 export default class SigRepository extends Repository<Sig> {
+  /**
+   * List sigs and total count.
+   * @param offset
+   * @param limit
+   */
   public async listSigsAndCount(
     offset?: number,
     limit?: number
@@ -21,7 +26,7 @@ export default class SigRepository extends Repository<Sig> {
         return sub
           .select("s.id, count(sm.contributor_id) as membersCount")
           .from(Sig, "s")
-          .leftJoin(SigMember, "sm", "s.id = sm.sig_id")
+          .leftJoin(SigMember, "sm", "sm.sig_id = s.id")
           .where(`s.status = ${publicSigStatus}`)
           .groupBy("s.id");
       }, "sigs")
