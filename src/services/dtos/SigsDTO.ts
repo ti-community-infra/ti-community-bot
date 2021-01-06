@@ -9,5 +9,6 @@ interface SigDTO {
   info: string;
   sigUrl: string;
   channel: string;
+  membersCount: number;
   needsLGTM: number;
 }

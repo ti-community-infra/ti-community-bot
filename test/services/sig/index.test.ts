@@ -1,7 +1,7 @@
 import { Repository } from "typeorm";
 import { StatusCodes } from "http-status-codes";
 
-import { SigService } from "../../../src/services/sig";
+import { SigBasicInfo, SigService } from "../../../src/services/sig";
 import { SigMember } from "../../../src/db/entities/SigMember";
 import { Sig } from "../../../src/db/entities/Sig";
 import { PullFormatQuery } from "../../../src/queries/PullFormatQuery";
@@ -12,10 +12,11 @@ import SigMemberRepository from "../../../src/repositoies/sig-member";
 import { SigMessage } from "../../../src/services/messages/SigMessage";
 import { ContributorInfo } from "../../../src/db/entities/ContributorInfo";
 import { Member } from "../../../src/services/member";
+import SigRepository from "../../../src/repositoies/sig";
 
 describe("Sig Service", () => {
   let sigService: SigService;
-  let sigRepository = new Repository<Sig>();
+  let sigRepository = new SigRepository();
   let sigMemberRepository = new SigMemberRepository();
   let contributorInfoRepository = new Repository<ContributorInfo>();
 
@@ -425,32 +426,33 @@ describe("Sig Service", () => {
 
   test("list all sigs without paginate query", async () => {
     // Mock find and count.
-    const sigs: Sig[] = [
+    const sigs: SigBasicInfo[] = [
       {
         id: 1003,
         name: "test",
         info: "info",
         sigUrl: "url",
-        createTime: new Date("2020-08-27T03:18:51.000Z"),
         channel: "channel",
-        updateTime: new Date("2020-08-27T03:18:51.000Z"),
-        status: 0,
-        lgtm: 2,
+        membersCount: 7,
+        needsLGTM: 2,
       },
       {
         id: 1004,
         name: "test1",
         info: "info",
         sigUrl: "url",
-        createTime: new Date("2020-08-27T03:18:51.000Z"),
         channel: "channel",
-        updateTime: new Date("2020-08-27T03:18:51.000Z"),
-        status: 0,
-        lgtm: 2,
+        membersCount: 7,
+        needsLGTM: 2,
       },
     ];
-    const sigFindOneMock = jest.spyOn(sigRepository, "find");
-    sigFindOneMock.mockReturnValue(Promise.resolve(sigs));
+    const sigListSigsAndCountMock = jest.spyOn(
+      sigRepository,
+      "listSigsAndCount"
+    );
+    sigListSigsAndCountMock.mockReturnValue(
+      Promise.resolve([sigs, sigs.length])
+    );
 
     const res = await sigService.listSigs();
 
@@ -462,36 +464,30 @@ describe("Sig Service", () => {
 
   test("list all sigs with query", async () => {
     // Mock find and count.
-    const sigs: Sig[] = [
+    const sigs: SigBasicInfo[] = [
       {
         id: 1003,
         name: "test",
         info: "info",
         sigUrl: "url",
-        createTime: new Date("2020-08-27T03:18:51.000Z"),
         channel: "channel",
-        updateTime: new Date("2020-08-27T03:18:51.000Z"),
-        status: 0,
-        lgtm: 2,
+        membersCount: 7,
+        needsLGTM: 2,
       },
       {
         id: 1004,
         name: "test1",
         info: "info",
         sigUrl: "url",
-        createTime: new Date("2020-08-27T03:18:51.000Z"),
         channel: "channel",
-        updateTime: new Date("2020-08-27T03:18:51.000Z"),
-        status: 0,
-        lgtm: 2,
+        membersCount: 7,
+        needsLGTM: 2,
       },
     ];
-    const sigFindOneMock = jest.spyOn(sigRepository, "findAndCount");
-    sigFindOneMock.mockImplementation((options) => {
-      // @ts-ignore
-      const { skip, take } = options;
 
-      return Promise.resolve([sigs.slice(skip, take), sigs.length]);
+    const sigFindOneMock = jest.spyOn(sigRepository, "listSigsAndCount");
+    sigFindOneMock.mockImplementation((offset?, limit?) => {
+      return Promise.resolve([sigs.slice(offset, limit), sigs.length]);
     });
 
     // One sig each page.
