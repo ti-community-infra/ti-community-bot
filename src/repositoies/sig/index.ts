@@ -24,13 +24,13 @@ export default class SigRepository extends Repository<Sig> {
       .select("*")
       .from((sub) => {
         return sub
-          .select("s.id, count(sm.contributor_id) as membersCount")
+          .select("s.id as sig_id, count(sm.contributor_id) as membersCount")
           .from(Sig, "s")
           .leftJoin(SigMember, "sm", "sm.sig_id = s.id")
           .where(`s.status = ${publicSigStatus}`)
           .groupBy("s.id");
       }, "sig_summary")
-      .leftJoin(Sig, "sig", "sig.id = sig_summary.id")
+      .leftJoin(Sig, "sig", "sig.id = sig_summary.sig_id")
       .orderBy("sig_summary.membersCount", "DESC")
       .offset(offset)
       .limit(limit)
