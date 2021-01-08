@@ -32,32 +32,40 @@ export default class ContributionRepository extends Repository<Pull> {
         : ""
     }`;
 
-    const contributions = await this.manager.connection
-      .createQueryBuilder()
-      .select(
-        "contributions.githubName, contributions.prCount, contributions.score, GROUP_CONCAT(DISTINCT sig.name) as sigs"
-      )
-      .from((sub) => {
-        // Get the contributions.
-        return sub
-          .select(
-            "p.user as githubName, count(p.id) as prCount, sum(cp.reward) as score"
-          )
-          .from(Pull, "p")
-          .leftJoin(ChallengePull, "cp", "p.id = cp.pull_id")
-          .where(where)
-          .groupBy("p.user");
-      }, "contributions")
-      // Get the sig list of contributors according to their GitHub name.
-      .leftJoin(ContributorInfo, "ci", "ci.github = contributions.githubName")
-      .leftJoin(SigMember, "sm", "sm.contributor_id = ci.id")
-      .leftJoin(Sig, "sig", "sig.id = sm.sig_id")
-      .groupBy("contributions.githubName")
-      // Order the contributions.
-      .orderBy(`contributions.${contributionQuery.orderBy}`, "DESC")
-      .offset(offset)
-      .limit(limit)
-      .getRawMany();
+    const contributions = (
+      await this.manager.connection
+        .createQueryBuilder()
+        .select(
+          "contributions.githubName, contributions.prCount, contributions.score, GROUP_CONCAT(DISTINCT sig.name) as sigs"
+        )
+        .from((sub) => {
+          // Get the contributions.
+          return sub
+            .select(
+              "p.user as githubName, count(p.id) as prCount, sum(cp.reward) as score"
+            )
+            .from(Pull, "p")
+            .leftJoin(ChallengePull, "cp", "p.id = cp.pull_id")
+            .where(where)
+            .groupBy("p.user");
+        }, "contributions")
+        // Get the sig list of contributors according to their GitHub name.
+        .leftJoin(ContributorInfo, "ci", "ci.github = contributions.githubName")
+        .leftJoin(SigMember, "sm", "sm.contributor_id = ci.id")
+        .leftJoin(Sig, "sig", "sig.id = sm.sig_id")
+        .groupBy("contributions.githubName")
+        // Order the contributions.
+        .orderBy(`contributions.${contributionQuery.orderBy}`, "DESC")
+        .offset(offset)
+        .limit(limit)
+        .getRawMany()
+    ).map((c) => {
+      return {
+        ...c,
+        prCount: Number(c.prCount),
+        score: Number(c.score),
+      };
+    });
 
     const total = (
       await this.createQueryBuilder("p")

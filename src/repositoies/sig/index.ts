@@ -19,22 +19,29 @@ export default class SigRepository extends Repository<Sig> {
     limit?: number
   ): Promise<[SigBasicInfo[], number]> {
     const publicSigStatus = 0;
-    const sigs = await this.manager.connection
-      .createQueryBuilder()
-      .select("*")
-      .from((sub) => {
-        return sub
-          .select("s.id as sig_id, count(sm.contributor_id) as membersCount")
-          .from(Sig, "s")
-          .leftJoin(SigMember, "sm", "sm.sig_id = s.id")
-          .where(`s.status = ${publicSigStatus}`)
-          .groupBy("s.id");
-      }, "sig_summary")
-      .leftJoin(Sig, "sig", "sig.id = sig_summary.sig_id")
-      .orderBy("sig_summary.membersCount", "DESC")
-      .offset(offset)
-      .limit(limit)
-      .getRawMany();
+    const sigs = (
+      await this.manager.connection
+        .createQueryBuilder()
+        .select("*")
+        .from((sub) => {
+          return sub
+            .select("s.id as sig_id, count(sm.contributor_id) as membersCount")
+            .from(Sig, "s")
+            .leftJoin(SigMember, "sm", "sm.sig_id = s.id")
+            .where(`s.status = ${publicSigStatus}`)
+            .groupBy("s.id");
+        }, "sig_summary")
+        .leftJoin(Sig, "sig", "sig.id = sig_summary.sig_id")
+        .orderBy("sig_summary.membersCount", "DESC")
+        .offset(offset)
+        .limit(limit)
+        .getRawMany()
+    ).map((s) => {
+      return {
+        ...s,
+        membersCount: Number(s.membersCount),
+      };
+    });
 
     const count = (
       await this.createQueryBuilder("s")
