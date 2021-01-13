@@ -67,16 +67,14 @@ export default class ContributionRepository extends Repository<Pull> {
       };
     });
 
-    const total = Number(
-      (
-        await this.createQueryBuilder("p")
-          .leftJoin(ChallengePull, "cp", "p.id = cp.pull_id")
-          .select("p.user")
-          .where(where)
-          .groupBy("p.user")
-          .getRawMany()
-      ).length
-    );
+    const total = (
+      await this.createQueryBuilder("p")
+        .leftJoin(ChallengePull, "cp", "p.id = cp.pull_id")
+        .select("p.user")
+        .where(where)
+        .groupBy("p.user")
+        .getRawMany()
+    ).length;
 
     return [contributions, total];
   }
