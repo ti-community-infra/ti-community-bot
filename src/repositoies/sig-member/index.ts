@@ -57,14 +57,16 @@ export default class SigMemberRepository extends Repository<SigMember> {
       };
     });
 
-    const count = (
-      await this.createQueryBuilder(sigMemberAlias)
-        .leftJoin(Sig, "s", "sm.sig_id = s.id")
-        .leftJoin(ContributorInfo, "ci", "sm.contributor_id = ci.id")
-        .select(`count(*) as total`)
-        .where(wheres)
-        .getRawOne()
-    ).total;
+    const count = Number(
+      (
+        await this.createQueryBuilder(sigMemberAlias)
+          .leftJoin(Sig, "s", "sm.sig_id = s.id")
+          .leftJoin(ContributorInfo, "ci", "sm.contributor_id = ci.id")
+          .select(`count(*) as total`)
+          .where(wheres)
+          .getRawOne()
+      ).total
+    );
 
     return [members, count];
   }
