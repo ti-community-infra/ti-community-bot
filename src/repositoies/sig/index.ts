@@ -43,12 +43,14 @@ export default class SigRepository extends Repository<Sig> {
       };
     });
 
-    const count = (
-      await this.createQueryBuilder("s")
-        .select("count(*) as total")
-        .where(`s.status = ${publicSigStatus}`)
-        .getRawOne()
-    ).total;
+    const count = Number(
+      (
+        await this.createQueryBuilder("s")
+          .select("count(*) as total")
+          .where(`s.status = ${publicSigStatus}`)
+          .getRawOne()
+      ).total
+    );
 
     return [sigs, count];
   }

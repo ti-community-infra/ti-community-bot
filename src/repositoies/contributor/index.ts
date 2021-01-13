@@ -34,14 +34,16 @@ export default class ContributorRepository extends Repository<Pull> {
       return c.githubName;
     });
 
-    const total = (
-      await this.createQueryBuilder()
-        .select("count(distinct user) as total")
-        .where(
-          "user not in ('ti-srebot', 'sre-bot', 'ti-community-prow-bot', 'dependabot[bot]')"
-        )
-        .getRawOne()
-    ).total;
+    const total = Number(
+      (
+        await this.createQueryBuilder()
+          .select("count(distinct user) as total")
+          .where(
+            "user not in ('ti-srebot', 'sre-bot', 'ti-community-prow-bot', 'dependabot[bot]')"
+          )
+          .getRawOne()
+      ).total
+    );
 
     return [contributors, total];
   }
