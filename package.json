@@ -50,7 +50,7 @@
     "@types/nock": "^11.1.0",
     "@types/node": "^14.14.21",
     "@typescript-eslint/parser": "^4.14.0",
-    "@types/lodash": "^4.14.167",
+    "@types/lodash": "^4.14.168",
     "axios-mock-adapter": "^1.19.0",
     "eslint-plugin-typescript": "^0.14.0",
     "husky": "^4.3.8",
