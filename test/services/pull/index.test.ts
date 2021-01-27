@@ -527,7 +527,7 @@ describe("Pull Service", () => {
     expect(
       res.data!.reviewers.find((r) => {
         // Old reviewer.
-        return r === "Rustin-Liu5";
+        return r === "Rustin-liu5";
       })
     ).toBe(undefined);
 
@@ -542,7 +542,7 @@ describe("Pull Service", () => {
     expect(
       res.data!.committers.find((r) => {
         // Old reviewer.
-        return r === "Rustin-Liu5";
+        return r === "Rustin-liu5";
       })
     ).toBe(undefined);
 
