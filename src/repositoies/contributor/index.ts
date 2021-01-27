@@ -23,7 +23,7 @@ export default class ContributorRepository extends Repository<Pull> {
             .select("user,created_at")
             .from(Pull, "pull")
             .where(
-              "user not in ('ti-srebot', 'sre-bot', 'ti-chi-bot', 'dependabot[bot]' and pull.status= 'merged')"
+              "user not in ('ti-srebot', 'sre-bot', 'ti-chi-bot', 'dependabot[bot]') and status= 'merged'"
             );
         }, "contributors")
         .orderBy("contributors.created_at", "DESC")
