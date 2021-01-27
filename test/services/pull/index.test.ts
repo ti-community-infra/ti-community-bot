@@ -425,6 +425,127 @@ describe("Pull Service", () => {
     expect(res.data!.needsLGTM).toBe(2);
   });
 
+  test("list owners when change sig info file's committers part", async () => {
+    const oldSigMembersWithLevel: Member[] = [
+      {
+        githubName: "Rustin-liu1",
+        level: "leader",
+      },
+      {
+        githubName: "Rustin-liu2",
+        level: "co-leader",
+      },
+      {
+        githubName: "Rustin-liu3",
+        level: "committer",
+      },
+      {
+        githubName: "Rustin-liu4",
+        level: "reviewer",
+      },
+      {
+        githubName: "Rustin-liu5",
+        level: "active-contributor",
+      },
+    ];
+
+    const newSigInfo: SigInfoSchema = {
+      name: "Test",
+      techLeaders: [
+        {
+          githubName: "Rustin-liu1",
+        },
+      ],
+      coLeaders: [
+        {
+          githubName: "Rustin-liu2",
+        },
+      ],
+      committers: [
+        {
+          githubName: "Rustin-liu4",
+        },
+      ],
+      reviewers: [],
+      activeContributors: [
+        {
+          githubName: "Rustin-liu5",
+        },
+      ],
+    };
+
+    // Mock get sig info and return new sig info.
+    const getSigInfoMock = jest.spyOn(sigInfoUtil, "getSigInfo");
+    getSigInfoMock.mockReturnValue(Promise.resolve(newSigInfo));
+
+    // Mock find sig and return old sig.
+    const sigFindOneMock = jest.spyOn(sigRepository, "findOne");
+    sigFindOneMock.mockReturnValue(Promise.resolve(new Sig()));
+
+    // Mock list sig members.
+    const listMembersMock = jest.spyOn(
+      sigMemberRepository,
+      "listMembersAndCount"
+    );
+    listMembersMock.mockReturnValue(
+      Promise.resolve([oldSigMembersWithLevel, oldSigMembersWithLevel.length])
+    );
+
+    const maintainer = {
+      githubName: "Rustin-Liu",
+    };
+
+    const pullOwnersQuery: PullOwnersQuery = {
+      sigInfoFileName: "member-list",
+      files: [
+        {
+          sha: "string",
+          filename: "member-list1",
+          status: "string",
+          raw_url: "string",
+        },
+      ],
+      labels: [],
+      maintainers: [maintainer],
+      collaborators: [maintainer],
+    };
+
+    // Owners should be maintainers.
+    const res = await pullService.listOwners(pullOwnersQuery);
+
+    // Assert status.
+    expect(res.status).toBe(StatusCodes.OK);
+
+    // Assert reviewers.
+    expect(res.data!.reviewers.length).toBe(4);
+    expect(
+      res.data!.reviewers.find((r) => {
+        return r === "Rustin-liu3";
+      })
+    ).not.toBe(undefined);
+    expect(
+      res.data!.reviewers.find((r) => {
+        return r === "Rustin-Liu5";
+      })
+    ).toBe(undefined);
+
+    // Assert committers.
+    expect(res.data!.committers.length).toBe(4);
+    expect(
+      res.data!.committers.find((r) => {
+        return r === "Rustin-liu3";
+      })
+    ).not.toBe(undefined);
+    expect(
+      res.data!.committers.find((r) => {
+        return r === "Rustin-Liu5";
+      })
+    ).toBe(undefined);
+
+    // Assert needsLGTM.
+    expect(res.data!.needsLGTM).toBe(2);
+  });
+
   test("list owners when change sig info file's reviewers part", async () => {
     const oldSigMembersWithLevel: Member[] = [
       {
