@@ -520,11 +520,13 @@ describe("Pull Service", () => {
     expect(res.data!.reviewers.length).toBe(4);
     expect(
       res.data!.reviewers.find((r) => {
+        // Old committer.
         return r === "Rustin-liu3";
       })
     ).not.toBe(undefined);
     expect(
       res.data!.reviewers.find((r) => {
+        // Old reviewer.
         return r === "Rustin-Liu5";
       })
     ).toBe(undefined);
@@ -533,11 +535,13 @@ describe("Pull Service", () => {
     expect(res.data!.committers.length).toBe(4);
     expect(
       res.data!.committers.find((r) => {
+        // Old committer.
         return r === "Rustin-liu3";
       })
     ).not.toBe(undefined);
     expect(
       res.data!.committers.find((r) => {
+        // Old reviewer.
         return r === "Rustin-Liu5";
       })
     ).toBe(undefined);
