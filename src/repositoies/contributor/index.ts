@@ -23,10 +23,10 @@ export default class ContributorRepository extends Repository<Pull> {
             .select("user,created_at")
             .from(Pull, "pull")
             .where(
-              "user not in ('ti-srebot', 'sre-bot', 'ti-community-prow-bot', 'dependabot[bot]')"
+              "user not in ('ti-srebot', 'sre-bot', 'ti-chi-bot', 'dependabot[bot]') and status= 'merged'"
             );
         }, "contributors")
-        .orderBy("created_at", "DESC")
+        .orderBy("contributors.created_at", "DESC")
         .offset(offset)
         .limit(limit)
         .getRawMany()
@@ -39,7 +39,7 @@ export default class ContributorRepository extends Repository<Pull> {
         await this.createQueryBuilder()
           .select("count(distinct user) as total")
           .where(
-            "user not in ('ti-srebot', 'sre-bot', 'ti-community-prow-bot', 'dependabot[bot]')"
+            "user not in ('ti-srebot', 'sre-bot', 'ti-chi-bot', 'dependabot[bot]') and status= 'merged'"
           )
           .getRawOne()
       ).total

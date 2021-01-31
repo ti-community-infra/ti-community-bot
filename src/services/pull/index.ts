@@ -108,14 +108,14 @@ export default class PullService implements IPullService {
       const contributor = diff[i];
       switch (contributor.level) {
         case SigMemberLevel.techLeaders:
-        case SigMemberLevel.coLeaders:
-        case SigMemberLevel.committers: {
+        case SigMemberLevel.coLeaders: {
           return {
             committers: maintainers,
             reviewers: maintainers,
             needsLGTM: LGTM.Two,
           };
         }
+        case SigMemberLevel.committers:
         case SigMemberLevel.reviewers: {
           // NOTICE: remove duplicates。
           const reviewers = Array.from(
