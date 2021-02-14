@@ -43,8 +43,7 @@ describe("Pull Service", () => {
     };
     const reply = await pullService.formatting(validate, pullFormatQuery);
 
-    expect(reply).not.toBe(null);
-    expect(reply!.status).toBe(Status.Success);
+    expect(reply).toBe(null);
   });
 
   test("formatting PR when first change sig info file", async () => {

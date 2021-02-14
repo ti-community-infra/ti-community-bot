@@ -64,6 +64,11 @@ async function checkPullFormat(context: Context, pullService: PullService) {
 
   const reply = await pullService.formatting(validate, pullFormatQuery);
 
+  // There are no membership changes to the file.
+  if (reply === null) {
+    return;
+  }
+
   const status = {
     sha: head.sha,
     state: reply.status === Status.Success ? "success" : "failure",
