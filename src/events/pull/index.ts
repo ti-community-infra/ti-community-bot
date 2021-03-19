@@ -142,17 +142,16 @@ async function createOrUpdateComment(
   });
 
   const botComment = comments.find((c) => {
-    return c.user.login === commenter;
+      return c.user?.login === commenter;
   });
 
   if (botComment === undefined) {
     await context.octokit.issues.createComment(context.issue({ body }));
   } else {
     // Update.
-    botComment.body = body;
     const comment = {
       ...context.issue(),
-      ...botComment,
+      body,
       comment_id: botComment.id,
     };
     await context.octokit.issues.updateComment(comment);
