@@ -142,7 +142,7 @@ async function createOrUpdateComment(
   });
 
   const botComment = comments.find((c) => {
-      return c.user?.login === commenter;
+    return c.user?.login === commenter;
   });
 
   if (botComment === undefined) {

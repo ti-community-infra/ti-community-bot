@@ -1,4 +1,4 @@
-import { ApplicationFunctionOptions,Probot, Context } from "probot";
+import { ApplicationFunctionOptions, Probot, Context } from "probot";
 import { Container } from "typedi";
 import { createConnection, useContainer } from "typeorm";
 import "reflect-metadata";
@@ -32,12 +32,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const { query } = require("express-validator");
 
-export = (
-  app: Probot,
-  {
-    getRouter,
-  }: ApplicationFunctionOptions
-) => {
+export = (app: Probot, { getRouter }: ApplicationFunctionOptions) => {
   useContainer(Container);
 
   // Get an express router to expose new HTTP endpoints.
