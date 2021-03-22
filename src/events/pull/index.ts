@@ -8,11 +8,14 @@ import {
   DEFAULT_SIG_INFO_FILE_NAME,
 } from "../../config/Config";
 import Ajv from "ajv";
+import { Endpoints } from "@octokit/types";
 
 import sigInfoSchema from "../../config/sig.info.schema.json";
 import { Status } from "../../services/reply";
 import { combineReplay } from "../../services/utils/ReplyUtil";
 import { SigService } from "../../services/sig";
+
+type createCommitStatusState = Endpoints["POST /repos/{owner}/{repo}/statuses/{sha}"]["parameters"]["state"];
 
 // NOTICE: compile schema.
 const ajv = Ajv();
@@ -71,7 +74,10 @@ async function checkPullFormat(context: Context, pullService: PullService) {
 
   const status = {
     sha: head.sha,
-    state: reply.status === Status.Success ? "success" : "failure",
+    state:
+      reply.status === Status.Success
+        ? "success"
+        : ("failure" as createCommitStatusState),
     target_url: "https://github.com/ti-community-infra/ti-community-bot",
     description: reply.message,
     context: "Sig Info File Format",
@@ -86,8 +92,7 @@ async function checkPullFormat(context: Context, pullService: PullService) {
         process.env.BOT_NAME!,
         reply.message
       );
-      // @ts-ignore
-      await context.octokit.repos.createStatus({
+      await context.octokit.repos.createCommitStatus({
         ...context.repo(),
         ...status,
       });
@@ -100,8 +105,7 @@ async function checkPullFormat(context: Context, pullService: PullService) {
         process.env.BOT_NAME!,
         reply.message
       );
-      // @ts-ignore
-      await context.octokit.repos.createStatus({
+      await context.octokit.repos.createCommitStatus({
         ...context.repo(),
         ...status,
       });
@@ -115,8 +119,7 @@ async function checkPullFormat(context: Context, pullService: PullService) {
         process.env.BOT_NAME!,
         combineReplay(reply)
       );
-      // @ts-ignore
-      await context.octokit.repos.createStatus({
+      await context.octokit.repos.createCommitStatus({
         ...context.repo(),
         ...status,
       });
