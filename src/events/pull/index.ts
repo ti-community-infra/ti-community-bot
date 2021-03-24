@@ -15,7 +15,7 @@ import { Status } from "../../services/reply";
 import { combineReplay } from "../../services/utils/ReplyUtil";
 import { SigService } from "../../services/sig";
 
-type createCommitStatusState = Endpoints["POST /repos/{owner}/{repo}/statuses/{sha}"]["parameters"]["state"];
+type createCommitStatus = Endpoints["POST /repos/{owner}/{repo}/statuses/{sha}"]["parameters"];
 
 // NOTICE: compile schema.
 const ajv = Ajv();
@@ -69,11 +69,10 @@ async function checkPullFormat(context: Context, pullService: PullService) {
   }
 
   const repoKey = context.repo();
-  const status = {
+  const status: createCommitStatus = {
+    ...repoKey,
     sha: head.sha,
-    state: (reply.status === Status.Success
-      ? "success"
-      : "failure") as createCommitStatusState,
+    state: reply.status === Status.Success ? "success" : "failure",
     target_url: "https://github.com/ti-community-infra/ti-community-bot",
     description: reply.message,
     context: "Sig Info File Format",
