@@ -72,12 +72,12 @@ async function checkPullFormat(context: Context, pullService: PullService) {
     return;
   }
 
+  const repoKey = context.repo();
   const status = {
     sha: head.sha,
-    state:
-      reply.status === Status.Success
-        ? "success"
-        : ("failure" as createCommitStatusState),
+    state: (reply.status === Status.Success
+      ? "success"
+      : "failure") as createCommitStatusState,
     target_url: "https://github.com/ti-community-infra/ti-community-bot",
     description: reply.message,
     context: "Sig Info File Format",
@@ -93,7 +93,7 @@ async function checkPullFormat(context: Context, pullService: PullService) {
         reply.message
       );
       await context.octokit.repos.createCommitStatus({
-        ...context.repo(),
+        ...repoKey,
         ...status,
       });
       break;
@@ -106,7 +106,7 @@ async function checkPullFormat(context: Context, pullService: PullService) {
         reply.message
       );
       await context.octokit.repos.createCommitStatus({
-        ...context.repo(),
+        ...repoKey,
         ...status,
       });
       break;
@@ -120,7 +120,7 @@ async function checkPullFormat(context: Context, pullService: PullService) {
         combineReplay(reply)
       );
       await context.octokit.repos.createCommitStatus({
-        ...context.repo(),
+        ...repoKey,
         ...status,
       });
       break;
@@ -153,7 +153,7 @@ async function createOrUpdateComment(
   } else {
     // Update.
     const comment = {
-      ...context.issue(),
+      ...context.repo(),
       body,
       comment_id: botComment.id,
     };
