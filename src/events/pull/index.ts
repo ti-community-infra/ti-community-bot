@@ -33,12 +33,8 @@ enum PullRequestActions {
 async function constructPullFormatQuery(
   context: Context
 ): Promise<PullFormatQuery> {
-  const { number } = context.payload.pull_request;
-
-  const { data: filesData } = await context.octokit.pulls.listFiles({
-    ...context.issue(),
-    pull_number: number,
-  });
+  const pullKey = context.pullRequest();
+  const { data: filesData } = await context.octokit.pulls.listFiles(pullKey);
 
   const files: PullFileQuery[] = filesData.map((f) => {
     return {
