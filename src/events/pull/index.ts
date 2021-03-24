@@ -8,11 +8,14 @@ import {
   DEFAULT_SIG_INFO_FILE_NAME,
 } from "../../config/Config";
 import Ajv from "ajv";
+import { Endpoints } from "@octokit/types";
 
 import sigInfoSchema from "../../config/sig.info.schema.json";
 import { Status } from "../../services/reply";
 import { combineReplay } from "../../services/utils/ReplyUtil";
 import { SigService } from "../../services/sig";
+
+type createCommitStatus = Endpoints["POST /repos/{owner}/{repo}/statuses/{sha}"]["parameters"];
 
 // NOTICE: compile schema.
 const ajv = Ajv();
@@ -30,12 +33,8 @@ enum PullRequestActions {
 async function constructPullFormatQuery(
   context: Context
 ): Promise<PullFormatQuery> {
-  const { number } = context.payload.pull_request;
-
-  const { data: filesData } = await context.octokit.pulls.listFiles({
-    ...context.issue(),
-    pull_number: number,
-  });
+  const pullKey = context.pullRequest();
+  const { data: filesData } = await context.octokit.pulls.listFiles(pullKey);
 
   const files: PullFileQuery[] = filesData.map((f) => {
     return {
@@ -69,7 +68,9 @@ async function checkPullFormat(context: Context, pullService: PullService) {
     return;
   }
 
-  const status = {
+  const repoKey = context.repo();
+  const status: createCommitStatus = {
+    ...repoKey,
     sha: head.sha,
     state: reply.status === Status.Success ? "success" : "failure",
     target_url: "https://github.com/ti-community-infra/ti-community-bot",
@@ -86,11 +87,7 @@ async function checkPullFormat(context: Context, pullService: PullService) {
         process.env.BOT_NAME!,
         reply.message
       );
-      // @ts-ignore
-      await context.octokit.repos.createStatus({
-        ...context.repo(),
-        ...status,
-      });
+      await context.octokit.repos.createCommitStatus(status);
       break;
     }
     case Status.Success: {
@@ -100,11 +97,7 @@ async function checkPullFormat(context: Context, pullService: PullService) {
         process.env.BOT_NAME!,
         reply.message
       );
-      // @ts-ignore
-      await context.octokit.repos.createStatus({
-        ...context.repo(),
-        ...status,
-      });
+      await context.octokit.repos.createCommitStatus(status);
       break;
     }
     case Status.Problematic: {
@@ -115,11 +108,7 @@ async function checkPullFormat(context: Context, pullService: PullService) {
         process.env.BOT_NAME!,
         combineReplay(reply)
       );
-      // @ts-ignore
-      await context.octokit.repos.createStatus({
-        ...context.repo(),
-        ...status,
-      });
+      await context.octokit.repos.createCommitStatus(status);
       break;
     }
   }
@@ -142,17 +131,16 @@ async function createOrUpdateComment(
   });
 
   const botComment = comments.find((c) => {
-    return c.user.login === commenter;
+    return c.user?.login === commenter;
   });
 
   if (botComment === undefined) {
     await context.octokit.issues.createComment(context.issue({ body }));
   } else {
     // Update.
-    botComment.body = body;
     const comment = {
-      ...context.issue(),
-      ...botComment,
+      ...context.repo(),
+      body,
       comment_id: botComment.id,
     };
     await context.octokit.issues.updateComment(comment);

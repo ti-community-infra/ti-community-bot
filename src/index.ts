@@ -1,16 +1,12 @@
-import { Application, Context } from "probot";
+import { ApplicationFunctionOptions, Probot, Context } from "probot";
 import { Container } from "typedi";
 import { createConnection, useContainer } from "typeorm";
 import "reflect-metadata";
 
 import PullService from "./services/pull";
 import { SigService } from "./services/sig";
-import { StatusCodes } from "http-status-codes";
-import { PullMessage } from "./services/messages/PullMessage";
 import { getSig, listSigs } from "./api/sig";
-import { listOwners } from "./api/pull";
 import { handlePullRequestEvents } from "./events/pull";
-import { Router } from "express";
 import { listContributors } from "./api/contributor";
 import ContributorService from "./services/contributor";
 import {
@@ -36,32 +32,19 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const { query } = require("express-validator");
 
-export = (
-  app: Application,
-  {
-    getRouter,
-  }: {
-    getRouter: (path?: string) => Router;
-  }
-) => {
+export = (app: Probot, { getRouter }: ApplicationFunctionOptions) => {
   useContainer(Container);
+
+  // Get an express router to expose new HTTP endpoints.
+  if (!getRouter) {
+    app.log.fatal("Failed to obtain getRouter.");
+    return;
+  }
 
   // Get an express router to expose new HTTP endpoints.
   const router = getRouter("/ti-community-bot");
   router.use(bodyParser.json());
   router.use(cors());
-
-  // Get app installation id.
-  const getInstallationId = async (owner: string): Promise<number | null> => {
-    const github = await app.auth();
-
-    const { data: installationInfos } = await github.apps.listInstallations();
-    const installations = installationInfos.filter((i) => {
-      return i.account.login === owner;
-    });
-
-    return installations.length > 0 ? installations[0].id : null;
-  };
 
   createConnection()
     .then(() => {
@@ -81,31 +64,6 @@ export = (
           Container.get(SigService)
         );
       });
-
-      // Pull request owners API.
-      router.get(
-        "/repos/:owner/:repo/pulls/:number/owners",
-        async (req, res) => {
-          // It must installed bot.
-          const installationId = await getInstallationId(req.params.owner);
-
-          if (installationId === null) {
-            res.status(StatusCodes.BAD_REQUEST);
-            const response = {
-              data: null,
-              status: StatusCodes.BAD_REQUEST,
-              message: PullMessage.InstallationIdNotFound,
-            };
-            res.json(response);
-
-            return;
-          }
-
-          // Create github client with installed token.
-          const github = await app.auth(installationId);
-          await listOwners(req, res, Container.get(PullService), github);
-        }
-      );
 
       router.get(
         "/sigs",

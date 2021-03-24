@@ -4,7 +4,7 @@
 import nock from "nock";
 // Requiring our app implementation
 import myProbotApp from "../src";
-import { Probot, ProbotOctokit } from "probot";
+import { Probot, ProbotOctokit, Server } from "probot";
 // Requiring our fixtures
 import payload from "./fixtures/issues.ping.comment.json";
 import typeorm = require("typeorm");
@@ -21,20 +21,23 @@ const privateKey = fs.readFileSync(
 describe("My Probot app", () => {
   let probot: any;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     typeorm.createConnection = jest.fn().mockResolvedValue(null);
     nock.disableNetConnect();
-    probot = new Probot({
-      appId: 123,
-      privateKey,
-      // disable request throttling and retries for testing
-      Octokit: ProbotOctokit.defaults({
-        retry: { enabled: false },
-        throttle: { enabled: false },
+    const server = new Server({
+      Probot: Probot.defaults({
+        appId: 123,
+        privateKey: privateKey,
+        secret: "secret",
+        // Disable request throttling and retries for testing.
+        Octokit: ProbotOctokit.defaults({
+          retry: { enabled: false },
+          throttle: { enabled: false },
+        }),
       }),
     });
-    // Load our app into probot
-    probot.load(myProbotApp);
+    probot = server.probotApp;
+    await server.load(myProbotApp);
   });
 
   test("creates a comment when got a ping command", async (done) => {
