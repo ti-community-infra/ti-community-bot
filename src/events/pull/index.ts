@@ -87,10 +87,7 @@ async function checkPullFormat(context: Context, pullService: PullService) {
         process.env.BOT_NAME!,
         reply.message
       );
-      await context.octokit.repos.createCommitStatus({
-        ...repoKey,
-        ...status,
-      });
+      await context.octokit.repos.createCommitStatus(status);
       break;
     }
     case Status.Success: {
@@ -100,10 +97,7 @@ async function checkPullFormat(context: Context, pullService: PullService) {
         process.env.BOT_NAME!,
         reply.message
       );
-      await context.octokit.repos.createCommitStatus({
-        ...repoKey,
-        ...status,
-      });
+      await context.octokit.repos.createCommitStatus(status);
       break;
     }
     case Status.Problematic: {
@@ -114,10 +108,7 @@ async function checkPullFormat(context: Context, pullService: PullService) {
         process.env.BOT_NAME!,
         combineReplay(reply)
       );
-      await context.octokit.repos.createCommitStatus({
-        ...repoKey,
-        ...status,
-      });
+      await context.octokit.repos.createCommitStatus(status);
       break;
     }
   }
