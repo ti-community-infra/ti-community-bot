@@ -7,21 +7,21 @@ import {
 
 describe("Paginate Helper", () => {
   test("valid current number", () => {
-    const mockRequest = ({
+    const mockRequest = {
       query: {
         pageSize: 2,
       },
-    } as unknown) as Req;
+    } as unknown as Req;
     const isValid = validateCurrent("1", { req: mockRequest });
     expect(isValid).toBe(true);
   });
 
   test("invalid current number", () => {
-    const mockRequest = ({
+    const mockRequest = {
       query: {
         pageSize: 2,
       },
-    } as unknown) as Req;
+    } as unknown as Req;
     const validator = () => {
       validateCurrent("-1", { req: mockRequest });
     };
@@ -29,9 +29,9 @@ describe("Paginate Helper", () => {
   });
 
   test("valid current without pageSize", () => {
-    const mockRequest = ({
+    const mockRequest = {
       query: {},
-    } as unknown) as Req;
+    } as unknown as Req;
     const validator = () => {
       validateCurrent("1", { req: mockRequest });
     };
@@ -39,21 +39,21 @@ describe("Paginate Helper", () => {
   });
 
   test("valid pageSize number", () => {
-    const mockRequest = ({
+    const mockRequest = {
       query: {
         current: 2,
       },
-    } as unknown) as Req;
+    } as unknown as Req;
     const isValid = validatePageSize("10", { req: mockRequest });
     expect(isValid).toBe(true);
   });
 
   test("invalid pageSize number", () => {
-    const mockRequest = ({
+    const mockRequest = {
       query: {
         current: 2,
       },
-    } as unknown) as Req;
+    } as unknown as Req;
     const validator = () => {
       validatePageSize("-1", { req: mockRequest });
     };
@@ -61,9 +61,9 @@ describe("Paginate Helper", () => {
   });
 
   test("valid pageSize without current", () => {
-    const mockRequest = ({
+    const mockRequest = {
       query: {},
-    } as unknown) as Req;
+    } as unknown as Req;
     const validator = () => {
       validatePageSize("10", { req: mockRequest });
     };

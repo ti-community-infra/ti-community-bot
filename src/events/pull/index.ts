@@ -15,7 +15,8 @@ import { Status } from "../../services/reply";
 import { combineReplay } from "../../services/utils/ReplyUtil";
 import { SigService } from "../../services/sig";
 
-type createCommitStatus = Endpoints["POST /repos/{owner}/{repo}/statuses/{sha}"]["parameters"];
+type createCommitStatus =
+  Endpoints["POST /repos/{owner}/{repo}/statuses/{sha}"]["parameters"];
 
 // NOTICE: compile schema.
 const ajv = Ajv();

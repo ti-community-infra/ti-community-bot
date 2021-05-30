@@ -20,18 +20,18 @@ describe("Sig API", () => {
   test("Get a sig", async () => {
     // Mock the request.
     const sigName = "test";
-    const mockRequest = ({
+    const mockRequest = {
       params: {
         name: sigName,
       },
-    } as unknown) as Req;
+    } as unknown as Req;
 
     const json = jest.fn();
     const status = jest.fn();
-    const mockResponse = ({
+    const mockResponse = {
       status,
       json,
-    } as unknown) as Res;
+    } as unknown as Res;
 
     const response: Response<SigDetailsDTO> = {
       data: {
@@ -81,16 +81,16 @@ describe("Sig API", () => {
 
   test("List all sigs", async () => {
     // Mock the request.
-    const mockRequest = ({
+    const mockRequest = {
       query: {},
-    } as unknown) as Req;
+    } as unknown as Req;
 
     const json = jest.fn();
     const status = jest.fn();
-    const mockResponse = ({
+    const mockResponse = {
       status,
       json,
-    } as unknown) as Res;
+    } as unknown as Res;
 
     const response: Response<SigsDTO> = {
       data: {
