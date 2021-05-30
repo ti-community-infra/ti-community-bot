@@ -53,12 +53,10 @@ export default class StatisticsService implements IStatisticsService {
   ): Promise<Response<ContributionsDTO>> {
     // No paginate.
     if (paginateQuery === undefined) {
-      const [
-        contributions,
-        total,
-      ] = await this.contributionRepository.listContributionsAndCount(
-        contributionQuery
-      );
+      const [contributions, total] =
+        await this.contributionRepository.listContributionsAndCount(
+          contributionQuery
+        );
 
       return {
         data: { contributions, total },
@@ -69,14 +67,12 @@ export default class StatisticsService implements IStatisticsService {
       const { current, pageSize } = paginateQuery;
       const offset = (current - 1) * pageSize;
 
-      const [
-        contributions,
-        total,
-      ] = await this.contributionRepository.listContributionsAndCount(
-        contributionQuery,
-        offset,
-        pageSize
-      );
+      const [contributions, total] =
+        await this.contributionRepository.listContributionsAndCount(
+          contributionQuery,
+          offset,
+          pageSize
+        );
 
       return {
         data: { contributions, total },

@@ -17,16 +17,16 @@ describe("Statistics API", () => {
 
   test("List all contributions", async () => {
     // No paginate query.
-    const mockRequest = ({
+    const mockRequest = {
       query: {},
-    } as unknown) as Req;
+    } as unknown as Req;
 
     const json = jest.fn();
     const status = jest.fn();
-    const mockResponse = ({
+    const mockResponse = {
       status,
       json,
-    } as unknown) as Res;
+    } as unknown as Res;
 
     const response: Response<ContributionsDTO> = {
       data: {

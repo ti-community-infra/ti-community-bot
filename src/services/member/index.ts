@@ -47,10 +47,8 @@ export default class MemberService implements IMemberService {
     paginateQuery?: PaginateQuery
   ): Promise<Response<MembersDTO>> {
     if (paginateQuery === undefined) {
-      const [
-        members,
-        total,
-      ] = await this.sigMemberRepository.listMembersAndCount(memberQuery);
+      const [members, total] =
+        await this.sigMemberRepository.listMembersAndCount(memberQuery);
 
       return {
         data: {
@@ -64,14 +62,12 @@ export default class MemberService implements IMemberService {
       const { current, pageSize } = paginateQuery;
       const offset = (current - 1) * pageSize;
 
-      const [
-        members,
-        total,
-      ] = await this.sigMemberRepository.listMembersAndCount(
-        memberQuery,
-        offset,
-        pageSize
-      );
+      const [members, total] =
+        await this.sigMemberRepository.listMembersAndCount(
+          memberQuery,
+          offset,
+          pageSize
+        );
 
       return {
         data: {
