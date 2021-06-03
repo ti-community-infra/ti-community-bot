@@ -19,13 +19,6 @@ import {
   validateMemberLevel,
   validateSigId,
 } from "./api/helpers/MemberQueryHelper";
-import { listContributions } from "./api/statistics";
-import StatisticsService from "./services/statistics";
-import {
-  validateEndDate,
-  validateOrderBy,
-  validateStartDate,
-} from "./api/helpers/ContributionQueryHelper";
 
 const commands = require("probot-commands-pro");
 const bodyParser = require("body-parser");
@@ -97,20 +90,8 @@ export = (app: Probot, { getRouter }: ApplicationFunctionOptions) => {
           await listMembers(req, res, Container.get(MemberService));
         }
       );
-
-      router.get(
-        "/statistics/contributions",
-        query("startDate").custom(validateStartDate),
-        query("endDate").custom(validateEndDate),
-        query("orderBy").custom(validateOrderBy),
-        query("current").custom(validateCurrent),
-        query("pageSize").custom(validatePageSize),
-        async (req, res) => {
-          await listContributions(req, res, Container.get(StatisticsService));
-        }
-      );
     })
     .catch((err) => {
-      app.log.fatal("Connect to db failed", err);
+      app.log.fatal(err, "Connect to db failed");
     });
 };
