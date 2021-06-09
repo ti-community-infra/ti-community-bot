@@ -44,10 +44,11 @@ docker-compose -f dev.docker-compose.yml up -d
 
 ## Deploy
 
-```sh
-# Docker compose up
-docker-compose up -d --build
+Deploy using the docker-compose file of the production environment.
 
+```sh
+# docker-compose up the bot
+docker-compose -f prod.docker-compose.yml up -d
 ```
 
 ## Contributing

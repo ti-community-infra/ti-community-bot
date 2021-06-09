@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  ti-community-bot:
+    image: ti-community-bot:latest
+    environment:
+      PORT: "3100"
+      BOT_DB_HOST: ""
+      BOT_DB_PORT: ""
+      BOT_DB_PASSWORD: ""
+      BOT_DB_NAME: ""
+      BOT_NAME: ""
+      WEBHOOK_PROXY_URL: ""
+      APP_ID: ""
+      PRIVATE_KEY: ""
+    entrypoint: npm start
+    ports:
+      - 3100:3100
+    restart: always
