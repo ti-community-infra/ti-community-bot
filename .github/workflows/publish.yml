@@ -34,7 +34,8 @@ jobs:
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # NOTICE: Do not use the built-in GITHUB_TOKEN, as this will cause the events of other workflows that cannot be triggered.
+          GITHUB_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
       - name: Image digest
         run:
           echo ${{ steps.docker_build.outputs.digest }}
