@@ -2,7 +2,7 @@ version: '3'
 
 services:
   ti-community-bot:
-    image: ti-community-bot:latest
+    image: ticommunityinfra/ti-community-bot:v1.9.1
     environment:
       PORT: "3100"
       BOT_DB_HOST: ""
