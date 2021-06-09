@@ -16,26 +16,39 @@
 - Docker
 - Docker Compose >= 3
 
-## Setup
+## Development
 
 ```sh
-# Install dependencies
-npm install
+# Copy .env.example to .env (fill in the relevant environment variables)
+copy .env.example .env
 
-# Run with hot reload
-npm run build:watch
+# docker-compose up the db and bot
+docker-compose -f dev.docker-compose.yml up -d --build
+```
 
-# Compile and run
-npm run build
-npm run start
+### Changing code
+
+The directory is mounted directly into the bot Docker container, which means that the nodemon live-reload server will still just work.
+
+If you change some configuration files or environment variables, we need to restart the service to take effect.
+
+```sh
+# Rebuild bot Docker image
+docker-compose -f dev.docker-compose.yml build bot
+
+# Restart running frontend container (if it's already running)
+docker-compose -f dev.docker-compose.yml stop bot
+docker-compose -f dev.docker-compose.yml rm bot
+docker-compose -f dev.docker-compose.yml up -d
 ```
 
 ## Deploy
 
-```sh
-# Docker compose up
-docker-compose up -d --build
+Deploy using the docker-compose file of the production environment.
 
+```sh
+# docker-compose up the bot
+docker-compose -f prod.docker-compose.yml up -d
 ```
 
 ## Contributing

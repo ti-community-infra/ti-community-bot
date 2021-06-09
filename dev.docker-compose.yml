@@ -14,5 +14,20 @@ services:
     volumes:
       - ./init.sql:/data/application/init.sql
       - mysql-data:/var/lib/mysql
+  ti-community-bot:
+    build:
+      context: .
+      dockerfile: dev.Dockerfile
+    restart: always
+    entrypoint: npm run dev
+    depends_on:
+      - db
+    links:
+      - db
+    ports:
+      - 3100:3100
+    volumes:
+      # Mount the directory so live reload works.
+      - .:/usr/src/app
 volumes:
   mysql-data:
