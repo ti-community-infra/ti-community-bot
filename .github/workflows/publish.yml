@@ -1,0 +1,40 @@
+name: Publish Docker Image
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+jobs:
+  publish:
+    name: Publish
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      # Generate image tag name, one is with the version number, the other is the latest version.
+      - name: Docker meta
+        id: docker_meta
+        uses: crazy-max/ghaction-docker-meta@v1
+        with:
+          images: ${{ secrets.DOCKERHUB_USERNAME }}/ti-community-bot
+      # The v2 version of docker/build-push-action uses Docker Buildx to build.
+      - name: Docker Setup Buildx
+        uses: docker/setup-buildx-action@v1.1.1
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          context: .
+          file: prod.Dockerfile
+          tags: ${{ steps.docker_meta.outputs.tags }}
+          labels: ${{ steps.docker_meta.outputs.labels }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Image digest
+        run:
+          echo ${{ steps.docker_build.outputs.digest }}
