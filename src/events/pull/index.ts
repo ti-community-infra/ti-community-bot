@@ -81,7 +81,7 @@ async function checkPullFormat(context: Context, pullService: PullService) {
 
   switch (reply.status) {
     case Status.Failed: {
-      context.log.error("Format failed.", pullFormatQuery.files);
+      context.log.error(pullFormatQuery.files, "Format failed.");
       // Create or update bot comment.
       await createOrUpdateComment(
         context,
@@ -102,7 +102,7 @@ async function checkPullFormat(context: Context, pullService: PullService) {
       break;
     }
     case Status.Problematic: {
-      context.log.warn("Format has some problems.", pullFormatQuery.files);
+      context.log.warn(pullFormatQuery.files, "Format has some problems.");
       // Create or update bot comment.
       await createOrUpdateComment(
         context,
@@ -160,21 +160,21 @@ async function updateSigInfo(context: Context, sigService: SigService) {
 
   switch (reply.status) {
     case Status.Failed: {
-      context.log.error("Update sig info.", files);
+      context.log.error(files, "Update sig info.");
       await context.octokit.issues.createComment(
         context.issue({ body: reply.message })
       );
       break;
     }
     case Status.Success: {
-      context.log.info("Update sig info.", files);
+      context.log.info(files, "Update sig info.");
       await context.octokit.issues.createComment(
         context.issue({ body: reply.message })
       );
       break;
     }
     case Status.Problematic: {
-      context.log.warn("Update sig info has some problems.", files);
+      context.log.warn(files, "Update sig info has some problems.");
       await context.octokit.issues.createComment(
         context.issue({ body: combineReplay(reply) })
       );
