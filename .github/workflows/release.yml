@@ -18,5 +18,6 @@ jobs:
         run: npm ci
       - name: Release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # NOTICE: Do not use the built-in GITHUB_TOKEN, as this will cause the events of other workflows that cannot be triggered.
+          GITHUB_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
         run: npx semantic-release
