@@ -2,7 +2,7 @@ FROM node:14-alpine as builder
 
 WORKDIR /usr/src/app
 
-COPY package.json package-lock.json ./
+COPY package*.json ./
 
 RUN apk --no-cache --virtual build-dependencies add \
     python \

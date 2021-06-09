@@ -14,10 +14,11 @@ services:
     volumes:
       - ./init.sql:/data/application/init.sql
       - mysql-data:/var/lib/mysql
-  bot:
+  ti-community-bot:
     build:
       context: .
       dockerfile: dev.Dockerfile
+    restart: always
     entrypoint: npm run dev
     depends_on:
       - db
