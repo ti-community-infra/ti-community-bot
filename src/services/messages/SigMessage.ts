@@ -1,6 +1,6 @@
 export enum SigMessage {
-  UpdateSuccess = "Update sig info success.",
-  NotFound = "Not found sig.",
-  GetSigSuccess = "Get sig success.",
-  ListSigsSuccess = "List contributors success.",
+  SigMembershipUpdateSuccess = "Congratulations🎉  SIG membership information has been updated.",
+  SigNotFound = "The SIG could not be found.",
+  GetSigSuccess = "Get SIG success.",
+  ListSigsSuccess = "List SIGs success.",
 }

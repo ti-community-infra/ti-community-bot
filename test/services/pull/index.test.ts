@@ -32,7 +32,7 @@ describe("Pull Service", () => {
         },
       ],
     };
-    const reply = await pullService.formatting(validate, pullFormatQuery);
+    const reply = await pullService.checkFormatting(validate, pullFormatQuery);
 
     expect(reply).toBe(null);
   });
@@ -52,7 +52,7 @@ describe("Pull Service", () => {
       ],
     };
 
-    const reply = await pullService.formatting(validate, pullFormatQuery);
+    const reply = await pullService.checkFormatting(validate, pullFormatQuery);
 
     expect(reply).not.toBe(null);
     expect(reply!.status).toBe(Status.Problematic);
@@ -95,7 +95,7 @@ describe("Pull Service", () => {
     const getSigInfoMock = jest.spyOn(sigInfoUtil, "getSigInfo");
     getSigInfoMock.mockReturnValue(Promise.resolve(newSigInfo));
 
-    const reply = await pullService.formatting(validate, pullFormatQuery);
+    const reply = await pullService.checkFormatting(validate, pullFormatQuery);
 
     expect(reply).not.toBe(null);
     expect(reply!.status).toBe(Status.Success);
@@ -138,11 +138,11 @@ describe("Pull Service", () => {
     const getSigInfoMock = jest.spyOn(sigInfoUtil, "getSigInfo");
     getSigInfoMock.mockReturnValue(Promise.resolve(newSigInfo));
 
-    const reply = await pullService.formatting(validate, pullFormatQuery);
+    const reply = await pullService.checkFormatting(validate, pullFormatQuery);
 
     expect(reply).not.toBe(null);
     expect(reply!.status).toBe(Status.Problematic);
-    expect(reply!.message).toBe(PullMessage.OnlyOneRole);
+    expect(reply!.message).toBe(PullMessage.ContributorCanOnlyHaveOneRole);
   });
 
   test("formatting PR when change sig info file to illegal", async () => {
@@ -176,7 +176,7 @@ describe("Pull Service", () => {
     const getSigInfoMock = jest.spyOn(sigInfoUtil, "getSigInfo");
     getSigInfoMock.mockReturnValue(Promise.resolve(newSigInfo));
 
-    const reply = await pullService.formatting(validate, pullFormatQuery);
+    const reply = await pullService.checkFormatting(validate, pullFormatQuery);
 
     expect(reply).not.toBe(null);
     expect(reply!.status).toBe(Status.Problematic);
@@ -206,10 +206,10 @@ describe("Pull Service", () => {
       ],
     };
 
-    const reply = await pullService.formatting(validate, pullFormatQuery);
+    const reply = await pullService.checkFormatting(validate, pullFormatQuery);
 
     expect(reply).not.toBe(null);
     expect(reply!.status).toBe(Status.Failed);
-    expect(reply!.message).toBe(PullMessage.CanNotModifyMultipleSigFiles);
+    expect(reply!.message).toBe(PullMessage.CanNotModifyMultipleSigsFiles);
   });
 });

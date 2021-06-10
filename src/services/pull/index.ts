@@ -59,11 +59,11 @@ export default class PullService {
   }
 
   /**
-   * Format the sig members file.
+   * Check format of the sig membership file.
    * @param validate
    * @param pullRequestFormatQuery
    */
-  public async formatting(
+  public async checkFormatting(
     validate: ValidateFunction,
     pullRequestFormatQuery: PullFormatQuery
   ): Promise<Reply<null> | null> {
@@ -86,11 +86,11 @@ export default class PullService {
       return {
         data: null,
         status: Status.Failed,
-        message: PullMessage.CanNotModifyMultipleSigFiles,
+        message: PullMessage.CanNotModifyMultipleSigsFiles,
       };
     }
 
-    // Filter sig file extension。
+    // Filter sig membership file extension.
     const illegalFilesExt = files.filter((f) => {
       return !f.filename.includes(DEFAULT_SIG_INFO_FILE_EXT);
     });
@@ -122,7 +122,7 @@ export default class PullService {
       return {
         data: null,
         status: Status.Problematic,
-        message: PullMessage.OnlyOneRole,
+        message: PullMessage.ContributorCanOnlyHaveOneRole,
         warning: contributorHasMultipleRoleWarning(githubName),
       };
     }
@@ -130,7 +130,7 @@ export default class PullService {
     return {
       data: null,
       status: Status.Success,
-      message: PullMessage.FormatSuccess,
+      message: PullMessage.CheckFormatPassed,
     };
   }
 }

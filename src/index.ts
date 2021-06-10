@@ -6,7 +6,7 @@ import "reflect-metadata";
 import PullService from "./services/pull";
 import { SigService } from "./services/sig";
 import { getSig, listSigs } from "./api/sig";
-import { handlePullRequestEvents } from "./events/pull";
+import { handlePullEvents } from "./events/pull";
 import { listContributors } from "./api/contributor";
 import ContributorService from "./services/contributor";
 import {
@@ -51,7 +51,7 @@ export = (app: Probot, { getRouter }: ApplicationFunctionOptions) => {
       });
 
       app.on("pull_request", async (context: Context) => {
-        await handlePullRequestEvents(
+        await handlePullEvents(
           context,
           Container.get(PullService),
           Container.get(SigService)
@@ -93,5 +93,6 @@ export = (app: Probot, { getRouter }: ApplicationFunctionOptions) => {
     })
     .catch((err) => {
       app.log.fatal(err, "Connect to db failed");
+      return;
     });
 };
