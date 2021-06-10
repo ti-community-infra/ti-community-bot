@@ -22,8 +22,7 @@ export function migrateToJSONTip() {
 }
 
 export function mustMatchSchemaMessage(fileName: string) {
-  // TODO: add url.
-  return `The \`${fileName}\` file must conform to the schema of the membership file.`;
+  return `The \`${fileName}\` file must conform to [the schema of the membership file](https://raw.githubusercontent.com/ti-community-infra/ti-community-bot/master/src/config/sig.info.schema.json).`;
 }
 
 export function contributorHasMultipleRoleWarning(githubName: string) {
