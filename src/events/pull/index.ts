@@ -14,7 +14,6 @@ import sigInfoSchema from "../../config/sig.info.schema.json";
 import { Status } from "../../services/reply";
 import { generateReplay } from "../../services/utils/ReplyUtil";
 import { SigService } from "../../services/sig";
-import { PullMessage } from "../../services/messages/PullMessage";
 
 type createCommitStatus =
   Endpoints["POST /repos/{owner}/{repo}/statuses/{sha}"]["parameters"];
@@ -22,6 +21,7 @@ type createCommitStatus =
 // NOTICE: compile schema.
 const ajv = Ajv();
 const validate = ajv.compile(sigInfoSchema);
+const GITHUB_STATUS_DESC_MAX_LENGTH = 140;
 
 enum PullRequestActions {
   Opened = "opened",
@@ -70,8 +70,11 @@ async function checkPullFormat(context: Context, pullService: PullService) {
     sha: head.sha,
     state: reply.status === Status.Success ? "success" : "failure",
     target_url: "https://github.com/ti-community-infra/ti-community-bot",
-    description: reply.message,
-    context: PullMessage.CheckFormatPassed,
+    description:
+      reply.message.length > GITHUB_STATUS_DESC_MAX_LENGTH
+        ? reply.message.substr(0, 130) + "..."
+        : reply.message,
+    context: "SIG Membership File Format Check",
   };
 
   switch (reply.status) {

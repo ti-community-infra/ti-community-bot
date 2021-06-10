@@ -1,9 +1,9 @@
 import sigInfoSchema from "../../config/sig.info.schema.json";
 
 export enum PullMessage {
-  CheckFormatPassed = "SIG relationship file format check passed. The SIG information will be updated when the PRs are merged.",
+  CheckFormatPassed = "SIG membership file format check passed. The SIG information will be updated when the PR is merged.",
   ContributorCanOnlyHaveOneRole = "Contributor can only have one role in each SIG, so please check if you have added the same contributor more than once.",
-  CanNotModifyMultipleSigsFiles = "Currently, the robot cannot modify the relationship files of multiple SIGs in one PR. Please split it into multiple PRs for modification.",
+  CanNotModifyMultipleSigsFiles = "Currently, the robot cannot modify the membership files of multiple SIGs in one PR. Please split it into multiple PRs for modification.",
 }
 
 export function mustBeJSONFileMessage(fileName: string) {
@@ -26,5 +26,5 @@ export function mustMatchSchemaMessage(fileName: string) {
 }
 
 export function contributorHasMultipleRoleWarning(githubName: string) {
-  return `${githubName} has multiple roles.`;
+  return `\`${githubName}\` has multiple roles.`;
 }
