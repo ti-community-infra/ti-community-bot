@@ -11,6 +11,7 @@ services:
       BOT_DB_NAME: ""
       BOT_NAME: ""
       WEBHOOK_PROXY_URL: ""
+      WEBHOOK_SECRET: ""
       APP_ID: ""
       PRIVATE_KEY: ""
     entrypoint: npm start
