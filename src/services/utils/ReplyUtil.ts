@@ -1,6 +1,6 @@
 import { Reply } from "../reply";
 
-export function combineReplay(reply: Reply<any>) {
+export function generateReplay(reply: Reply<any>) {
   return `
 ${reply.message}
 

@@ -1,6 +1,6 @@
 import { Reply } from "../../../lib/services/reply";
 import { Status } from "../../../src/services/reply";
-import { combineReplay } from "../../../src/services/utils/ReplyUtil";
+import { generateReplay } from "../../../src/services/utils/ReplyUtil";
 
 describe("Reply Util", () => {
   test("combine the replay without tip and warning", () => {
@@ -22,7 +22,7 @@ ${reply.message}
 </details>
     `;
 
-    expect(combineReplay(reply)).toBe(expectReply);
+    expect(generateReplay(reply)).toBe(expectReply);
   });
 
   test("combine the replay with tip and warning", () => {
@@ -46,6 +46,6 @@ ${reply.message}
 </details>
     `;
 
-    expect(combineReplay(reply)).toBe(expectReply);
+    expect(generateReplay(reply)).toBe(expectReply);
   });
 });

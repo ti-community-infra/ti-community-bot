@@ -101,8 +101,7 @@ export class SigService implements ISigService {
   }
 
   /**
-   * Update sig info when PR merged.
-   * It will delete all members and add members from the sig info file.
+   * Update SIG info when PR merged.
    * @param pullFormatQuery
    */
   public async updateSigInfo(
@@ -163,7 +162,7 @@ export class SigService implements ISigService {
     return {
       data: null,
       status: Status.Success,
-      message: SigMessage.UpdateSuccess,
+      message: SigMessage.SigMembershipUpdateSuccess,
     };
   }
 
@@ -184,7 +183,7 @@ export class SigService implements ISigService {
       return {
         data: null,
         status: StatusCodes.NOT_FOUND,
-        message: SigMessage.NotFound,
+        message: SigMessage.SigNotFound,
       };
     }
 

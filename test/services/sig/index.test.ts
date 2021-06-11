@@ -421,7 +421,7 @@ describe("Sig Service", () => {
     const sigRes = await sigService.getSig(sigName);
 
     expect(sigRes.status).toBe(StatusCodes.NOT_FOUND);
-    expect(sigRes.message).toBe(SigMessage.NotFound);
+    expect(sigRes.message).toBe(SigMessage.SigNotFound);
   });
 
   test("list all sigs without paginate query", async () => {

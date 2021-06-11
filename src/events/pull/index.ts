@@ -12,7 +12,7 @@ import { Endpoints } from "@octokit/types";
 
 import sigInfoSchema from "../../config/sig.info.schema.json";
 import { Status } from "../../services/reply";
-import { combineReplay } from "../../services/utils/ReplyUtil";
+import { generateReplay } from "../../services/utils/ReplyUtil";
 import { SigService } from "../../services/sig";
 
 type createCommitStatus =
@@ -21,6 +21,7 @@ type createCommitStatus =
 // NOTICE: compile schema.
 const ajv = Ajv();
 const validate = ajv.compile(sigInfoSchema);
+const GITHUB_STATUS_DESC_MAX_LENGTH = 140;
 
 enum PullRequestActions {
   Opened = "opened",
@@ -37,23 +38,17 @@ async function constructPullFormatQuery(
   const pullKey = context.pullRequest();
   const { data: filesData } = await context.octokit.pulls.listFiles(pullKey);
 
-  const files: PullFileQuery[] = filesData.map((f) => {
-    return {
-      ...f,
-    };
-  });
-
   // NOTICE: get config from repo.
   const config = await context.config<Config>(DEFAULT_CONFIG_FILE_PATH);
 
   return {
     sigInfoFileName: config?.sigInfoFileName || DEFAULT_SIG_INFO_FILE_NAME,
-    files,
+    files: filesData as PullFileQuery[],
   };
 }
 
 /**
- * Check pull format.
+ * Check pull request file changes format.
  * @param context Probot context.
  * @param pullService Pull request service.
  */
@@ -62,7 +57,7 @@ async function checkPullFormat(context: Context, pullService: PullService) {
 
   const pullFormatQuery = await constructPullFormatQuery(context);
 
-  const reply = await pullService.formatting(validate, pullFormatQuery);
+  const reply = await pullService.checkFormatting(validate, pullFormatQuery);
 
   // There are no membership changes to the file.
   if (reply === null) {
@@ -75,8 +70,11 @@ async function checkPullFormat(context: Context, pullService: PullService) {
     sha: head.sha,
     state: reply.status === Status.Success ? "success" : "failure",
     target_url: "https://github.com/ti-community-infra/ti-community-bot",
-    description: reply.message,
-    context: "Sig Info File Format",
+    description:
+      reply.message.length > GITHUB_STATUS_DESC_MAX_LENGTH
+        ? reply.message.substr(0, GITHUB_STATUS_DESC_MAX_LENGTH - 10) + "..."
+        : reply.message,
+    context: "SIG Membership File Format Check",
   };
 
   switch (reply.status) {
@@ -107,7 +105,7 @@ async function checkPullFormat(context: Context, pullService: PullService) {
       await createOrUpdateComment(
         context,
         process.env.BOT_NAME!,
-        combineReplay(reply)
+        generateReplay(reply)
       );
       await context.octokit.repos.createCommitStatus(status);
       break;
@@ -176,13 +174,13 @@ async function updateSigInfo(context: Context, sigService: SigService) {
     case Status.Problematic: {
       context.log.warn("Update sig info has some problems.", files);
       await context.octokit.issues.createComment(
-        context.issue({ body: combineReplay(reply) })
+        context.issue({ body: generateReplay(reply) })
       );
     }
   }
 }
 
-export async function handlePullRequestEvents(
+export async function handlePullEvents(
   context: Context,
   pullRequestFormatService: PullService,
   sigService: SigService
@@ -194,12 +192,6 @@ export async function handlePullRequestEvents(
       if (mergedAt) {
         await updateSigInfo(context, sigService);
       }
-      break;
-    }
-    case PullRequestActions.Labeled: {
-      break;
-    }
-    case PullRequestActions.Unlabeled: {
       break;
     }
     default: {
