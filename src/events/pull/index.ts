@@ -12,7 +12,6 @@ import { Endpoints } from "@octokit/types";
 
 import sigInfoSchema from "../../config/sig.info.schema.json";
 import { Status } from "../../services/reply";
-import { generateReplay } from "../../services/utils/ReplyUtil";
 import { SigService } from "../../services/sig";
 
 type createCommitStatus =
@@ -99,17 +98,6 @@ async function checkPullFormat(context: Context, pullService: PullService) {
       await context.octokit.repos.createCommitStatus(status);
       break;
     }
-    case Status.Problematic: {
-      context.log.warn(pullFormatQuery.files, "Format has some problems.");
-      // Create or update bot comment.
-      await createOrUpdateComment(
-        context,
-        process.env.BOT_NAME!,
-        generateReplay(reply)
-      );
-      await context.octokit.repos.createCommitStatus(status);
-      break;
-    }
   }
 }
 
@@ -170,12 +158,6 @@ async function updateSigInfo(context: Context, sigService: SigService) {
         context.issue({ body: reply.message })
       );
       break;
-    }
-    case Status.Problematic: {
-      context.log.warn(files, "Update sig info has some problems.");
-      await context.octokit.issues.createComment(
-        context.issue({ body: generateReplay(reply) })
-      );
     }
   }
 }

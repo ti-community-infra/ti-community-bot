@@ -16,6 +16,7 @@ import {
 } from "../../config/Config";
 import { ContributorSchema, SigInfoSchema } from "../../config/SigInfoSchema";
 import { getSigInfo } from "../utils/SigInfoUtils";
+import {generateReplyMsg} from "../utils/ReplyUtil";
 
 /**
  * Github change file status.
@@ -59,7 +60,7 @@ export default class PullService {
   }
 
   /**
-   * Check format of the sig membership file.
+   * Check format of the SIG membership file.
    * @param validate
    * @param pullRequestFormatQuery
    */
@@ -98,9 +99,8 @@ export default class PullService {
     if (illegalFilesExt.length > 0) {
       return {
         data: null,
-        status: Status.Problematic,
-        message: mustBeJSONFileMessage(pullRequestFormatQuery.sigInfoFileName),
-        tip: migrateToJSONTip(),
+        status: Status.Failed,
+        message: generateReplyMsg(mustBeJSONFileMessage(pullRequestFormatQuery.sigInfoFileName),migrateToJSONTip()),
       };
     }
 
@@ -109,21 +109,24 @@ export default class PullService {
 
     const sigInfo = await getSigInfo(sigInfoFile.raw_url);
     if (!validate(sigInfo)) {
+      let details = `
+      ${migrateToJSONTip()}
+
+      Current errors:
+      ${JSON.stringify(validate.errors)}
+      `
       return {
         data: null,
-        status: Status.Problematic,
-        message: mustMatchSchemaMessage(pullRequestFormatQuery.sigInfoFileName),
-        tip: migrateToJSONTip(),
-        warning: JSON.stringify(validate.errors),
+        status: Status.Failed,
+        message: generateReplyMsg(mustMatchSchemaMessage(pullRequestFormatQuery.sigInfoFileName),details),
       };
     }
     const githubName = PullService.checkContributorHasOnlyOneRole(sigInfo);
     if (githubName !== null) {
       return {
         data: null,
-        status: Status.Problematic,
-        message: PullMessage.ContributorCanOnlyHaveOneRole,
-        warning: contributorHasMultipleRoleWarning(githubName),
+        status: Status.Failed,
+        message: generateReplyMsg(PullMessage.ContributorCanOnlyHaveOneRole,contributorHasMultipleRoleWarning(githubName)),
       };
     }
 

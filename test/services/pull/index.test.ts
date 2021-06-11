@@ -2,7 +2,7 @@ import Ajv from "ajv";
 
 import PullService from "../../../src/services/pull";
 import {
-  migrateToJSONTip,
+  mustBeJSONFileMessage,
   mustMatchSchemaMessage,
   PullMessage,
 } from "../../../src/services/messages/PullMessage";
@@ -11,6 +11,7 @@ import { SigInfoSchema } from "../../../src/config/SigInfoSchema";
 import sigInfoSchema from "../../../src/config/sig.info.schema.json";
 import { PullFormatQuery } from "../../../src/queries/PullFormatQuery";
 import { Status } from "../../../src/services/reply";
+import {migrateToJSONTip} from "../../../lib/services/messages/PullMessage";
 
 const ajv = Ajv();
 const validate = ajv.compile(sigInfoSchema);
@@ -55,8 +56,9 @@ describe("Pull Service", () => {
     const reply = await pullService.checkFormatting(validate, pullFormatQuery);
 
     expect(reply).not.toBe(null);
-    expect(reply!.status).toBe(Status.Problematic);
-    expect(reply!.tip).toStrictEqual(migrateToJSONTip());
+    expect(reply!.status).toBe(Status.Failed);
+    expect(reply!.message).toContain(mustBeJSONFileMessage(pullFormatQuery.sigInfoFileName));
+    expect(reply!.message).toContain(migrateToJSONTip());
   });
 
   test("checking the PR format when changing SIG membership file", async () => {
@@ -137,8 +139,8 @@ describe("Pull Service", () => {
     const reply = await pullService.checkFormatting(validate, pullFormatQuery);
 
     expect(reply).not.toBe(null);
-    expect(reply!.status).toBe(Status.Problematic);
-    expect(reply!.message).toBe(PullMessage.ContributorCanOnlyHaveOneRole);
+    expect(reply!.status).toBe(Status.Failed);
+    expect(reply!.message).toContain(PullMessage.ContributorCanOnlyHaveOneRole);
   });
 
   test("checking the PR format when changing SIG membership file to illegal schema", async () => {
@@ -173,8 +175,8 @@ describe("Pull Service", () => {
     const reply = await pullService.checkFormatting(validate, pullFormatQuery);
 
     expect(reply).not.toBe(null);
-    expect(reply!.status).toBe(Status.Problematic);
-    expect(reply!.message).toBe(
+    expect(reply!.status).toBe(Status.Failed);
+    expect(reply!.message).toContain(
       mustMatchSchemaMessage(pullFormatQuery.sigInfoFileName)
     );
   });
