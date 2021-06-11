@@ -78,7 +78,7 @@ async function checkPullFormat(context: Context, pullService: PullService) {
 
   switch (reply.status) {
     case Status.Failed: {
-      context.log.error(pullFormatQuery.files, "Format failed.");
+      context.log.error(pullFormatQuery.files, "The format check for these files failed.");
       // Create or update bot comment.
       await createOrUpdateComment(
         context,
@@ -146,14 +146,14 @@ async function updateSigInfo(context: Context, sigService: SigService) {
 
   switch (reply.status) {
     case Status.Failed: {
-      context.log.error(files, "Update sig info.");
+      context.log.error(files, "Failed to update SIG membership information.");
       await context.octokit.issues.createComment(
         context.issue({ body: reply.message })
       );
       break;
     }
     case Status.Success: {
-      context.log.info(files, "Update sig info.");
+      context.log.info(files, "Successfully updated SIG membership information.");
       await context.octokit.issues.createComment(
         context.issue({ body: reply.message })
       );
