@@ -72,7 +72,7 @@ async function checkPullFormat(context: Context, pullService: PullService) {
     target_url: "https://github.com/ti-community-infra/ti-community-bot",
     description:
       reply.message.length > GITHUB_STATUS_DESC_MAX_LENGTH
-        ? reply.message.substr(0, 130) + "..."
+        ? reply.message.substr(0, GITHUB_STATUS_DESC_MAX_LENGTH - 10) + "..."
         : reply.message,
     context: "SIG Membership File Format Check",
   };
