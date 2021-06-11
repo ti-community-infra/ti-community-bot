@@ -5,9 +5,9 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 RUN apk --no-cache --virtual build-dependencies add \
-    python \
-    make \
-    g++
+  python \
+  make \
+  g++
 
 RUN npm install
 
