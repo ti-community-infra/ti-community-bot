@@ -1,3 +1,5 @@
+import Ajv from "ajv";
+
 import PullService from "../../../src/services/pull";
 import {
   migrateToJSONTip,
@@ -6,10 +8,12 @@ import {
 } from "../../../src/services/messages/PullMessage";
 import * as sigInfoUtil from "../../../src/services/utils/SigInfoUtils";
 import { SigInfoSchema } from "../../../src/config/SigInfoSchema";
-import Ajv from "ajv";
 import sigInfoSchema from "../../../src/config/sig.info.schema.json";
 import { PullFormatQuery } from "../../../src/queries/PullFormatQuery";
 import { Status } from "../../../src/services/reply";
+
+const ajv = Ajv();
+const validate = ajv.compile(sigInfoSchema);
 
 describe("Pull Service", () => {
   let pullService: PullService;
@@ -18,9 +22,7 @@ describe("Pull Service", () => {
     pullService = new PullService();
   });
 
-  test("formatting PR when not change sig info file", async () => {
-    const ajv = Ajv();
-    const validate = ajv.compile(sigInfoSchema);
+  test("checking the PR format without changing the SIG membership file", async () => {
     const pullFormatQuery: PullFormatQuery = {
       sigInfoFileName: "member-list",
       files: [
@@ -37,9 +39,7 @@ describe("Pull Service", () => {
     expect(reply).toBe(null);
   });
 
-  test("formatting PR when first change sig info file", async () => {
-    const ajv = Ajv();
-    const validate = ajv.compile(sigInfoSchema);
+  test("checking the PR format when SIG membership file extension is wrong", async () => {
     const pullFormatQuery: PullFormatQuery = {
       sigInfoFileName: "member-list",
       files: [
@@ -59,9 +59,7 @@ describe("Pull Service", () => {
     expect(reply!.tip).toStrictEqual(migrateToJSONTip());
   });
 
-  test("formatting PR when change sig info file", async () => {
-    const ajv = Ajv();
-    const validate = ajv.compile(sigInfoSchema);
+  test("checking the PR format when changing SIG membership file", async () => {
     const pullFormatQuery: PullFormatQuery = {
       sigInfoFileName: "member-list",
       files: [
@@ -101,9 +99,7 @@ describe("Pull Service", () => {
     expect(reply!.status).toBe(Status.Success);
   });
 
-  test("formatting PR when change sig info file to add multiple roles", async () => {
-    const ajv = Ajv();
-    const validate = ajv.compile(sigInfoSchema);
+  test("checking the PR format when changing SIG membership file to add multiple roles", async () => {
     const pullFormatQuery: PullFormatQuery = {
       sigInfoFileName: "member-list",
       files: [
@@ -145,9 +141,7 @@ describe("Pull Service", () => {
     expect(reply!.message).toBe(PullMessage.ContributorCanOnlyHaveOneRole);
   });
 
-  test("formatting PR when change sig info file to illegal", async () => {
-    const ajv = Ajv();
-    const validate = ajv.compile(sigInfoSchema);
+  test("checking the PR format when changing SIG membership file to illegal schema", async () => {
     const pullFormatQuery: PullFormatQuery = {
       sigInfoFileName: "member-list",
       files: [
@@ -185,9 +179,7 @@ describe("Pull Service", () => {
     );
   });
 
-  test("formatting PR when change multiple sig info files", async () => {
-    const ajv = Ajv();
-    const validate = ajv.compile(sigInfoSchema);
+  test("checking the PR format when changing multiple SIG membership files", async () => {
     const pullFormatQuery: PullFormatQuery = {
       sigInfoFileName: "member-list",
       files: [
