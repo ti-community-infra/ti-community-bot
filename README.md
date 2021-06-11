@@ -28,7 +28,7 @@ docker-compose -f dev.docker-compose.yml up -d --build
 
 ### Changing code
 
-The directory is mounted directly into the bot Docker container, which means that the nodemon live-reload server will still just work.
+The directory is mounted directly into the ti-community-bot Docker container, which means that the nodemon live-reload server will still just work.
 
 If you change some configuration files or environment variables, we need to restart the service to take effect.
 
