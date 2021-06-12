@@ -3,8 +3,9 @@ export function generateReplyMsg(basicMsg: string, details: string) {
 ${basicMsg}
 
 <details>
-<summary>Details</summary>
+
 ${details}
+
 </details>
     `;
 }

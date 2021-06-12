@@ -92,7 +92,7 @@ export = (app: Probot, { getRouter }: ApplicationFunctionOptions) => {
       );
     })
     .catch((err) => {
-      app.log.fatal(err, "Connect to db failed");
+      app.log.fatal(err, "Database connection failed.");
       return;
     });
 };

@@ -9,8 +9,9 @@ describe("Reply Util", () => {
 some messages
 
 <details>
-<summary>Details</summary>
+
 some details
+
 </details>
     `;
 

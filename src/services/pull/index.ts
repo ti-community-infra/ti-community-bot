@@ -110,10 +110,12 @@ export default class PullService {
     const sigInfo = await getSigInfo(sigInfoFile.raw_url);
     if (!validate(sigInfo)) {
       let details = `
-      ${migrateToJSONTip()}
+${migrateToJSONTip()}
 
-      Current errors:
-      ${JSON.stringify(validate.errors)}
+Current errors:
+\`\`\`json
+${JSON.stringify(validate.errors)}
+\`\`\`
       `
       return {
         data: null,
