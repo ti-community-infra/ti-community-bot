@@ -12,7 +12,6 @@ import { Endpoints } from "@octokit/types";
 
 import sigInfoSchema from "../../config/sig.info.schema.json";
 import { Status } from "../../services/reply";
-import { generateReplay } from "../../services/utils/ReplyUtil";
 import { SigService } from "../../services/sig";
 
 type createCommitStatus =
@@ -79,7 +78,7 @@ async function checkPullFormat(context: Context, pullService: PullService) {
 
   switch (reply.status) {
     case Status.Failed: {
-      context.log.error(pullFormatQuery.files, "Format failed.");
+      context.log.error(pullFormatQuery.files, "The format check for these files failed.");
       // Create or update bot comment.
       await createOrUpdateComment(
         context,
@@ -95,17 +94,6 @@ async function checkPullFormat(context: Context, pullService: PullService) {
         context,
         process.env.BOT_NAME!,
         reply.message
-      );
-      await context.octokit.repos.createCommitStatus(status);
-      break;
-    }
-    case Status.Problematic: {
-      context.log.warn(pullFormatQuery.files, "Format has some problems.");
-      // Create or update bot comment.
-      await createOrUpdateComment(
-        context,
-        process.env.BOT_NAME!,
-        generateReplay(reply)
       );
       await context.octokit.repos.createCommitStatus(status);
       break;
@@ -158,24 +146,18 @@ async function updateSigInfo(context: Context, sigService: SigService) {
 
   switch (reply.status) {
     case Status.Failed: {
-      context.log.error(files, "Update sig info.");
+      context.log.error(files, "Failed to update SIG membership information.");
       await context.octokit.issues.createComment(
         context.issue({ body: reply.message })
       );
       break;
     }
     case Status.Success: {
-      context.log.info(files, "Update sig info.");
+      context.log.info(files, "Successfully updated SIG membership information.");
       await context.octokit.issues.createComment(
         context.issue({ body: reply.message })
       );
       break;
-    }
-    case Status.Problematic: {
-      context.log.warn(files, "Update sig info has some problems.");
-      await context.octokit.issues.createComment(
-        context.issue({ body: generateReplay(reply) })
-      );
     }
   }
 }

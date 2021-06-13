@@ -1,15 +1,11 @@
-import { Reply } from "../reply";
-
-export function generateReplay(reply: Reply<any>) {
+export function generateReplyMsg(basicMsg: string, details: string) {
   return `
-${reply.message}
+${basicMsg}
 
 <details>
-<summary>Details</summary>
 
-**Tip**    : ${reply.tip ? reply.tip : "None"}
+${details}
 
-**Warning**: ${reply.warning ? reply.warning : "None"}
 </details>
     `;
 }
