@@ -2,6 +2,7 @@ import Ajv from "ajv";
 
 import PullService from "../../../src/services/pull";
 import {
+  migrateToJSONTip,
   mustBeJSONFileMessage,
   mustMatchSchemaMessage,
   PullMessage,
@@ -11,7 +12,6 @@ import { SigInfoSchema } from "../../../src/config/SigInfoSchema";
 import sigInfoSchema from "../../../src/config/sig.info.schema.json";
 import { PullFormatQuery } from "../../../src/queries/PullFormatQuery";
 import { Status } from "../../../src/services/reply";
-import {migrateToJSONTip} from "../../../src/services/messages/PullMessage";
 
 const ajv = Ajv();
 const validate = ajv.compile(sigInfoSchema);
