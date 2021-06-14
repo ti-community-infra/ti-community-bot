@@ -59,7 +59,6 @@ describe("Members API", () => {
       },
     };
 
-    // Get a sig.
     await listMembers(mockRequest, mockResponse, mockMemberService);
 
     // Assert response.

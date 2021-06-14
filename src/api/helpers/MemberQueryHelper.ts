@@ -14,7 +14,7 @@ export function validateMemberLevel(value?: string) {
 
     if (validLevel === undefined) {
       throw new Error(
-        `Illegal member level, only ${levels.join("|")} are supported.`
+        `Illegal SIG member level, only ${levels.join("|")} are supported.`
       );
     }
   }
@@ -23,14 +23,14 @@ export function validateMemberLevel(value?: string) {
 }
 
 /**
- * Validate sig id.
+ * Validate SIG id.
  * @param value
  */
 export function validateSigId(value?: string) {
   if (value !== undefined) {
     const sigId = Number(value);
     if (!Number.isInteger(sigId) || sigId <= 0) {
-      throw new Error("Illegal sig id.");
+      throw new Error("Illegal SIG id.");
     }
   }
 

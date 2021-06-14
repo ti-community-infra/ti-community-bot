@@ -28,7 +28,7 @@ describe("Sig Service", () => {
     );
   });
 
-  test("update sig info when not change sig info", async () => {
+  test("attempt to update SIG info when not changing SIG info", async () => {
     const pullFormatQuery: PullFormatQuery = {
       sigInfoFileName: "member-list",
       files: [
@@ -46,7 +46,7 @@ describe("Sig Service", () => {
     expect(reply).toBe(null);
   });
 
-  test("update sig info when change a sig info file", async () => {
+  test("update SIG info when changing a SIG info file", async () => {
     const pullFormatQuery: PullFormatQuery = {
       sigInfoFileName: "member-list",
       files: [
@@ -149,7 +149,7 @@ describe("Sig Service", () => {
     expect(reply!.status).toBe(Status.Success);
   });
 
-  test("update sig info when add a sig info file", async () => {
+  test("update SIG info when add a SIG info file", async () => {
     const pullFormatQuery: PullFormatQuery = {
       sigInfoFileName: "member-list",
       files: [
@@ -255,7 +255,7 @@ describe("Sig Service", () => {
     expect(reply!.status).toBe(Status.Success);
   });
 
-  test("update sig info when add a sig member", async () => {
+  test("update SIG info when add a SIG member", async () => {
     const pullFormatQuery: PullFormatQuery = {
       sigInfoFileName: "member-list",
       files: [
@@ -363,7 +363,7 @@ describe("Sig Service", () => {
     expect(reply!.status).toBe(Status.Success);
   });
 
-  test("get a sig", async () => {
+  test("get a SIG", async () => {
     const sigMembersWithLevel: Member[] = [
       {
         githubName: "Rustin-Liu1",
@@ -411,7 +411,7 @@ describe("Sig Service", () => {
     expect(sigRes.data!.membership.techLeaders[0]).toBe(sigMembersWithLevel[0]);
   });
 
-  test("get a sig when sig not found", async () => {
+  test("get a SIG when SIG not found", async () => {
     const sigName = "test";
 
     // Mock find sig and return sig
@@ -424,7 +424,7 @@ describe("Sig Service", () => {
     expect(sigRes.message).toBe(SigMessage.SigNotFound);
   });
 
-  test("list all sigs without paginate query", async () => {
+  test("list all SIGs without paginate query", async () => {
     // Mock find and count.
     const sigs: SigBasicInfo[] = [
       {
@@ -462,7 +462,7 @@ describe("Sig Service", () => {
     expect(res.message).toBe(SigMessage.ListSigsSuccess);
   });
 
-  test("list all sigs with query", async () => {
+  test("list all SIGs with query", async () => {
     // Mock find and count.
     const sigs: SigBasicInfo[] = [
       {

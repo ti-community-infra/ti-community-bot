@@ -21,7 +21,7 @@ export async function getSig(
 }
 
 /**
- * List all sigs.
+ * List all SIGs.
  * @param req
  * @param res
  * @param sigService

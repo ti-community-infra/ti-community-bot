@@ -52,7 +52,6 @@ describe("Contributors API", () => {
       },
     };
 
-    // Get a sig.
     await listContributors(mockRequest, mockResponse, mockContributorService);
 
     // Assert response.

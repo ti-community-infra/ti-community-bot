@@ -167,7 +167,7 @@ export class SigService implements ISigService {
   }
 
   /**
-   * Get sig by sig name.
+   * Get SIG by SIG's name.
    * @param sigName
    */
   public async getSig(
@@ -210,12 +210,13 @@ export class SigService implements ISigService {
   }
 
   /**
-   * List all public sigs.
+   * List all public SIGs.
    * @param paginateQuery
    */
   public async listSigs(
     paginateQuery?: PaginateQuery
   ): Promise<Response<SigsDTO>> {
+    // If there is no paging query parameter then all sigs are listed.
     if (paginateQuery === undefined) {
       const [sigs, count] = await this.sigRepository.listSigsAndCount();
 
