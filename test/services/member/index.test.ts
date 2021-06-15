@@ -106,7 +106,7 @@ describe("Member Service", () => {
     expect(res.data.members.length).toStrictEqual(2);
   });
 
-  test("list members with member query", async () => {
+  test("list members with member level query", async () => {
     // sigId query.
     let res = await memberService.listMembers({
       sigId: 1,
@@ -124,7 +124,7 @@ describe("Member Service", () => {
     expect(res.data.members.length).toStrictEqual(2);
   });
 
-  test("list members with member and paginate queries", async () => {
+  test("list members with member level and paginate queries", async () => {
     const paginateQuery = { current: 1, pageSize: 1 };
 
     // sigId query.

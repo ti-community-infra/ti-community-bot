@@ -11,13 +11,13 @@ import { getSig, listSigs } from "../../../src/api/sig";
 import { PaginateQuery } from "../../../src/queries/PaginateQuery";
 import { SigsDTO } from "../../../src/services/dtos/SigsDTO";
 
-describe("Sig API", () => {
+describe("SIGs API", () => {
   beforeEach(() => {
     // Mock the db connection.
     typeorm.createConnection = jest.fn().mockResolvedValue(null);
   });
 
-  test("Get a sig", async () => {
+  test("Get a SIG", async () => {
     // Mock the request.
     const sigName = "test";
     const mockRequest = {
@@ -68,7 +68,7 @@ describe("Sig API", () => {
       },
     };
 
-    // Get a sig.
+    // Get a SIG.
     await getSig(mockRequest, mockResponse, mockPullService);
 
     // Assert response.
@@ -79,7 +79,7 @@ describe("Sig API", () => {
     expect(status.mock.calls[0][0]).toBe(StatusCodes.OK);
   });
 
-  test("List all sigs", async () => {
+  test("List all SIGs", async () => {
     // Mock the request.
     const mockRequest = {
       query: {},
