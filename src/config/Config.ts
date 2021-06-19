@@ -1,7 +1,6 @@
 export interface Config {
   sigInfoFileName?: string;
   maintainerTeamSlug: string;
-  afterComment?: string;
 }
 
 export const DEFAULT_SIG_INFO_FILE_NAME = "member-list";
