@@ -157,12 +157,6 @@ async function updateSigInfo(context: Context, sigService: SigService) {
       await context.octokit.issues.createComment(
         context.issue({ body: reply.message })
       );
-      const config = await context.config<Config>(DEFAULT_CONFIG_FILE_PATH);
-      if (config?.afterComment){
-        await context.octokit.issues.createComment(
-          context.issue({ body: config?.afterComment })
-        );
-      }
       break;
     }
   }
