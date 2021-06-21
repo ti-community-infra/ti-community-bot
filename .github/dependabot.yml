@@ -5,21 +5,3 @@ updates:
   schedule:
     interval: daily
   open-pull-requests-limit: 10
-  assignees:
-  - hi-rustin
-  ignore:
-  - dependency-name: ajv
-    versions:
-    - ">= 7.a, < 8"
-  - dependency-name: ajv
-    versions:
-    - ">= 8.a, < 9"
-  - dependency-name: probot
-    versions:
-    - 11.0.6
-    - 11.1.0
-    - 11.1.1
-    - 11.2.1
-  - dependency-name: typescript
-    versions:
-    - 4.1.4
