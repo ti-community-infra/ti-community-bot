@@ -47,7 +47,7 @@
     "@semantic-release/release-notes-generator": "^9.0.3",
     "@types/jest": "^26.0.24",
     "@types/js-yaml": "^4.0.2",
-    "@types/lodash": "^4.14.171",
+    "@types/lodash": "^4.14.172",
     "@types/nock": "^11.1.0",
     "@types/node": "^16.7.8",
     "@typescript-eslint/parser": "^4.30.0",
