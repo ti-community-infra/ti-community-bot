@@ -3,5 +3,6 @@ updates:
 - package-ecosystem: npm
   directory: "/"
   schedule:
-    interval: daily
+    # Check for dependency updates once a month
+    interval: monthly
   open-pull-requests-limit: 10
